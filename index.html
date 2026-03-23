@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editor Vetorial — Computação Gráfica 2026</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app">
+
+    <!-- Painel Superior: propriedades (cor de preenchimento, cor de borda, etc.) -->
+    <header id="painel-propriedades">
+      <span class="propriedade-label">Preenchimento:</span>
+      <input type="color" id="cor-preenchimento" value="#4a90d9" title="Cor de preenchimento" />
+
+      <span class="propriedade-label">Borda:</span>
+      <input type="color" id="cor-borda" value="#1a1a2e" title="Cor da borda" />
+
+      <span id="ferramenta-atual-label">Ferramenta: <strong id="nome-ferramenta">Nenhuma</strong></span>
+    </header>
+
+    <div id="workspace">
+
+      <!-- Barra Lateral: botões das ferramentas de desenho -->
+      <aside id="barra-ferramentas">
+        <button class="btn-ferramenta" data-ferramenta="selecao" title="Seleção (S)">
+          &#9654;
+        </button>
+        <button class="btn-ferramenta" data-ferramenta="retangulo" title="Retângulo (R)">
+          &#9645;
+        </button>
+        <button class="btn-ferramenta" data-ferramenta="elipse" title="Elipse (E)">
+          &#9711;
+        </button>
+        <button class="btn-ferramenta" data-ferramenta="linha" title="Linha (L)">
+          &#9135;
+        </button>
+        <button class="btn-ferramenta" data-ferramenta="texto" title="Texto (T)">
+          T
+        </button>
+      </aside>
+
+      <!-- Área Central de Desenho -->
+      <main id="area-desenho">
+        <svg
+          id="canvas"
+          xmlns="http://www.w3.org/2000/svg"
+          width="100%"
+          height="100%"
+          aria-label="Área de desenho vetorial"
+        >
+          <!-- Os elementos SVG criados pelo usuário serão inseridos aqui -->
+        </svg>
+      </main>
+
+    </div><!-- /#workspace -->
+  </div><!-- /#app -->
+
+  <!-- Ponto de entrada da aplicação: ES6 Module -->
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
