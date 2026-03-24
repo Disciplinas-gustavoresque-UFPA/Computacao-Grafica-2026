@@ -1,0 +1,21 @@
+name: Mover PR para a Coluna Review
+
+# roda sempre que alguém solicitar uma revisão no PR
+on:
+  pull_request:
+    types: [review_requested]
+
+jobs:
+  mover_card:
+    if: github.event.requested_reviewer.login == 'gustavoresque'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Atualizar Status no GitHub Projects V2
+        uses: leonsteinhaeuser/project-beta-automations@v2.2.1
+        with:
+          # Usa o token VIP
+          gh_token: ${{ secrets.PROJECT_PAT }}
+          organization: "Disciplinas-gustavoresque-UFPA"
+          project_id: 1 
+          resource_node_id: ${{ github.event.pull_request.node_id }}
+          status_value: "Review"
