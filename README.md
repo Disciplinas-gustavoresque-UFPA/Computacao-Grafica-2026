@@ -169,11 +169,39 @@ npx serve .
 
 ---
 
-## 🤝 Como Contribuir
+## 📌 Fluxo de Trabalho (Issues e PRs)
 
-1. Crie uma nova ferramenta estendendo `ToolBase` em `js/tools/`.
-2. Importe e registre a ferramenta em `js/main.js`.
-3. Todas as interações, commits, comentários de código e Pull Requests devem estar em **Português do Brasil (pt-BR)**, conforme as instruções em `.github/copilot-instructions.md`.
+Para manter o repositório organizado, evitar conflitos e simular um ambiente real de desenvolvimento, temos duas formas de contribuir. Você é livre para propor melhorias em qualquer parte do código (interface, motor gráfico, estado, etc.), mas o fluxo abaixo deve ser sempre respeitado:
+
+### Fluxo 1: Resolvendo uma Tarefa do Professor
+1. **Escolha uma Issue e assuma a tarefa:** Vá na aba *Issues* do repositório, escolha uma tarefa e **deixe um comentário com o seu usuário (ex: "Vou desenvolver esta funcionalidade - @seu-nick")** para sinalizar que você é o responsável oficial por ela.
+2. **Crie a Branch:** Crie uma branch associada a essa Issue (ex: `feature/tool-retangulo` ou `fix/bug-selecao`).
+3. **Faça Commits Atômicos:** Recomendamos fortemente a prática de commits atômicos. Cada commit deve resolver um único problema ou adicionar uma única funcionalidade, sempre com uma mensagem clara e descritiva explicando a alteração.
+4. **Abra um Draft PR:** Assim que fizer o seu primeiro commit, abra um Pull Request em modo **Draft** (Rascunho). Isso avisa à turma que você já está trabalhando ativamente nessa frente.
+5. **Desenvolva:** Continue desenvolvendo a lógica e registrando seus avanços em novos commits atômicos.
+6. **Revisão e Merge:** Quando finalizar, tire o PR do modo Draft e solicite a revisão (Review) do professor (`@gustavoresque`).
+
+### Fluxo 2: Propondo Melhorias, UI/UX ou Correções
+1. **Crie uma Issue:** Quer melhorar o CSS, otimizar o `StateManager.js` ou encontrou um bug de renderização no SVG? Abra uma nova Issue com a sua proposta e **insira o seu usuário (`@seu-nick`) na descrição.**
+2. **Chame o Professor:** Mencione o professor (`@gustavoresque`) na Issue para avaliação.
+3. **Aprovação:** O professor vai avaliar a viabilidade técnica e aprovar a Issue.
+4. **Mão na Massa:** Com a ideia aprovada, siga os mesmos passos do Fluxo 1 (branch, commits atômicos, Draft PR, código e revisão).
+
+---
+
+## 🛠️ Como Criar uma Nova Ferramenta
+
+Embora você possa contribuir alterando a arquitetura global do projeto, a contribuição mais comum será a adição de novas ferramentas vetoriais de desenho (linhas, polígonos, elipses, etc.).
+
+Para garantir que a sua nova ferramenta se integre perfeitamente à arquitetura do software, siga este padrão:
+
+1. **Crie o Módulo da Ferramenta:** Na pasta `js/tools/`, crie um arquivo com o nome da sua funcionalidade (ex: `RetanguloTool.js`).
+2. **Estenda a Classe Base:** O seu módulo deve importar e estender a classe abstrata `ToolBase`.
+3. **Sobrescreva os Eventos de Mouse:** Implemente a sua lógica matemática e as chamadas de renderização SVG (usando o `svgHelpers.js`) sobrescrevendo os métodos principais de ciclo de vida:
+   - `onMouseDown(evento, coordenadas)`: Disparado no clique inicial.
+   - `onMouseMove(evento, coordenadas)`: Disparado ao arrastar o mouse.
+   - `onMouseUp(evento, coordenadas)`: Disparado ao soltar o clique final.
+4. **Registre a Ferramenta:** Vá no arquivo principal `js/main.js`, importe a classe que você acabou de criar e adicione-a ao seletor de ferramentas do sistema. Assim, ela passará a ouvir os eventos globais do `<svg>` quando for selecionada na interface.
 
 ---
 
