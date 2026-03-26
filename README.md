@@ -189,6 +189,29 @@ Para manter o repositório organizado, evitar conflitos e simular um ambiente re
 
 ---
 
+## ⚖️ Políticas de Colaboração e Fluxo Ágil
+
+Para garantir uma melhor organização no desenvolvimento, este repositório adota regras de colaboração baseadas em metodologias ágeis e práticas reais de projetos Open Source.
+
+### 1. Ideação Livre (Criação de Issues)
+O repositório é aberto para ideias. Qualquer aluno pode (e deve! Pois faz parte da avaliação também) abrir Issues sugerindo novos filtros, ferramentas, correções de bugs ou melhorias de interface a qualquer momento. No entanto, **abrir uma Issue não significa que você tem autorização imediata para codificá-la.**
+
+### 2. O "Sinal Verde" (Lock e Autorização)
+Você só pode criar uma branch e começar a escrever código para uma Issue após o professor aprovar e "travar" a tarefa para você.
+* **Como solicitar:** Deixe um comentário na Issue dizendo *"Quero assumir esta tarefa - @seu-nick"* ou algo assim.
+* **Aprovação:** O professor avaliará a solicitação e adicionará uma label (ex: `Aprovada`), atribuindo você oficialmente como o responsável (Assignee).
+
+### 3. Propriedade e Trabalho em Equipe (Ownership)
+O aluno que recebeu a autorização (Assignee) torna-se o **"Tech Lead"** daquela tarefa. 
+* Outros colegas podem ajudar discutindo soluções na Issue ou até mesmo enviando commits secundários para a sua branch, mas o Assignee é o responsável final por organizar o código, fechar o escopo e solicitar a revisão do professor.
+
+### 4. Limite Anti-Monopólio (WIP Limit = 1)
+Para evitar o bloquei de threads (que um aluno pegue simultaneamente multiplas issues), adotamos um limite de Trabalho em Progresso (*Work In Progress*).
+* **Regra de Ouro:** Cada aluno só pode ter **1 (uma)** branch ativa por vez.
+* Você só poderá reivindicar uma nova tarefa após ter aberto o Pull Request da sua tarefa atual e solicitado a revisão (Review) do professor. Enquanto o seu código estiver em desenvolvimento, seu foco deve ser exclusivo nessa branch.
+
+---
+
 ## 🛠️ Como Criar uma Nova Ferramenta
 
 Embora você possa contribuir alterando a arquitetura global do projeto, a contribuição mais comum será a adição de novas ferramentas vetoriais de desenho (linhas, polígonos, elipses, etc.).
