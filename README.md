@@ -13,9 +13,11 @@ Para tornar o nosso desenvolvimento mais dinâmico e simular um ambiente de enge
 As suas contribuições e Pull Requests (PRs) não valem apenas nota, mas também **Badges (Medalhas)** de prestígio.
 
 **Como funciona?**
-1. Você abre um Pull Request com o seu plugin ou melhoria.
-2. O professor faz o *Code Review*. Se o seu trabalho se destacar de alguma forma, o professor concederá uma badge diretamente nos comentários da sua PR.
-3. Todo domingo à noite, nosso robô invisível (GitHub Actions) varre o repositório, contabiliza as badges e atualiza o **Hall da Fama** abaixo.
+1. Você realiza uma contribuição. Por exemplo, abre um Pull Request com o seu plugin, resolve um bug ou faz uma excelente revisão no código de um colega.
+2. 📢 **Solicitação de Badge:** O professor **não** distribui badges automaticamente. Para concorrer a uma badge, **você deve solicitá-la explicitamente** em um comentário no seu PR ou na Issue, justificando brevemente o porquê.
+   * *Exemplo:* "Acredito que mereço a badge 🐛 *Bug Catcher* pois identifiquei e resolvi o problema de vazamento de memória que travava a aplicação."
+3. O professor fará a revisão e avaliará o seu pedido. Se o seu trabalho realmente atingir o nível esperado, o professor responderá concedendo a badge oficialmente.
+4. Todo domingo à noite, nosso robô invisível (GitHub Actions) varre o repositório, contabiliza as badges concedidas e atualiza o **Hall da Fama** abaixo.
 
 **As Badges que você pode conquistar:**
 * 🤝 **O Salvador da Pátria:** Ajudou os colegas em discussões, revisões ou resolveu bloqueios da turma.
@@ -24,6 +26,12 @@ As suas contribuições e Pull Requests (PRs) não valem apenas nota, mas també
 * 🧠 **Lógica Brilhante:** Implementou um algoritmo complexo de forma excepcional.
 * 🎨 **UI/UX Master:** Criou uma interface ou controle absurdamente fácil e bonito de usar.
 * 💻 **Enter the Matrix:** Dominou aplicação ou manipulação de matrizes e álgebra linear.
+
+**🏆 Badges Exclusivas de Code Review (Revisão de Código):**
+* 🛡️ **Guardião do Merge:** Impediu que um código quebrado fosse para a branch principal sugerindo boas correções.
+* 🔎 **Detetive do Código:** Encontrou aquele bug minúsculo e disfarçado na matemática do plugin de um colega.
+* 🌉 **Guardião da Bifrost:** O aluno que está sempre atento e avaliando os Pull Requests da turma com agilidade.
+* 📐 **Revisor Implacável:** Não deixa passar nada: cobra variáveis bem escritas, arquitetura limpa e padrão de projeto.
 
 ---
 
@@ -91,6 +99,42 @@ As suas contribuições e Pull Requests (PRs) não valem apenas nota, mas també
 ![Neo](/.github/images/memes/image_11.png)
 
 🥇 **Ainda não há registros. Manipule a matriz!** (0 badges acumuladas)
+
+---
+
+### 🧙‍♂️ O Gandalf do Code Review
+*Quem mais ganhou a badge 🛡️ Guardião do Merge*
+
+![Gandalf](/.github/images/memes/image_12.png)
+
+🥇 **Ainda não há registros nesta semana.**
+
+---
+
+### 🕵️ O Sherlock Holmes da Turma
+*Quem mais ganhou a badge 🔎 Detetive do Código*
+
+![Sherlock](/.github/images/memes/image_13.png)
+
+🥇 **Ainda não há registros nesta semana.**
+
+---
+
+### 👁️ O Heimdall do Repositório
+*Quem mais ganhou a badge 🌉 Guardião da Bifrost*
+
+![Heimdall](/.github/images/memes/image_14.png)
+
+🥇 **Ainda não há registros nesta semana.**
+
+---
+
+### 👓 A Edna Moda do Código
+*Quem mais ganhou a badge 📐 Revisor Implacável*
+
+![Edna](/.github/images/memes/image_15.png)
+
+🥇 **Ainda não há registros nesta semana.**
 
 ---
 
