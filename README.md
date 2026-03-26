@@ -105,7 +105,7 @@ As suas contribuições e Pull Requests (PRs) não valem apenas nota, mas també
 ### 🧙‍♂️ O Gandalf do Code Review
 *Quem mais ganhou a badge 🛡️ Guardião do Merge*
 
-<img src="/.github/images/memes/image_12.png" alt="Gandalf" width="200" height="200">
+<img src="/.github/images/memes/image_12.gif" alt="Gandalf" width="200" height="200">
 
 🥇 **Ainda não há registros nesta semana.**
 
@@ -123,7 +123,7 @@ As suas contribuições e Pull Requests (PRs) não valem apenas nota, mas també
 ### 👁️ O Heimdall do Repositório
 *Quem mais ganhou a badge 🌉 Guardião da Bifrost*
 
-<img src="/.github/images/memes/image_14.png" alt="Heimdall" width="200" height="200">
+<img src="/.github/images/memes/image_14.jpg" alt="Heimdall" width="200" height="200">
 
 🥇 **Ainda não há registros nesta semana.**
 
@@ -132,7 +132,7 @@ As suas contribuições e Pull Requests (PRs) não valem apenas nota, mas també
 ### 👓 A Edna Moda do Código
 *Quem mais ganhou a badge 📐 Revisor Implacável*
 
-<img src="/.github/images/memes/image_15.png" alt="Edna Moda" width="200" height="200">
+<img src="/.github/images/memes/image_15.jpg" alt="Edna Moda" width="200" height="200">
 
 🥇 **Ainda não há registros nesta semana.**
 
