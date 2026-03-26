@@ -1,4 +1,5 @@
 import { ToolBase } from './ToolBase.js';
+import { obterCoordenadasSVG } from ''../utils/svgHelpers.js;
 
 // ferramenta responsavel por controlar zoom no canvas SVG via viewBox
 export class LupaTool extends ToolBase {
@@ -41,7 +42,22 @@ export class LupaTool extends ToolBase {
     this.viewBox.height = newHeight;
 
     this.applyViewBox();
-  }
+  } // <-- zoom 
+  
+  onMouseDown(evento) {
+    // Converte coordenadas do mouse (viewport) para o sistema (SVG)
+    const coords = obterCoordenadasSVG(evento, this.svg);
+
+    // Botão esquerdo : zoom in
+    if (evento.button === 0) {
+      this.zoom(0.9, coords.x, coords.y);
+    }
+
+    // Botão direito : zoom out
+    if (evento.button === 2) {
+      this.zoom(1.1, coords.x, coords.y);
+    }
+  } // <-- onMouseDown
 } // <-- class LupaTool
 
 
