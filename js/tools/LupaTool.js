@@ -9,9 +9,18 @@ export class LupaTool extends ToolBase {
       y: 0,
       width: svg.clientWidth,
       height: svg.clientHeight
-    };
-  }
-
-}
+    }; // <-- criar viewBox
+  } // <-- construtor
+  
+  applyViewBox() {
+    const {
+      x,
+      y,
+      width,
+      height
+    } = this.viewBox;
+    this.svg.setAttribute('viewBox','${x} ${y} ${width} ${height}');
+  } // <-- aplicar viewBox
+} // <-- classe LupaTool
 
 
