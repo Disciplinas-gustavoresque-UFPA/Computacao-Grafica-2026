@@ -42,7 +42,7 @@ As suas contribuições e Pull Requests (PRs) não valem apenas nota, mas també
 ### ⌨️ Jack Bauer do Código
 *Quem mais codificou na semana (Volume total de linhas mescladas)*
 
-![Jack Bauer](/.github/images/memes/image_5.png)
+<img src="/.github/images/memes/image_5.png" alt="Jack Bauer" width="200" height="200">
 
 🥇 **Ainda não há registros. Faça o primeiro PR!** (0 linhas mescladas)
 
@@ -51,7 +51,7 @@ As suas contribuições e Pull Requests (PRs) não valem apenas nota, mas també
 ### 🤝 John Coffey do grupo
 *Quem mais ganhou a badge 🤝 O Salvador da Pátria*
 
-![John Coffey](/.github/images/memes/image_6.png)
+<img src="/.github/images/memes/image_6.png" alt="John Coffey" width="200" height="200">
 
 🥇 **Ainda não há registros. Ajude um colega!** (0 badges acumuladas)
 
@@ -60,7 +60,7 @@ As suas contribuições e Pull Requests (PRs) não valem apenas nota, mas també
 ### 🐛 Pokemon Bug Catcher
 *Quem mais ganhou a badge 🐛 Bug Catcher*
 
-![Bug Catcher](/.github/images/memes/image_7.png)
+<img src="/.github/images/memes/image_7.png" alt="Bug Catcher" width="200" height="200">
 
 🥇 **Ainda não há registros. Encontre um erro!** (0 badges acumuladas)
 
@@ -69,7 +69,7 @@ As suas contribuições e Pull Requests (PRs) não valem apenas nota, mas també
 ### ⭐ Patrick Bateman da turma
 *Quem mais ganhou a badge ⭐ Código de Ouro*
 
-![Patrick Bateman](/.github/images/memes/image_8.png)
+<img src="/.github/images/memes/image_8.png" alt="Patrick Bateman" width="200" height="200">
 
 🥇 **Ainda não há registros. Escreva um código impecável!** (0 badges acumuladas)
 
@@ -78,7 +78,7 @@ As suas contribuições e Pull Requests (PRs) não valem apenas nota, mas també
 ### 🧠 John Nash da turma
 *Quem mais ganhou a badge 🧠 Lógica Brilhante*
 
-![John Nash](/.github/images/memes/image_9.png)
+<img src="/.github/images/memes/image_9.png" alt="John Nash" width="200" height="200">
 
 🥇 **Ainda não há registros. Mostre sua genialidade!** (0 badges acumuladas)
 
@@ -87,7 +87,7 @@ As suas contribuições e Pull Requests (PRs) não valem apenas nota, mas també
 ### 🎨 Da Vinci do Front-end
 *Quem mais ganhou a badge 🎨 UI/UX Master*
 
-![Da Vinci](/.github/images/memes/image_10.png)
+<img src="/.github/images/memes/image_10.png" alt="Da Vinci" width="200" height="200">
 
 🥇 **Ainda não há registros. Capriche na interface!** (0 badges acumuladas)
 
@@ -96,7 +96,7 @@ As suas contribuições e Pull Requests (PRs) não valem apenas nota, mas també
 ### 💻 Neo da turma
 *Quem dominou o uso de matrizes e álgebra linear (Badge 💻 Enter the Matrix)*
 
-![Neo](/.github/images/memes/image_11.png)
+<img src="/.github/images/memes/image_11.png" alt="Neo" width="200" height="200">
 
 🥇 **Ainda não há registros. Manipule a matriz!** (0 badges acumuladas)
 
@@ -105,7 +105,7 @@ As suas contribuições e Pull Requests (PRs) não valem apenas nota, mas també
 ### 🧙‍♂️ O Gandalf do Code Review
 *Quem mais ganhou a badge 🛡️ Guardião do Merge*
 
-![Gandalf](/.github/images/memes/image_12.png)
+<img src="/.github/images/memes/image_12.png" alt="Gandalf" width="200" height="200">
 
 🥇 **Ainda não há registros nesta semana.**
 
@@ -114,7 +114,7 @@ As suas contribuições e Pull Requests (PRs) não valem apenas nota, mas també
 ### 🕵️ O Sherlock Holmes da Turma
 *Quem mais ganhou a badge 🔎 Detetive do Código*
 
-![Sherlock](/.github/images/memes/image_13.png)
+<img src="/.github/images/memes/image_13.png" alt="Sherlock Holmes" width="200" height="200">
 
 🥇 **Ainda não há registros nesta semana.**
 
@@ -123,7 +123,7 @@ As suas contribuições e Pull Requests (PRs) não valem apenas nota, mas també
 ### 👁️ O Heimdall do Repositório
 *Quem mais ganhou a badge 🌉 Guardião da Bifrost*
 
-![Heimdall](/.github/images/memes/image_14.png)
+<img src="/.github/images/memes/image_14.png" alt="Heimdall" width="200" height="200">
 
 🥇 **Ainda não há registros nesta semana.**
 
@@ -132,7 +132,7 @@ As suas contribuições e Pull Requests (PRs) não valem apenas nota, mas també
 ### 👓 A Edna Moda do Código
 *Quem mais ganhou a badge 📐 Revisor Implacável*
 
-![Edna](/.github/images/memes/image_15.png)
+<img src="/.github/images/memes/image_15.png" alt="Edna Moda" width="200" height="200">
 
 🥇 **Ainda não há registros nesta semana.**
 
