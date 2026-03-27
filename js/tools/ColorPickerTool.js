@@ -1,4 +1,7 @@
-import { definirCorPreenchimento } from "../core/StateManager.js";
+import {
+  definirCorBorda,
+  definirCorPreenchimento,
+} from "../core/StateManager.js";
 import { rgbToHex } from "../utils/colorHelpers.js";
 import { obterCoordenadaSVG } from "../utils/svgHelpers.js";
 import { ToolBase } from "./ToolBase.js";
@@ -8,6 +11,29 @@ export class ColorPickerTool extends ToolBase {
   constructor(svgCanvas) {
     super();
     this.svgCanvas = svgCanvas;
+    this.shiftPressed = false;
+
+    this.onShiftDown = (/** @type {KeyboardEvent} */ event) => {
+      if (event.key === "Shift") {
+        this.shiftPressed = true;
+      }
+    };
+
+    this.onShiftUp = (/** @type {KeyboardEvent} */ event) => {
+      if (event.key === "Shift") {
+        this.shiftPressed = false;
+      }
+    };
+  }
+
+  onAtivar() {
+    window.addEventListener("keydown", this.onShiftDown);
+    window.addEventListener("keyup", this.onShiftUp);
+  }
+
+  onDesativar() {
+    window.removeEventListener("keydown", this.onShiftDown);
+    window.removeEventListener("keyup", this.onShiftUp);
   }
 
   /** @param {MouseEvent} evento*/
@@ -24,10 +50,20 @@ export class ColorPickerTool extends ToolBase {
       color = elemento.computedStyleMap().get("background-color").toString();
     }
 
-    definirCorPreenchimento(color);
-    const corInput =
-      /** @type {HTMLInputElement} */
-      (document.getElementById("cor-preenchimento"));
-    corInput.value = rgbToHex(color);
+    const hexColor = rgbToHex(color);
+
+    if (this.shiftPressed) {
+      definirCorBorda(color);
+      const bordaInput =
+        /** @type {HTMLInputElement} */
+        (document.getElementById("cor-borda"));
+      bordaInput.value = hexColor;
+    } else {
+      definirCorPreenchimento(color);
+      const preenchimentoInput =
+        /** @type {HTMLInputElement} */
+        (document.getElementById("cor-preenchimento"));
+      preenchimentoInput.value = hexColor;
+    }
   }
 }
