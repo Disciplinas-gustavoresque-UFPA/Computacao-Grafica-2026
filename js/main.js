@@ -8,9 +8,17 @@
  */
 
 import { estado, definirFerramenta, definirCorPreenchimento, definirCorBorda } from './core/StateManager.js';
+import { RetanguloTool } from './tools/RetanguloTool.js';
 
 // Referências aos elementos do DOM
 const svgCanvas = document.getElementById('canvas');
+
+// Instâncias das ferramentas disponíveis
+const instanciasFerramentas = {
+  retangulo: new RetanguloTool(svgCanvas),
+  // Futuras ferramentas (selecao, elipse, linha, texto) entrarão aqui
+};
+
 const botoesFerramenta = document.querySelectorAll('.btn-ferramenta');
 const inputCorPreenchimento = document.getElementById('cor-preenchimento');
 const inputCorBorda = document.getElementById('cor-borda');
@@ -38,9 +46,13 @@ function atualizarBotaoAtivo(nomeDaFerramenta) {
 // Seleciona a ferramenta ao clicar nos botões da barra lateral
 botoesFerramenta.forEach((btn) => {
   btn.addEventListener('click', () => {
-    const ferramenta = btn.dataset.ferramenta;
-    definirFerramenta(ferramenta);
-    atualizarBotaoAtivo(ferramenta);
+    const ferramentaId = btn.dataset.ferramenta;
+    
+    // Obtém a instância da ferramenta atual correspondente (se implementada)
+    const ferramentaInstancia = instanciasFerramentas[ferramentaId] || null;
+    
+    definirFerramenta(ferramentaInstancia);
+    atualizarBotaoAtivo(ferramentaId);
   });
 });
 
