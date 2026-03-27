@@ -219,7 +219,7 @@ Para manter o repositório organizado, evitar conflitos e simular um ambiente re
 
 ### Fluxo 1: Resolvendo uma Tarefa do Professor
 1. **Escolha uma Issue e assuma a tarefa:** Vá na aba *Issues* do repositório, escolha uma tarefa e **deixe um comentário com o seu usuário (ex: "Vou desenvolver esta funcionalidade - @seu-nick")** para sinalizar que você é o responsável oficial por ela.
-2. ** Aguarde a Avaliação do Professor:** Ao fim da discussão o professor vai aprovar sua Issue para desenvolvimento
+2. **Aguarde a Avaliação do Professor:** Ao fim da discussão o professor vai aprovar sua Issue para desenvolvimento
 3. **Crie a Branch:** Crie uma branch associada a essa Issue (ex: `feature/tool-retangulo` ou `fix/bug-selecao`).
 4. **Faça Commits Atômicos:** Recomendamos fortemente a prática de commits atômicos. Cada commit deve resolver um único problema ou adicionar uma única funcionalidade, sempre com uma mensagem clara e descritiva explicando a alteração.
 5. **Abra um Draft PR:** Assim que fizer o seu primeiro commit, abra um Pull Request em modo **Draft** (Rascunho). Isso avisa à turma que você já está trabalhando ativamente nessa frente.
