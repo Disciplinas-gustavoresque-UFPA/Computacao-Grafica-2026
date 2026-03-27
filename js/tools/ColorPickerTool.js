@@ -13,14 +13,18 @@ export class ColorPickerTool extends ToolBase {
   /** @param {MouseEvent} evento*/
   onMouseDown(evento) {
     const elemento = document.elementFromPoint(evento.x, evento.y);
-    if (!(elemento instanceof SVGGeometryElement)) return;
-    const point = obterCoordenadaSVG(evento, this.svgCanvas);
-    const isInStroke = elemento.isPointInStroke(point);
-    const style = window.getComputedStyle(elemento);
-    const color =
-      isInStroke && style.stroke !== "none" ? style.stroke : style.fill;
-    definirCorPreenchimento(color);
+    /** @type {string} */ let color;
 
+    if (elemento instanceof SVGGeometryElement) {
+      const point = obterCoordenadaSVG(evento, this.svgCanvas);
+      const isInStroke = elemento.isPointInStroke(point);
+      const style = window.getComputedStyle(elemento);
+      color = isInStroke && style.stroke !== "none" ? style.stroke : style.fill;
+    } else {
+      color = elemento.computedStyleMap().get("background-color").toString();
+    }
+
+    definirCorPreenchimento(color);
     const corInput =
       /** @type {HTMLInputElement} */
       (document.getElementById("cor-preenchimento"));
