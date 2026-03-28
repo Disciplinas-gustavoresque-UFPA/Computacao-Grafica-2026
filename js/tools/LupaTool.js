@@ -26,6 +26,21 @@ export class LupaTool extends ToolBase {
     }; // <-- initialViewBox (guardar a posição inicial)
   } // <-- constructor
   
+  // Define o modo de interação da lupa 
+  setModo(modo) {
+    this.modo = (this.modo === modo) ? 'click' : modo;
+  } // <-- setModo
+
+  // Remove elementos temporários e reseta o estado/modo da lupa 
+  cleanup() {
+    if (this.selectionRect && this.selectionRect.parentNode) {
+      this.selectionRect.parentNode.removeChild(this.selectionRect);
+    }
+
+    this.selectionRect = null;
+    this.isDragging = false;
+    this.dragButton = null;
+  } // <-- cleanup
 
   // Aplica o estado atual do viewBox no SVG : atualiza o "zoom"
   applyViewBox() {
@@ -57,16 +72,38 @@ export class LupaTool extends ToolBase {
   onMouseDown(evento) {
     // Converte coordenadas do mouse (viewport) para o sistema (SVG)
     const coords = obterCoordenadasSVG(evento, this.svg);
-
-    // Botão esquerdo : zoom in
-    if (evento.button === 0) {
-      this.zoom(0.9, coords.x, coords.y);
+    
+    if (this.isDragging) {
+      this.cleanup();
     }
+    
+    if (this.modo === 'click') {
+      // Botão esquerdo : zoom in
+      if (evento.button === 0) {
+        this.zoom(0.9, coords.x, coords.y);
+       }
 
-    // Botão direito : zoom out
-    if (evento.button === 2) {
-      this.zoom(1.1, coords.x, coords.y);
-    }
+       // Botão direito : zoom out
+       if (evento.button === 2) {
+        this.zoom(1.1, coords.x, coords.y);
+       }
+
+      return;
+    } // <-- fim do modo de zoom padrão 
+
+    if (this.modo === 'drag') {
+      this.isDragging = true;
+      this.start = coords;
+      this.dragButton = evento.button;
+
+      // Cria retangulo de seleção
+      this.selectionRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      this.selectionRect.setAttribute("fill", "rgba(0,0,255,0.2)");
+      this.selectionRect.setAttribute("stroke", "blue");
+      this.selectionRect.setAttribute("stroke-dasharray", "4");
+
+      this.svg.appendChild(this.selectionRect); 
+    } // <-- fim do modo de zoom com  seleção
   } // <-- onMouseDown
 } // <-- class LupaTool
 
