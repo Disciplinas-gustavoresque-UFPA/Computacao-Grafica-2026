@@ -11,29 +11,39 @@ export class ColorPickerTool extends ToolBase {
   constructor(svgCanvas) {
     super();
     this.svgCanvas = svgCanvas;
-    this.shiftPressed = false;
-
-    this.onShiftDown = (/** @type {KeyboardEvent} */ event) => {
-      if (event.key === "Shift") {
-        this.shiftPressed = true;
-      }
+    /** @type {Set<string>} */
+    this.pressedKeys = new Set();
+    const listenKey = (/** @type {string} */ key) => {
+      const onKeyDown = (/** @type {KeyboardEvent} */ event) => {
+        if (event.key === key) {
+          console.log(key, "down");
+          this.pressedKeys.add(key);
+        }
+      };
+      const onKeyUp = (/** @type {KeyboardEvent} */ event) => {
+        if (event.key === key) {
+          console.log(key, "up");
+          this.pressedKeys.delete(key);
+        }
+      };
+      return { onKeyDown, onKeyUp };
     };
-
-    this.onShiftUp = (/** @type {KeyboardEvent} */ event) => {
-      if (event.key === "Shift") {
-        this.shiftPressed = false;
-      }
-    };
+    this.listeners = ["Control", "Shift", "c"].flatMap(listenKey);
+    this.detectedColor = null;
   }
 
   onAtivar() {
-    window.addEventListener("keydown", this.onShiftDown);
-    window.addEventListener("keyup", this.onShiftUp);
+    this.listeners.forEach((keyListeners) => {
+      window.addEventListener("keydown", keyListeners.onKeyDown);
+      window.addEventListener("keyup", keyListeners.onKeyUp);
+    });
   }
 
   onDesativar() {
-    window.removeEventListener("keydown", this.onShiftDown);
-    window.removeEventListener("keyup", this.onShiftUp);
+    this.listeners.forEach((keyListeners) => {
+      window.removeEventListener("keydown", keyListeners.onKeyDown);
+      window.removeEventListener("keyup", keyListeners.onKeyUp);
+    });
   }
 
   /** @param {MouseEvent} evento*/
@@ -52,7 +62,7 @@ export class ColorPickerTool extends ToolBase {
 
     const hexColor = rgbToHex(color);
 
-    if (this.shiftPressed) {
+    if (this.pressedKeys.has("Shift")) {
       definirCorBorda(color);
       const bordaInput =
         /** @type {HTMLInputElement} */
