@@ -8,6 +8,7 @@
  */
 
 import { estado, definirFerramenta, definirCorPreenchimento, definirCorBorda } from './core/StateManager.js';
+import { LupaTool } from './tools/LupaTool.js';
 
 // Referências aos elementos do DOM
 const svgCanvas = document.getElementById('canvas');
@@ -15,6 +16,8 @@ const botoesFerramenta = document.querySelectorAll('.btn-ferramenta');
 const inputCorPreenchimento = document.getElementById('cor-preenchimento');
 const inputCorBorda = document.getElementById('cor-borda');
 const nomeFerramenta = document.getElementById('nome-ferramenta');
+const lupaTool = new LupaTool(svgCanvas);
+
 
 /**
  * Atualiza o estado visual dos botões da barra lateral,
@@ -39,7 +42,12 @@ function atualizarBotaoAtivo(nomeDaFerramenta) {
 botoesFerramenta.forEach((btn) => {
   btn.addEventListener('click', () => {
     const ferramenta = btn.dataset.ferramenta;
-    definirFerramenta(ferramenta);
+    // definirFerramenta(ferramenta); // <-- correto 
+    if (ferramenta === 'lupa') {
+      definirFerramenta(lupaTool);
+    } else {
+      definirFerramenta(ferramenta);
+    }
     atualizarBotaoAtivo(ferramenta);
   });
 });

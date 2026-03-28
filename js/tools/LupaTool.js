@@ -1,11 +1,17 @@
 import { ToolBase } from './ToolBase.js';
-import { obterCoordenadasSVG } from ''../utils/svgHelpers.js;
+import { obterCoordenadasSVG } from '../utils/svgHelpers.js';
 
-// ferramenta responsavel por controlar zoom no canvas SVG via viewBox
+// Ferramenta responsavel por controlar zoom no canvas SVG via viewBox
 export class LupaTool extends ToolBase {
   constructor(svg) {
     super();
     this.svg = svg;
+    this.modo = 'click'; // zoom padrão do inkscape
+
+    this.isDragging = false;
+    this.start = null;
+    this.dragButton = null;
+    this.selectionRect = null;
 
     // Estado interno do SVG : "área visivel"  
     this.viewBox = {
@@ -14,6 +20,10 @@ export class LupaTool extends ToolBase {
       width: svg.clientWidth,
       height: svg.clientHeight
     }; // <-- viewBox
+
+    this.initialViewBox = {
+      ...this.viewBox
+    }; // <-- initialViewBox (guardar a posição inicial)
   } // <-- constructor
   
 
