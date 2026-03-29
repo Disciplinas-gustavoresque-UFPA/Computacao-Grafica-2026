@@ -1,5 +1,5 @@
 import { ToolBase } from './ToolBase.js';
-import { obterCoordenadasSVG } from '../utils/svgHelpers.js';
+import { obterCoordenadaSVG } from '../utils/svgHelpers.js';
 
 // Ferramenta responsavel por controlar zoom no canvas SVG via viewBox
 export class LupaTool extends ToolBase {
@@ -35,47 +35,6 @@ export class LupaTool extends ToolBase {
     this.applyViewBox();
   } // <-- resetView
 
-  // Define o modo de interação da lupa 
-  setModo(modo) {
-    this.modo = (this.modo === modo) ? 'click' : modo;
-    this.renderOptions();
-  } // <-- setModo
-
-  // Remove elementos temporários e reseta o estado/modo da lupa 
-  cleanup() {
-    if (this.selectionRect && this.selectionRect.parentNode) {
-      this.selectionRect.parentNode.removeChild(this.selectionRect);
-    }
-    this.selectionRect = null;
-    this.isDragging = false;
-    this.dragButton = null;
-  } // <-- cleanup
-
-  // Maskara para os valores dos botoes do mouse 
-  getButtonMask(button) {
-    switch (button) {
-      case 0: return 1; // esquerdo
-      case 1: return 4; // meio
-      case 2: return 2; // direito
-      default: return 0;
-    }
-  } // <-- getButtonMask
-
-  // Renderiza dinamicamente o painel de opcoes da lupa 
-  renderOptions() {
-    const panel = document.getElementById('tool-options');
-
-    panel.innerHTML = `
-    <button id="btn-drag" class="${this.modo === 'drag' ? 'ativo' : ''}">
-    S
-    </button>
-    `;
-
-    panel.querySelector('#btn-drag').onclick = () => {
-      this.setModo('drag');
-    };
-  }
-
   // Aplica o estado atual do viewBox no SVG : atualiza o "zoom"
   applyViewBox() {
     const {
@@ -86,6 +45,38 @@ export class LupaTool extends ToolBase {
     } = this.viewBox;
     this.svg.setAttribute('viewBox', `${x} ${y} ${width} ${height}`);
   } // <-- applyViewBox
+
+    // Define o modo de interação da lupa 
+  setModo(modo) {
+    this.modo = (this.modo === modo) ? 'click' : modo;
+    this.renderOptions();
+  } // <-- setModo
+
+
+  // Renderiza dinamicamente o painel de opcoes da lupa 
+  renderOptions() {
+    const panel = document.getElementById('tool-options');
+
+    panel.innerHTML = `
+    <button id="btn-drag" class="${this.modo === 'drag' ? 'ativo' : ''}">
+    &#11193;
+    </button>
+    `;
+
+    panel.querySelector('#btn-drag').onclick = () => {
+      this.setModo('drag');
+    };
+  }
+
+  // Maskara para os valores dos botoes do mouse 
+  getButtonMask(button) {
+    switch (button) {
+      case 0: return 1; // esquerdo
+      case 1: return 4; // meio
+      case 2: return 2; // direito
+      default: return 0;
+    }
+  } // <-- getButtonMask
 
   // Realiza zoom mantendo o ponto (cx, cy) fixo como foco
   zoom(scale, cx, cy) {
@@ -105,7 +96,7 @@ export class LupaTool extends ToolBase {
   
   onMouseDown(evento) {
     // Converte coordenadas do mouse (viewport) para o sistema (SVG)
-    const coords = obterCoordenadasSVG(evento, this.svg);
+    const coords = obterCoordenadaSVG(evento, this.svg);
     
     if (this.isDragging) {
       this.cleanup();
@@ -122,12 +113,12 @@ export class LupaTool extends ToolBase {
       // Botão esquerdo : zoom in
       if (evento.button === 0) {
         this.zoom(0.9, coords.x, coords.y);
-       }
+      }
 
        // Botão direito : zoom out
-       if (evento.button === 2) {
+      if (evento.button === 2) {
         this.zoom(1.1, coords.x, coords.y);
-       }
+      }
 
       return;
     } // <-- fim do modo de zoom padrão 
@@ -157,7 +148,7 @@ export class LupaTool extends ToolBase {
       return;
     } 
 
-    const coords = obterCoordenadasSVG(evento, this.svg);
+    const coords = obterCoordenadaSVG(evento, this.svg);
 
     const x = Math.min(this.start.x, coords.x);
     const y = Math.min(this.start.y, coords.y);
@@ -177,7 +168,7 @@ export class LupaTool extends ToolBase {
       return;
     }
 
-    const coords = obterCoordenadasSVG(evento,this.svg);
+    const coords = obterCoordenadaSVG(evento,this.svg);
 
     const x = Math.min(this.start.x, coords.x);
     const y = Math.min(this.start.y, coords.y);
@@ -218,6 +209,16 @@ export class LupaTool extends ToolBase {
     this.applyViewBox();
     this.cleanup();
   } // <-- onMouseUp
+
+  // Remove elementos temporários e reseta o estado/modo da lupa 
+  cleanup() {
+    if (this.selectionRect && this.selectionRect.parentNode) {
+      this.selectionRect.parentNode.removeChild(this.selectionRect);
+    }
+    this.selectionRect = null;
+    this.isDragging = false;
+    this.dragButton = null;
+  } // <-- cleanup
 
   onAtivar() { 
     this.svg.style.cursor = 'zoom-in';
