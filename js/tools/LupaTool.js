@@ -152,7 +152,7 @@ export class LupaTool extends ToolBase {
     
     const expected = this.getButtonMask(this.dragButton);
 
-    if ((evento.button & expected) === 0) {
+    if ((evento.buttons & expected) === 0) {
       this.cleanup();
       return;
     } 
@@ -172,7 +172,7 @@ export class LupaTool extends ToolBase {
 
   onMouseUp(evento) {
     if (!this.isDragging || this.modo !== 'drag') return;
-    if (evento.button !== ths.dragButton) {
+    if (evento.button !== this.dragButton) {
       this.cleanup();
       return;
     }
