@@ -44,11 +44,20 @@ export class LupaTool extends ToolBase {
     if (this.selectionRect && this.selectionRect.parentNode) {
       this.selectionRect.parentNode.removeChild(this.selectionRect);
     }
-
     this.selectionRect = null;
     this.isDragging = false;
     this.dragButton = null;
   } // <-- cleanup
+
+  // Maskara para os valores dos botoes do mouse 
+  getButtonMask(button) {
+    switch (button) {
+      case 0: return 1; // esquerdo
+      case 1: return 4; // meio
+      case 2: return 2; // direito
+      default: return 0;
+    }
+  } // <-- getButtonMask
 
   // Aplica o estado atual do viewBox no SVG : atualiza o "zoom"
   applyViewBox() {
@@ -123,7 +132,9 @@ export class LupaTool extends ToolBase {
   onMouseMove(evento) {
     if (!this.isDragging || this.modo !== 'drag' || !this.selectionRect) return;
     
-    if ((evento.button !== (1 << this.dragButton)) {
+    const expected = this.getButtonMask(this.dragButton);
+
+    if ((evento.button & expected) === 0) {
       this.cleanup();
       return;
     } 
