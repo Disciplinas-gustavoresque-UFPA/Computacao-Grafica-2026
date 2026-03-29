@@ -59,6 +59,21 @@ export class LupaTool extends ToolBase {
     }
   } // <-- getButtonMask
 
+  // Renderiza dinamicamente o painel de opcoes da lupa 
+  renderOptions() {
+    const panel = document.getElementById('tool-options');
+
+    panel.innerHTML = `
+    <button id="btn-drag" class="${this.modo === 'drag' ? 'ativo' : ''}">
+    S
+    </button>
+    `;
+
+    panel.querySelector('#btn-drag').onclick = () => {
+      this.setModo('drag');
+    };
+  }
+
   // Aplica o estado atual do viewBox no SVG : atualiza o "zoom"
   applyViewBox() {
     const {
@@ -152,14 +167,77 @@ export class LupaTool extends ToolBase {
     this.selectionRect.setAttribute("height", height);
   } // <-- onMouseMove
 
-  onMouseUp() {
-  }
+  onMouseUp(evento) {
+    if (!this.isDragging || this.modo !== 'drag') return;
+    if (evento.button !== ths.dragButton) {
+      this.cleanup();
+      return;
+    }
 
-  onAtivar() {
-  }
+    const coords = obterCoordenadasSVG(evento,this.svg);
+
+    const x = Math.min(this.start.x, coords.x);
+    const y = Math.min(this.start.y, coords.y);
+    const width = Math.abs(coords.x - this.start.x);
+    const height = Math.abs(coords.y - this.start.y);
+
+    if (width < 5 || height < 5) {
+      this.cleanup();
+      return;
+    }
+    
+    // BOTÃO ESQUERDO = ZOOM IN
+    if (evento.button === 0) {
+      this.viewBox = {
+        x,
+        y,
+        width,
+        height
+      };
+    }
+
+    // BOTÃO DIREITO = ZOOM OUT
+    if (evento.button === 2) { 
+      const scale = Math.max(
+        this.viewBox.width / width,
+        this.viewBox.height / height
+      );
+
+      const newWidth = this.viewBox.width * scale;
+      const newHeight = this.viewBox.height * scale;
+
+      this.viewBox.x = x - (newWidth - width) / 2;
+      this.viewBox.y = y - (newHeight - height) / 2;
+      this.viewBox.width = newWidth;
+      this.viewBox.height = newHeight;
+    }
+
+    this.applyViewBox();
+    this.cleanup();
+  } // <-- onMouseUp
+
+  onAtivar() { 
+    this.svg.style.cursor = 'zoom-in';
+
+    const panel = document.getElementById('tool-options');
+    const btnLupa = document.querySelector('[data-ferramenta="lupa"]');
+
+    const rect = btnLupa.getBoundingClientRect();
+
+    panel.style.top = `${rect.top}px`;
+    panel.style.left = `${rect.right + 8}px`;
+    panel.classList.remove('hidden');
+    this.renderOptions();
+  } // <-- onAtivar
 
   onDesativar() {
-  }
+    this.cleanup();
+    this.svg.style.cursor = 'default';
+
+    const panel = document.getElementById('tool-options');
+    panel.classList.add('hidden');
+    panel.innerHTML = '';
+  } // <-- onDesativar
 } // <-- class LupaTool
 
 
