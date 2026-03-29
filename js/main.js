@@ -12,6 +12,7 @@ import { LupaTool } from './tools/LupaTool.js';
 
 // Referências aos elementos do DOM
 const svgCanvas = document.getElementById('canvas');
+
 const botoesFerramenta = document.querySelectorAll('.btn-ferramenta');
 const inputCorPreenchimento = document.getElementById('cor-preenchimento');
 const inputCorBorda = document.getElementById('cor-borda');
@@ -81,6 +82,19 @@ svgCanvas.addEventListener('mouseup', (evento) => {
   }
 });
 
+// Listener para botôes do painel de opçẽos da ferramenta ativa
+document.querySelectorAll('#tool-options button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (estado.ferramentaAtual instanceof LupaTool) {
+      estado.ferramentaAtual.setModo(btn.dataset.modo);
+    }
+  });
+}); // SOLUÇÃO TEMPORARIA 
+
+// Previne o menu de opções do botao direito do mouse no svg
+svgCanvas.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+});
 
 // Inicializa os valores dos inputs com os valores padrão do estado
 inputCorPreenchimento.value = estado.corPreenchimento;

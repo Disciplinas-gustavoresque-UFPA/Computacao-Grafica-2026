@@ -6,6 +6,7 @@ export class LupaTool extends ToolBase {
   constructor(svg) {
     super();
     this.svg = svg;
+
     this.modo = 'click'; // zoom padrão do inkscape
 
     this.isDragging = false;
@@ -37,6 +38,7 @@ export class LupaTool extends ToolBase {
   // Define o modo de interação da lupa 
   setModo(modo) {
     this.modo = (this.modo === modo) ? 'click' : modo;
+    this.renderOptions();
   } // <-- setModo
 
   // Remove elementos temporários e reseta o estado/modo da lupa 
@@ -82,7 +84,7 @@ export class LupaTool extends ToolBase {
       width,
       height
     } = this.viewBox;
-    this.svg.setAttribute('viewBox','${x} ${y} ${width} ${height}');
+    this.svg.setAttribute('viewBox', `${x} ${y} ${width} ${height}`);
   } // <-- applyViewBox
 
   // Realiza zoom mantendo o ponto (cx, cy) fixo como foco
@@ -116,6 +118,7 @@ export class LupaTool extends ToolBase {
     }
 
     if (this.modo === 'click') {
+      
       // Botão esquerdo : zoom in
       if (evento.button === 0) {
         this.zoom(0.9, coords.x, coords.y);
