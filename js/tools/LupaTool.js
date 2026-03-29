@@ -119,8 +119,36 @@ export class LupaTool extends ToolBase {
       this.svg.appendChild(this.selectionRect); 
     } // <-- fim do modo de zoom com  seleção
   } // <-- onMouseDown
+  
+  onMouseMove(evento) {
+    if (!this.isDragging || this.modo !== 'drag' || !this.selectionRect) return;
+    
+    if ((evento.button !== (1 << this.dragButton)) {
+      this.cleanup();
+      return;
+    } 
 
+    const coords = obterCoordenadasSVG(evento, this.svg);
 
+    const x = Math.min(this.start.x, coords.x);
+    const y = Math.min(this.start.y, coords.y);
+    const width = Math.abs(coords.x - this.start.x);
+    const height = Math.abs(coords.y - this.start.y);
+
+    this.selectionRect.setAttribute("x", x);
+    this.selectionRect.setAttribute("y", y);
+    this.selectionRect.setAttribute("width", width);
+    this.selectionRect.setAttribute("height", height);
+  } // <-- onMouseMove
+
+  onMouseUp() {
+  }
+
+  onAtivar() {
+  }
+
+  onDesativar() {
+  }
 } // <-- class LupaTool
 
 
