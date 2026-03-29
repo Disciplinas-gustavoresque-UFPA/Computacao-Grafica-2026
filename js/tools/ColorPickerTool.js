@@ -11,31 +11,35 @@ export class ColorPickerTool extends ToolBase {
   constructor(svgCanvas) {
     super();
     this.svgCanvas = svgCanvas;
+    this.detectedColor = "";
     /** @type {Set<string>} */
     this.pressedKeys = new Set();
     const listenKey = (/** @type {string} */ key) => {
       const onKeyDown = (/** @type {KeyboardEvent} */ event) => {
         if (event.key === key) {
-          console.log(key, "down");
           this.pressedKeys.add(key);
         }
       };
       const onKeyUp = (/** @type {KeyboardEvent} */ event) => {
         if (event.key === key) {
-          console.log(key, "up");
           this.pressedKeys.delete(key);
         }
       };
       return { onKeyDown, onKeyUp };
     };
     this.listeners = ["Control", "Shift", "c"].flatMap(listenKey);
-    this.detectedColor = null;
   }
 
   onAtivar() {
     this.listeners.forEach((keyListeners) => {
       window.addEventListener("keydown", keyListeners.onKeyDown);
       window.addEventListener("keyup", keyListeners.onKeyUp);
+    });
+
+    window.addEventListener("keydown", () => {
+      if (this.pressedKeys.has("Control") && this.pressedKeys.has("c")) {
+        navigator.clipboard.writeText(this.detectedColor);
+      }
     });
   }
 
@@ -47,7 +51,7 @@ export class ColorPickerTool extends ToolBase {
   }
 
   /** @param {MouseEvent} evento*/
-  onMouseDown(evento) {
+  onMouseMove(evento) {
     const elemento = document.elementFromPoint(evento.x, evento.y);
     /** @type {string} */ let color;
 
@@ -60,20 +64,25 @@ export class ColorPickerTool extends ToolBase {
       color = elemento.computedStyleMap().get("background-color").toString();
     }
 
-    const hexColor = rgbToHex(color);
+    this.detectedColor = rgbToHex(color);
+  }
 
+  /**
+   * @param {MouseEvent} evento
+   */
+  onMouseDown(evento) {
     if (this.pressedKeys.has("Shift")) {
-      definirCorBorda(color);
+      definirCorBorda(this.detectedColor);
       const bordaInput =
         /** @type {HTMLInputElement} */
         (document.getElementById("cor-borda"));
-      bordaInput.value = hexColor;
+      bordaInput.value = this.detectedColor;
     } else {
-      definirCorPreenchimento(color);
+      definirCorPreenchimento(this.detectedColor);
       const preenchimentoInput =
         /** @type {HTMLInputElement} */
         (document.getElementById("cor-preenchimento"));
-      preenchimentoInput.value = hexColor;
+      preenchimentoInput.value = this.detectedColor;
     }
   }
 }
