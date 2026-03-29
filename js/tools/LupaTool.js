@@ -26,6 +26,14 @@ export class LupaTool extends ToolBase {
     }; // <-- initialViewBox (guardar a posição inicial)
   } // <-- constructor
   
+  // Voltar à posição inicial do viewBox
+  resetView() {
+    this.viewBox = {
+      ...this.initialViewBox
+    };
+    this.applyViewBox();
+  } // <-- resetView
+
   // Define o modo de interação da lupa 
   setModo(modo) {
     this.modo = (this.modo === modo) ? 'click' : modo;
@@ -77,6 +85,12 @@ export class LupaTool extends ToolBase {
       this.cleanup();
     }
     
+    // BOTAO DO MEIO = Reset
+    if (evento.button === 1) {
+      this.resetView();
+      return;
+    }
+
     if (this.modo === 'click') {
       // Botão esquerdo : zoom in
       if (evento.button === 0) {
@@ -105,6 +119,8 @@ export class LupaTool extends ToolBase {
       this.svg.appendChild(this.selectionRect); 
     } // <-- fim do modo de zoom com  seleção
   } // <-- onMouseDown
+
+
 } // <-- class LupaTool
 
 
