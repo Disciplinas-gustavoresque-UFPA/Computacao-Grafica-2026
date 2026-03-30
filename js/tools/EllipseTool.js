@@ -30,4 +30,8 @@ export class EllipseTool extends ToolBase {
 
         this.svgCanvas.appendChild(this.ellipseElement);
     }
+
+    onMouseMove(evento) {
+        
+    }
 }
