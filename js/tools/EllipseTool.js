@@ -32,6 +32,10 @@ export class EllipseTool extends ToolBase {
     }
 
     onMouseMove(evento) {
-        
+        if (!this.isDrawing || !this.ellipseElement) return;
+
+        const cd = obterCoordenadaSVG(evento, this.svgCanvas);
+        const currentX = cd.x;
+        const currentY = cd.y;
     }
 }
