@@ -9,4 +9,8 @@ export class EllipseTool extends ToolBase {
         this.startY = 0
         this.ellipseElement = null
     }
+
+    onMouseDown(evento) {
+        
+    }
 }
