@@ -48,4 +48,11 @@ export class EllipseTool extends ToolBase {
         this.ellipseElement.setAttribute('rx', rx);
         this.ellipseElement.setAttribute('ry', ry);
     }
+
+    onMouseUp(evento) {
+        if (this.isDrawing) {
+            this.isDrawing = false;
+            this.ellipseElement = null
+        }
+    }
 }
