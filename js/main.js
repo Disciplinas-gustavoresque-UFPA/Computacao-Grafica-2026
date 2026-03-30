@@ -9,6 +9,7 @@
 
 import { estado, definirFerramenta, definirCorPreenchimento, definirCorBorda } from './core/StateManager.js';
 import { RetanguloTool } from './tools/RetanguloTool.js';
+import { EllipseTool } from './tools/EllipseTool.js';
 
 // Referências aos elementos do DOM
 const svgCanvas = document.getElementById('canvas');
@@ -16,6 +17,7 @@ const svgCanvas = document.getElementById('canvas');
 // Instâncias das ferramentas disponíveis
 const instanciasFerramentas = {
   retangulo: new RetanguloTool(svgCanvas),
+  elipse: new EllipseTool(svgCanvas),
   // Futuras ferramentas (selecao, elipse, linha, texto) entrarão aqui
 };
 
