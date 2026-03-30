@@ -37,5 +37,10 @@ export class EllipseTool extends ToolBase {
         const cd = obterCoordenadaSVG(evento, this.svgCanvas);
         const currentX = cd.x;
         const currentY = cd.y;
+
+        const cx = (this.startX + currentX) / 2;
+        const cy = (this.startY + currentY) / 2;
+        const rx = Math.abs(this.startX - currentX) / 2;
+        const ry = Math.abs(this.startY - currentY) / 2;
     }
 }
