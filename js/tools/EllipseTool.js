@@ -42,5 +42,10 @@ export class EllipseTool extends ToolBase {
         const cy = (this.startY + currentY) / 2;
         const rx = Math.abs(this.startX - currentX) / 2;
         const ry = Math.abs(this.startY - currentY) / 2;
+
+        this.ellipseElement.setAttribute('cx', cx);
+        this.ellipseElement.setAttribute('cy', cy);
+        this.ellipseElement.setAttribute('rx', rx);
+        this.ellipseElement.setAttribute('ry', ry);
     }
 }
