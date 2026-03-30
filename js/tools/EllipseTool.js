@@ -12,6 +12,8 @@ export class EllipseTool extends ToolBase {
     }
 
     onMouseDown(evento) {
+        this.isDrawing = true
+
         const cd = obterCoordenadaSVG(evento, this.svgCanvas);
         this.startX = cd.x;
         this.startY = cd.y;
@@ -25,5 +27,7 @@ export class EllipseTool extends ToolBase {
             stroke: 'black',
             'stroke-width': 2
         });
+
+        this.svgCanvas.appendChild(this.ellipseElement);
     }
 }
