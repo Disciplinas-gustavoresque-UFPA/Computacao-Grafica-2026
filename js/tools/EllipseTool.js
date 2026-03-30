@@ -1,4 +1,5 @@
 import { ToolBase } from "./ToolBase";
+import { criarElementoSVG, obterCoordenadaSVG } from "../utils/svgHelpers.js";
 
 export class EllipseTool extends ToolBase {
     constructor(svgCanvas) {
@@ -14,5 +15,15 @@ export class EllipseTool extends ToolBase {
         const cd = obterCoordenadaSVG(evento, this.svgCanvas);
         this.startX = cd.x;
         this.startY = cd.y;
+
+        this.ellipseElement = criarElementoSVG('ellipse', {
+            cx: this.startX,
+            cy: this.startY,
+            rx: 0,
+            ry: 0,
+            fill: 'transparent',
+            stroke: 'black',
+            'stroke-width': 2
+        });
     }
 }
