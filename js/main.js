@@ -10,6 +10,7 @@
 import { estado, definirFerramenta, definirCorPreenchimento, definirCorBorda } from './core/StateManager.js';
 import { ColorPickerTool } from './tools/ColorPickerTool.js';
 import { RetanguloTool } from './tools/RetanguloTool.js';
+import { exportarDesenho } from './utils/exportHelpers.js';
 
 // Referências aos elementos do DOM
 const svgCanvas = document.getElementById('canvas');
@@ -25,6 +26,8 @@ const botoesFerramenta = document.querySelectorAll('.btn-ferramenta');
 const inputCorPreenchimento = document.getElementById('cor-preenchimento');
 const inputCorBorda = document.getElementById('cor-borda');
 const nomeFerramenta = document.getElementById('nome-ferramenta');
+const btnExportar = document.getElementById('btn-exportar');
+const exportFormat = document.getElementById('export-format');
 
 /**
  * Atualiza o estado visual dos botões da barra lateral,
@@ -90,3 +93,9 @@ svgCanvas.addEventListener('mouseup', (evento) => {
 // Inicializa os valores dos inputs com os valores padrão do estado
 inputCorPreenchimento.value = estado.corPreenchimento;
 inputCorBorda.value = estado.corBorda;
+
+// Exportar / Salvar desenho
+btnExportar.addEventListener('click', () => {
+  const formato = exportFormat.value || 'png';
+  exportarDesenho(svgCanvas, formato);
+});

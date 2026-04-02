@@ -2,18 +2,18 @@
    Variáveis de Design
    ========================================================= */
 :root {
-  --cor-fundo-app: #1a1a2e;
-  --cor-fundo-painel: #16213e;
-  --cor-fundo-barra: #0f3460;
-  --cor-fundo-canvas: #f0f0f0;
-  --cor-texto: #e0e0e0;
-  --cor-texto-secundario: #a0a0b0;
-  --cor-destaque: #4a90d9;
-  --cor-borda-ui: #2a2a4e;
-  --altura-painel-superior: 48px;
-  --largura-barra-lateral: 56px;
-  --raio-borda: 6px;
-  --sombra-padrao: 0 2px 8px rgba(0, 0, 0, 0.4);
+    --cor-fundo-app: #1a1a2e;
+    --cor-fundo-painel: #16213e;
+    --cor-fundo-barra: #0f3460;
+    --cor-fundo-canvas: #f0f0f0;
+    --cor-texto: #e0e0e0;
+    --cor-texto-secundario: #a0a0b0;
+    --cor-destaque: #4a90d9;
+    --cor-borda-ui: #2a2a4e;
+    --altura-painel-superior: 48px;
+    --largura-barra-lateral: 56px;
+    --raio-borda: 6px;
+    --sombra-padrao: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 /* =========================================================
@@ -22,18 +22,18 @@
 *,
 *::before,
 *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  font-size: 14px;
-  background-color: var(--cor-fundo-app);
-  color: var(--cor-texto);
-  height: 100vh;
-  overflow: hidden;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    background-color: var(--cor-fundo-app);
+    color: var(--cor-texto);
+    height: 100vh;
+    overflow: hidden;
 }
 
 /* =========================================================
@@ -41,49 +41,49 @@ body {
    Usa CSS Grid para dividir o espaço em painel superior + workspace
    ========================================================= */
 #app {
-  display: grid;
-  grid-template-rows: var(--altura-painel-superior) 1fr;
-  height: 100vh;
+    display: grid;
+    grid-template-rows: var(--altura-painel-superior) 1fr;
+    height: 100vh;
 }
 
 /* =========================================================
    Painel Superior de Propriedades
    ========================================================= */
 #painel-propriedades {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 0 16px;
-  background-color: var(--cor-fundo-painel);
-  border-bottom: 1px solid var(--cor-borda-ui);
-  box-shadow: var(--sombra-padrao);
-  z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 16px;
+    background-color: var(--cor-fundo-painel);
+    border-bottom: 1px solid var(--cor-borda-ui);
+    box-shadow: var(--sombra-padrao);
+    z-index: 10;
 }
 
 .propriedade-label {
-  color: var(--cor-texto-secundario);
-  font-size: 12px;
-  white-space: nowrap;
+    color: var(--cor-texto-secundario);
+    font-size: 12px;
+    white-space: nowrap;
 }
 
 #painel-propriedades input[type="color"] {
-  width: 32px;
-  height: 28px;
-  border: 1px solid var(--cor-borda-ui);
-  border-radius: var(--raio-borda);
-  background: none;
-  cursor: pointer;
-  padding: 2px;
+    width: 32px;
+    height: 28px;
+    border: 1px solid var(--cor-borda-ui);
+    border-radius: var(--raio-borda);
+    background: none;
+    cursor: pointer;
+    padding: 2px;
 }
 
 #ferramenta-atual-label {
-  margin-left: auto;
-  font-size: 12px;
-  color: var(--cor-texto-secundario);
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--cor-texto-secundario);
 }
 
 #ferramenta-atual-label strong {
-  color: var(--cor-destaque);
+    color: var(--cor-destaque);
 }
 
 /* =========================================================
@@ -91,74 +91,147 @@ body {
    Usa CSS Flexbox para layout horizontal
    ========================================================= */
 #workspace {
-  display: flex;
-  overflow: hidden;
+    display: flex;
+    overflow: hidden;
 }
 
 /* =========================================================
    Barra Lateral de Ferramentas
    ========================================================= */
 #barra-ferramentas {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  width: var(--largura-barra-lateral);
-  padding: 12px 0;
-  background-color: var(--cor-fundo-barra);
-  border-right: 1px solid var(--cor-borda-ui);
-  box-shadow: var(--sombra-padrao);
-  flex-shrink: 0;
-  z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: var(--largura-barra-lateral);
+    padding: 12px 0;
+    background-color: var(--cor-fundo-barra);
+    border-right: 1px solid var(--cor-borda-ui);
+    box-shadow: var(--sombra-padrao);
+    flex-shrink: 0;
+    z-index: 5;
 }
 
 .btn-ferramenta {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  background-color: transparent;
-  color: var(--cor-texto);
-  border: 1px solid transparent;
-  border-radius: var(--raio-borda);
-  font-size: 18px;
-  cursor: pointer;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background-color: transparent;
+    color: var(--cor-texto);
+    border: 1px solid transparent;
+    border-radius: var(--raio-borda);
+    font-size: 18px;
+    cursor: pointer;
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease;
 }
 
 .btn-ferramenta:hover {
-  background-color: rgba(74, 144, 217, 0.2);
-  border-color: var(--cor-destaque);
-  color: var(--cor-destaque);
+    background-color: rgba(74, 144, 217, 0.2);
+    border-color: var(--cor-destaque);
+    color: var(--cor-destaque);
 }
 
 .btn-ferramenta.ativo {
-  background-color: rgba(74, 144, 217, 0.35);
-  border-color: var(--cor-destaque);
-  color: var(--cor-destaque);
-  box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.25);
+    background-color: rgba(74, 144, 217, 0.35);
+    border-color: var(--cor-destaque);
+    color: var(--cor-destaque);
+    box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.25);
+}
+
+/*Botão de salvar*/
+.btn-exportar {
+    background-color: white;
+    color: black;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 1em 2em;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    border: 1px solid black;
+    box-shadow: 0 0 0 0 black;
+}
+
+.btn-exportar:hover {
+    transform: translateY(-2px) translateX(-2px);
+    box-shadow: 2px 5px 0 0 black;
+}
+
+.btn-exportar:active {
+    transform: translateY(2px) translateX(1px);
+    box-shadow: 0 0 0 0 black;
+}
+
+/*select de formato de exportação */
+
+.select-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.select-format {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    font-family: "Inter", sans-serif;
+    font-size: 1rem;
+    color: #f0f0f0;
+
+    padding: 8px 32px 8px 12px;
+    border: 1px solid #f0f0f0;
+    border-radius: 4px;
+    background-color: transparent;
+    cursor: pointer;
+
+    transition: border-color 0.2s;
+    outline: none;
+}
+
+.select-format:hover {
+    border-color: #999;
+}
+
+.select-format:focus {
+    border-color: #000;
+}
+
+/* Minimal Chevron */
+.select-arrow {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 12px;
+    height: 12px;
+    pointer-events: none;
+    fill: #f0f0f0;
 }
 
 /* =========================================================
    Área Central de Desenho
    ========================================================= */
 #area-desenho {
-  flex: 1;
-  overflow: hidden;
-  background-color: #2a2a3e;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
+    flex: 1;
+    overflow: hidden;
+    background-color: #2a2a3e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
 }
 
 #canvas {
-  display: block;
-  background-color: var(--cor-fundo-canvas);
-  border-radius: var(--raio-borda);
-  box-shadow: var(--sombra-padrao);
-  cursor: crosshair;
-  width: 100%;
-  height: 100%;
+    display: block;
+    background-color: var(--cor-fundo-canvas);
+    border-radius: var(--raio-borda);
+    box-shadow: var(--sombra-padrao);
+    cursor: crosshair;
+    width: 100%;
+    height: 100%;
 }
