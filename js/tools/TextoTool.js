@@ -27,9 +27,13 @@ export class TextoTool extends ToolBase {
   }
 
   onMouseDown(evento) { 
+    // se existe um input ativo nao permite criar outro
+    if (this.inputTemporario) return;
+
     // Pegamos a coordenada exata dentro do universo do SVG
     const pt = obterCoordenadaSVG(evento, this.svgCanvas);
-    console.log('Preparado para inserir texto na coordenada SVG:', pt.x, pt.y);
+
+    this.criarInputTemporario(evento.clientX, evento.clientY, pt);
   }
 
   criarInputTemporario(telaX, telaY, ptSVG) {
