@@ -23,7 +23,13 @@ CONFIG_RANKINGS = {
     "ouro": {"titulo": "⭐ Patrick Bateman da turma", "desc": "Badge ⭐ Código de Ouro", "imagem": "/.github/images/memes/image_8.png", "badge": "⭐ Código de Ouro"},
     "logica": {"titulo": "🧠 John Nash da turma", "desc": "Badge 🧠 Lógica Brilhante", "imagem": "/.github/images/memes/image_9.png", "badge": "🧠 Lógica Brilhante"},
     "uiux": {"titulo": "🎨 Da Vinci do Front-end", "desc": "Badge 🎨 UI/UX Master", "imagem": "/.github/images/memes/image_10.png", "badge": "🎨 UI/UX Master"},
-    "matrix": {"titulo": "💻 Neo da turma", "desc": "Badge 💻 Enter the Matrix", "imagem": "/.github/images/memes/image_11.png", "badge": "💻 Enter the Matrix"}
+    "matrix": {"titulo": "💻 Neo da turma", "desc": "Badge 💻 Enter the Matrix", "imagem": "/.github/images/memes/image_11.png", "badge": "💻 Enter the Matrix"},
+    
+    # NOVAS BADGES DE CODE REVIEW
+    "gandalf": {"titulo": "🧙‍♂️ O Gandalf do Code Review", "desc": "Badge 🛡️ Guardião do Merge", "imagem": "/.github/images/memes/image_12.png", "badge": "🛡️ Guardião do Merge"},
+    "sherlock": {"titulo": "🕵️ O Sherlock Holmes da Turma", "desc": "Badge 🔎 Detetive do Código", "imagem": "/.github/images/memes/image_13.png", "badge": "🔎 Detetive do Código"},
+    "heimdall": {"titulo": "👁️ O Heimdall do Repositório", "desc": "Badge 🌉 Guardião da Bifrost", "imagem": "/.github/images/memes/image_14.png", "badge": "🌉 Guardião da Bifrost"},
+    "edna": {"titulo": "👓 A Edna Moda do Código", "desc": "Badge 📐 Revisor Implacável", "imagem": "/.github/images/memes/image_15.png", "badge": "📐 Revisor Implacável"}
 }
 
 REGEX_BADGE = r"@(\w+)\s+ganhou\s+uma\s+badge\s+de\s+(.*)"
@@ -85,14 +91,19 @@ def processar_contribuicoes(prs):
 def gerar_markdown_readme(data):
     md = f"> 🤖 *Placar atualizado automaticamente em: {datetime.now().strftime('%d/%m/%Y %H:%M')}*\n\n"
     for ranking_id, config in CONFIG_RANKINGS.items():
+        # A imagem e o título são gerados sempre
+        md += f"### {config['titulo']}\n*{config['desc']}*\n\n![{config['titulo']}]({config['imagem']})\n\n"
+        
         ranking_alunos = data[ranking_id]
         if not ranking_alunos:
+            # Se ninguém ganhou, mostra a mensagem e passa para o próximo
+            md += "🥇 **Ainda não há registros nesta semana.**\n\n---\n\n"
             continue
+            
         sorted_alunos = sorted(ranking_alunos.items(), key=lambda item: item[1], reverse=True)
         top_aluno, top_score = sorted_alunos[0]
         score_str = f"{top_score} linhas mescladas" if ranking_id == "volume" else f"{top_score} badges acumuladas"
 
-        md += f"### {config['titulo']}\n*{config['desc']}*\n\n![{config['titulo']}]({config['imagem']})\n\n"
         md += f"🥇 **@{top_aluno}** ({score_str})\n\n"
         
         if len(sorted_alunos) > 1:
@@ -107,8 +118,14 @@ def gerar_markdown_readme(data):
 def atualizar_readme(novo_conteudo):
     with open("README.md", "r", encoding="utf-8") as f:
         readme = f.read()
-    pattern = re.compile(r"()(.*)()", re.DOTALL)
-    novo_readme = pattern.sub(f"\\1\n\n{novo_conteudo}\\3", readme)
+    pattern = re.compile(r"(\n)(.*)(\n)", re.DOTALL)
+    novo_readme = pattern.sub(f"\\1\n{novo_conteudo}\\3", readme)
+    
+    # Fallback caso os comentários não existam
+    if novo_readme == readme:
+       pattern = re.compile(r"(> 🤖 \*O robô está aquecendo os motores.*?)(?=\n## 📌 Fluxo de Trabalho)", re.DOTALL)
+       novo_readme = pattern.sub(f"{novo_conteudo}", readme)
+
     with open("README.md", "w", encoding="utf-8") as f:
         f.write(novo_readme)
     print("README.md atualizado!")
@@ -133,13 +150,11 @@ def atualizar_historico(data):
         md_historico += f"### {config['titulo']}\n"
         sorted_alunos = sorted(ranking_alunos.items(), key=lambda item: item[1], reverse=True)
         
-        # Lista TODOS os alunos que pontuaram nessa categoria
         for posicao, (aluno, score) in enumerate(sorted_alunos, start=1):
             score_str = "linhas" if ranking_id == "volume" else "badges"
             md_historico += f"{posicao}. **@{aluno}** - {score} {score_str}\n"
         md_historico += "\n"
 
-    # Salva no arquivo (cria se não existir, adiciona se existir)
     arquivo_existe = os.path.exists("HISTORICO_PLACAR.md")
     with open("HISTORICO_PLACAR.md", "a", encoding="utf-8") as f:
         if not arquivo_existe:
@@ -153,9 +168,6 @@ if __name__ == "__main__":
     prs = buscar_prs_recentes()
     contribuicoes = processar_contribuicoes(prs)
     
-    # 1. Atualiza a vitrine principal
     markdown_readme = gerar_markdown_readme(contribuicoes)
     atualizar_readme(markdown_readme)
-    
-    # 2. Salva o registro para a nota do professor
     atualizar_historico(contribuicoes)

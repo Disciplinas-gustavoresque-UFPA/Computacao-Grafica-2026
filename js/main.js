@@ -8,10 +8,20 @@
  */
 
 import { estado, definirFerramenta, definirCorPreenchimento, definirCorBorda } from './core/StateManager.js';
+import { ColorPickerTool } from './tools/ColorPickerTool.js';
+import { RetanguloTool } from './tools/RetanguloTool.js';
 import { LupaTool } from './tools/LupaTool.js';
 
 // Referências aos elementos do DOM
 const svgCanvas = document.getElementById('canvas');
+
+// Instâncias das ferramentas disponíveis
+const instanciasFerramentas = {
+  retangulo: new RetanguloTool(svgCanvas),
+  "Conta-gotas": new ColorPickerTool(svgCanvas),
+  // Futuras ferramentas (selecao, elipse, linha, texto) entrarão aqui
+};
+
 
 const botoesFerramenta = document.querySelectorAll('.btn-ferramenta');
 const inputCorPreenchimento = document.getElementById('cor-preenchimento');
@@ -42,14 +52,13 @@ function atualizarBotaoAtivo(nomeDaFerramenta) {
 // Seleciona a ferramenta ao clicar nos botões da barra lateral
 botoesFerramenta.forEach((btn) => {
   btn.addEventListener('click', () => {
-    const ferramenta = btn.dataset.ferramenta;
-    // definirFerramenta(ferramenta); // <-- correto 
-    if (ferramenta === 'lupa') {
-      definirFerramenta(lupaTool);
-    } else {
-      definirFerramenta(ferramenta);
-    }
-    atualizarBotaoAtivo(ferramenta);
+    const ferramentaId = btn.dataset.ferramenta;
+    
+    // Obtém a instância da ferramenta atual correspondente (se implementada)
+    const ferramentaInstancia = instanciasFerramentas[ferramentaId] || null;
+    
+    definirFerramenta(ferramentaInstancia);
+    atualizarBotaoAtivo(ferramentaId);
   });
 });
 
