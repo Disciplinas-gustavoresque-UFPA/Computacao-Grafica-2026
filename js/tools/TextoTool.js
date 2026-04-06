@@ -12,7 +12,6 @@ export class TextoTool extends ToolBase {
   constructor(svgCanvas) {
     super();
     this.svgCanvas = svgCanvas;
-    // Guardará a referência da caixa de texto HTML que criaremos depois
     this.inputTemporario = null; 
   }
 
@@ -28,8 +27,11 @@ export class TextoTool extends ToolBase {
   }
 
   onMouseDown(evento) { 
-    // se existe um input ativo nao permite criar outro
-    if (this.inputTemporario) return;
+    // Se o usuário clicar novamente e já existir um input, vamos forçar a finalização do anterior
+    if (this.inputTemporario) {
+      this.finalizarTexto();
+      return;
+    }
 
     // Pegamos a coordenada exata dentro do universo do SVG
     const pt = obterCoordenadaSVG(evento, this.svgCanvas);
@@ -60,6 +62,32 @@ export class TextoTool extends ToolBase {
     // Guarda a coordenada SVG no próprio elemento
     this.inputTemporario.dataset.svgX = pt.x;
     this.inputTemporario.dataset.svgY = pt.y;
+  }
+
+  finalizarTexto() {
+    if (!this.inputTemporario) return;
+
+    const textoDigitado = this.inputTemporario.value.trim();
+    const x = this.inputTemporario.dataset.svgX;
+    const y = this.inputTemporario.dataset.svgY;
+
+    // Só cria o elemento SVG se algo foi digitado
+    if (textoDigitado !== '') {
+      const elementoTextoSVG = criarElementoSVG('text', {
+        x: x,
+        y: y,
+        fill: estado.corPreenchimento,
+        'font-family': 'Arial, sans-serif',
+        'font-size': '16px',
+        'dominant-baseline': 'text-before-edge' 
+      });
+
+      // pegando o texto e colocando no html
+      elementoTextoSVG.textContent = textoDigitado;
+      this.svgCanvas.appendChild(elementoTextoSVG);
+    }
+
+    this.removerInputTemporario();
   }
 
   removerInputTemporario() {
