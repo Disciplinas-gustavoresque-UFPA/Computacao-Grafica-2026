@@ -36,7 +36,7 @@ export class TextoTool extends ToolBase {
     this.criarInputTemporario(evento.clientX, evento.clientY, pt);
   }
 
-  criarInputTemporario(telaX, telaY, ptSVG) {
+  criarInputTemporario(telaX, telaY, pt) {
     this.inputTemporario = document.createElement('input');
     this.inputTemporario.type = 'text';
     
@@ -57,8 +57,8 @@ export class TextoTool extends ToolBase {
     this.inputTemporario.focus();
     
     // Guarda a coordenada SVG no próprio elemento
-    this.inputTemporario.dataset.svgX = ptSVG.x;
-    this.inputTemporario.dataset.svgY = ptSVG.y;
-  }
+    this.inputTemporario.dataset.svgX = pt.x;
+    this.inputTemporario.dataset.svgY = pt.y;
+  }s
 
 }
