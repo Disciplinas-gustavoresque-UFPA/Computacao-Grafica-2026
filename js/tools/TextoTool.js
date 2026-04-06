@@ -24,6 +24,7 @@ export class TextoTool extends ToolBase {
   onDesativar() {
     // Volta para o cursor padrão do editor
     this.svgCanvas.style.cursor = 'crosshair';
+    this.removerInputTemporario();
   }
 
   onMouseDown(evento) { 
@@ -59,6 +60,13 @@ export class TextoTool extends ToolBase {
     // Guarda a coordenada SVG no próprio elemento
     this.inputTemporario.dataset.svgX = pt.x;
     this.inputTemporario.dataset.svgY = pt.y;
-  }s
+  }
+
+  removerInputTemporario() {
+    if (this.inputTemporario && this.inputTemporario.parentNode) {
+      this.inputTemporario.parentNode.removeChild(this.inputTemporario);
+      this.inputTemporario = null;
+    }
+  }
 
 }
