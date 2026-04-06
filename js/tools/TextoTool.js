@@ -1,5 +1,5 @@
 import { ToolBase } from './ToolBase.js';
-import { obterCoordenadaSVG } from '../utils/svgHelpers.js';
+import { obterCoordenadaSVG, criarElementoSVG } from '../utils/svgHelpers.js';
 import { estado } from '../core/StateManager.js';
 
 /**
