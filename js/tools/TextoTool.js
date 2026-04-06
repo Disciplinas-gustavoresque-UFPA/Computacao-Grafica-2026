@@ -26,9 +26,35 @@ export class TextoTool extends ToolBase {
     this.svgCanvas.style.cursor = 'crosshair';
   }
 
-  onMouseDown(evento) {
+  onMouseDown(evento) { 
     // Pegamos a coordenada exata dentro do universo do SVG
     const pt = obterCoordenadaSVG(evento, this.svgCanvas);
     console.log('Preparado para inserir texto na coordenada SVG:', pt.x, pt.y);
   }
+
+  criarInputTemporario(telaX, telaY, ptSVG) {
+    this.inputTemporario = document.createElement('input');
+    this.inputTemporario.type = 'text';
+    
+    // estilizando o input 
+    this.inputTemporario.style.position = 'absolute';
+    this.inputTemporario.style.left = `${telaX}px`;
+    this.inputTemporario.style.top = `${telaY - 10}px`; // Ajuste fino para o texto alinhar com o clique
+    this.inputTemporario.style.zIndex = '100'; // Garante que fique por cima de tudo
+    this.inputTemporario.style.background = 'transparent';
+    this.inputTemporario.style.color = estado.corPreenchimento; // Usa a cor do StateManager
+    this.inputTemporario.style.border = `1px dashed ${estado.corBorda}`;
+    this.inputTemporario.style.outline = 'none';
+    this.inputTemporario.style.fontFamily = 'Arial, sans-serif';
+    this.inputTemporario.style.fontSize = '16px';
+    
+    // coloca o input no body do html (na tela)
+    document.body.appendChild(this.inputTemporario);
+    this.inputTemporario.focus();
+    
+    // Guarda a coordenada SVG no próprio elemento
+    this.inputTemporario.dataset.svgX = ptSVG.x;
+    this.inputTemporario.dataset.svgY = ptSVG.y;
+  }
+
 }
