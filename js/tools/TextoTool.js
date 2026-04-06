@@ -62,6 +62,17 @@ export class TextoTool extends ToolBase {
     // Guarda a coordenada SVG no próprio elemento
     this.inputTemporario.dataset.svgX = pt.x;
     this.inputTemporario.dataset.svgY = pt.y;
+
+    this.inputTemporario.addEventListener('keydown', this.tratarTeclaPressionada.bind(this));
+    this.inputTemporario.addEventListener('blur', this.finalizarTexto.bind(this));
+  }
+
+  tratarTeclaPressionada(evento) {
+    if (evento.key === 'Enter') {
+      this.finalizarTexto();
+    } else if (evento.key === 'Escape') {
+      this.removerInputTemporario();
+    }
   }
 
   finalizarTexto() {
