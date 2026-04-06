@@ -10,6 +10,7 @@
 import { estado, definirFerramenta, definirCorPreenchimento, definirCorBorda } from './core/StateManager.js';
 import { ColorPickerTool } from './tools/ColorPickerTool.js';
 import { RetanguloTool } from './tools/RetanguloTool.js';
+import { TextoTool } from './tools/TextoTool.js';
 
 // Referências aos elementos do DOM
 const svgCanvas = document.getElementById('canvas');
@@ -18,7 +19,8 @@ const svgCanvas = document.getElementById('canvas');
 const instanciasFerramentas = {
   retangulo: new RetanguloTool(svgCanvas),
   "Conta-gotas": new ColorPickerTool(svgCanvas),
-  // Futuras ferramentas (selecao, elipse, linha, texto) entrarão aqui
+  texto: new TextoTool(svgCanvas),
+  // Futuras ferramentas (selecao, elipse, linha) entrarão aqui
 };
 
 const botoesFerramenta = document.querySelectorAll('.btn-ferramenta');
