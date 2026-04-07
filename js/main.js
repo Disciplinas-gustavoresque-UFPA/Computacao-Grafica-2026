@@ -22,10 +22,10 @@ const instanciasFerramentas = {
 };
 
 const botoesFerramenta = document.querySelectorAll('.btn-ferramenta');
-const inputCorPreenchimento = /** @type {HTMLInputElement} */ (
+const inputCorPreenchimento = (
   document.getElementById('cor-preenchimento')
 );
-const inputCorBorda = /** @type {HTMLInputElement} */ (
+const inputCorBorda = (
   document.getElementById('cor-borda')
 );
 
