@@ -22,8 +22,13 @@ const instanciasFerramentas = {
 };
 
 const botoesFerramenta = document.querySelectorAll('.btn-ferramenta');
-const inputCorPreenchimento = document.getElementById('cor-preenchimento');
-const inputCorBorda = document.getElementById('cor-borda');
+const inputCorPreenchimento = (
+  document.getElementById('cor-preenchimento')
+);
+const inputCorBorda = (
+  document.getElementById('cor-borda')
+);
+
 const nomeFerramenta = document.getElementById('nome-ferramenta');
 
 /**
@@ -34,7 +39,7 @@ const nomeFerramenta = document.getElementById('nome-ferramenta');
  */
 function atualizarBotaoAtivo(nomeDaFerramenta) {
   botoesFerramenta.forEach((btn) => {
-    if (btn.dataset.ferramenta === nomeDaFerramenta) {
+    if (btn.getAttribute('data-ferramenta') === nomeDaFerramenta) {
       btn.classList.add('ativo');
     } else {
       btn.classList.remove('ativo');
@@ -48,11 +53,11 @@ function atualizarBotaoAtivo(nomeDaFerramenta) {
 // Seleciona a ferramenta ao clicar nos botões da barra lateral
 botoesFerramenta.forEach((btn) => {
   btn.addEventListener('click', () => {
-    const ferramentaId = btn.dataset.ferramenta;
-    
+    const ferramentaId = btn.getAttribute('data-ferramenta');
+
     // Obtém a instância da ferramenta atual correspondente (se implementada)
     const ferramentaInstancia = instanciasFerramentas[ferramentaId] || null;
-    
+
     definirFerramenta(ferramentaInstancia);
     atualizarBotaoAtivo(ferramentaId);
   });
@@ -60,12 +65,12 @@ botoesFerramenta.forEach((btn) => {
 
 // Atualiza a cor de preenchimento no estado global
 inputCorPreenchimento.addEventListener('input', (evento) => {
-  definirCorPreenchimento(evento.target.value);
+  definirCorPreenchimento(inputCorPreenchimento.value);
 });
 
 // Atualiza a cor da borda no estado global
 inputCorBorda.addEventListener('input', (evento) => {
-  definirCorBorda(evento.target.value);
+  definirCorBorda(inputCorBorda.value);
 });
 
 // Event listeners globais do SVG (delegados para a ferramenta ativa)
