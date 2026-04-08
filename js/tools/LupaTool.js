@@ -95,6 +95,7 @@ export class LupaTool extends ToolBase {
   } // <-- zoom 
   
   onMouseDown(evento) {
+    evento.preventDefault();
     // Converte coordenadas do mouse (viewport) para o sistema (SVG)
     const coords = obterCoordenadaSVG(evento, this.svg);
     
@@ -139,6 +140,7 @@ export class LupaTool extends ToolBase {
   } // <-- onMouseDown
   
   onMouseMove(evento) {
+    evento.preventDefault();
     if (!this.isDragging || this.modo !== 'drag' || !this.selectionRect) return;
     
     const expected = this.getButtonMask(this.dragButton);
@@ -162,6 +164,7 @@ export class LupaTool extends ToolBase {
   } // <-- onMouseMove
 
   onMouseUp(evento) {
+    evento.preventDefault();
     if (!this.isDragging || this.modo !== 'drag') return;
     if (evento.button !== this.dragButton) {
       this.cleanup();

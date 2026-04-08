@@ -19,6 +19,7 @@ const svgCanvas = document.getElementById('canvas');
 const instanciasFerramentas = {
   retangulo: new RetanguloTool(svgCanvas),
   "Conta-gotas": new ColorPickerTool(svgCanvas),
+  lupa: new LupaTool(svgCanvas),
   // Futuras ferramentas (selecao, elipse, linha, texto) entrarão aqui
 };
 
@@ -27,7 +28,6 @@ const botoesFerramenta = document.querySelectorAll('.btn-ferramenta');
 const inputCorPreenchimento = document.getElementById('cor-preenchimento');
 const inputCorBorda = document.getElementById('cor-borda');
 const nomeFerramenta = document.getElementById('nome-ferramenta');
-const lupaTool = new LupaTool(svgCanvas);
 
 
 /**
@@ -90,15 +90,6 @@ svgCanvas.addEventListener('mouseup', (evento) => {
     estado.ferramentaAtual.onMouseUp(evento);
   }
 });
-
-// Listener para botôes do painel de opçẽos da ferramenta ativa
-document.querySelectorAll('#tool-options button').forEach(btn => {
-  btn.addEventListener('click', () => {
-    if (estado.ferramentaAtual instanceof LupaTool) {
-      estado.ferramentaAtual.setModo(btn.dataset.modo);
-    }
-  });
-}); // SOLUÇÃO TEMPORARIA 
 
 // Previne o menu de opções do botao direito do mouse no svg
 svgCanvas.addEventListener('contextmenu', (e) => {
