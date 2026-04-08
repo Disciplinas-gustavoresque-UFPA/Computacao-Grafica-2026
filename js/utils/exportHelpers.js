@@ -51,7 +51,7 @@ function mostrarMensagem(texto, duracao = 2500) {
   clearTimeout(el._hideTimeout);
   el._hideTimeout = setTimeout(() => {
     el.style.opacity = "0";
-    // remove after transition
+    // remove após a transição
     setTimeout(() => {
       if (el && el.parentNode) el.parentNode.removeChild(el);
     }, 250);
