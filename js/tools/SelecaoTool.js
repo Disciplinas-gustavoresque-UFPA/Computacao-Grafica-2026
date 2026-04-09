@@ -1,17 +1,16 @@
 import { ToolBase } from './ToolBase.js';
-import { criarElementoSVG, obterCoordenadaSVG } from '../utils/svgHelpers.js';
+import { obterCoordenadaSVG } from '../utils/svgHelpers.js';
+import { definirElementoSelecionado, atualizarPosicaoSelecaoVisual } from '../core/StateManager.js';
 
 /**
  * Ferramenta de Seleção
  */
 export class SelecaoTool extends ToolBase {
-  constructor(svgCanvas, overlaySvg) {
+  constructor(svgCanvas) {
     super();
     this.svgCanvas = svgCanvas;
-    this.overlaySvg = overlaySvg;
 
     this.elementoSelecionado = null;
-    this.bordaSelecao = null;
 
     this.isDragging = false;
     this.offsetX = 0;
@@ -31,26 +30,13 @@ export class SelecaoTool extends ToolBase {
     // Se o clique não foi no canvas vazio e for um elemento permitido
     if (
       target !== this.svgCanvas &&
-      target !== this.overlaySvg &&
       target.parentNode === this.svgCanvas &&
       allowedTags.includes(tag)
     ) {
       this.elementoSelecionado = target;
 
-      // Lógica de Seleção: Utiliza .getBBox() para desenhar o outline no overlay
-      const bbox = target.getBBox();
-      this.bordaSelecao = criarElementoSVG('rect', {
-        x: bbox.x - 2,
-        y: bbox.y - 2,
-        width: bbox.width + 4,
-        height: bbox.height + 4,
-        fill: 'none',
-        stroke: "blue",
-        'stroke-width': 1.5,
-        'stroke-dasharray': '4 2', // Borda tracejada
-        'pointer-events': 'none' // Garante que a borda não bloqueie eventos de mouse
-      });
-      this.overlaySvg.appendChild(this.bordaSelecao);
+      // Chama a função definindo o elemento selecionado no gerenciador de estado, o que atualiza a camada visual de seleção.
+      definirElementoSelecionado(target);
 
       // Inicia a Movimentação
       this.isDragging = true;
@@ -91,12 +77,8 @@ export class SelecaoTool extends ToolBase {
       this.elementoSelecionado.setAttribute('cy', novoY);
     }
 
-    // Atualiza a posição da borda de seleção via getBBox() para generalizar para qualquer formato
-    if (this.bordaSelecao) {
-      const bbox = this.elementoSelecionado.getBBox();
-      this.bordaSelecao.setAttribute('x', bbox.x - 2);
-      this.bordaSelecao.setAttribute('y', bbox.y - 2);
-    }
+    // Atualiza a posição da borda de seleção
+    atualizarPosicaoSelecaoVisual();
   }
 
   onMouseUp(evento) {
@@ -108,11 +90,8 @@ export class SelecaoTool extends ToolBase {
   }
 
   limparSelecao() {
-    if (this.bordaSelecao && this.bordaSelecao.parentNode) {
-      this.bordaSelecao.parentNode.removeChild(this.bordaSelecao);
-    }
-    this.bordaSelecao = null;
     this.elementoSelecionado = null;
     this.isDragging = false;
+    definirElementoSelecionado(null);
   }
 }
