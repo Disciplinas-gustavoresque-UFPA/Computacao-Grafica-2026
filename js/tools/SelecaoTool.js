@@ -25,12 +25,15 @@ export class SelecaoTool extends ToolBase {
     // Limpa a seleção anterior
     this.limparSelecao();
 
-    // Se o clique não foi no canvas vazio e for um rect, selecionamos o elemento
+    const allowedTags = ['rect', 'text', 'image', 'circle', 'ellipse'];
+    const tag = target.tagName ? target.tagName.toLowerCase() : '';
+
+    // Se o clique não foi no canvas vazio e for um elemento permitido
     if (
       target !== this.svgCanvas &&
       target !== this.overlaySvg &&
       target.parentNode === this.svgCanvas &&
-      target.tagName.toLowerCase() === 'rect'
+      allowedTags.includes(tag)
     ) {
       this.elementoSelecionado = target;
 
@@ -53,8 +56,15 @@ export class SelecaoTool extends ToolBase {
       this.isDragging = true;
 
       // Movimentação: Cálculo do offset para que o arraste seja suave
-      const elX = parseFloat(target.getAttribute('x') || 0);
-      const elY = parseFloat(target.getAttribute('y') || 0);
+      let elX = 0, elY = 0;
+
+      if (tag === 'rect' || tag === 'text' || tag === 'image') {
+        elX = parseFloat(target.getAttribute('x') || 0);
+        elY = parseFloat(target.getAttribute('y') || 0);
+      } else if (tag === 'circle' || tag === 'ellipse') {
+        elX = parseFloat(target.getAttribute('cx') || 0);
+        elY = parseFloat(target.getAttribute('cy') || 0);
+      }
 
       this.offsetX = pt.x - elX;
       this.offsetY = pt.y - elY;
@@ -70,14 +80,22 @@ export class SelecaoTool extends ToolBase {
     const novoX = pt.x - this.offsetX;
     const novoY = pt.y - this.offsetY;
 
-    // Atualiza x e y do elemento selecionado (sabemos que é 'rect')
-    this.elementoSelecionado.setAttribute('x', novoX);
-    this.elementoSelecionado.setAttribute('y', novoY);
+    const tag = this.elementoSelecionado.tagName.toLowerCase();
 
-    // Atualiza a posição da borda de seleção de forma otimizada sem getBBox()
+    // Atualiza as propriedades dependendo da forma
+    if (tag === 'rect' || tag === 'text' || tag === 'image') {
+      this.elementoSelecionado.setAttribute('x', novoX);
+      this.elementoSelecionado.setAttribute('y', novoY);
+    } else if (tag === 'circle' || tag === 'ellipse') {
+      this.elementoSelecionado.setAttribute('cx', novoX);
+      this.elementoSelecionado.setAttribute('cy', novoY);
+    }
+
+    // Atualiza a posição da borda de seleção via getBBox() para generalizar para qualquer formato
     if (this.bordaSelecao) {
-      this.bordaSelecao.setAttribute('x', novoX - 2);
-      this.bordaSelecao.setAttribute('y', novoY - 2);
+      const bbox = this.elementoSelecionado.getBBox();
+      this.bordaSelecao.setAttribute('x', bbox.x - 2);
+      this.bordaSelecao.setAttribute('y', bbox.y - 2);
     }
   }
 
