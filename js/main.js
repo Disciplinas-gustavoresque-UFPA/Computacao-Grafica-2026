@@ -7,10 +7,11 @@
  *  - Conectar os botões da barra de ferramentas ao StateManager
  */
 
-import { estado, definirFerramenta, definirCorPreenchimento, definirCorBorda } from './core/StateManager.js';
+import { estado, definirFerramenta, definirCorPreenchimento, definirCorBorda, definirGerenciadorSelecao } from './core/StateManager.js';
 import { ColorPickerTool } from './tools/ColorPickerTool.js';
 import { RetanguloTool } from './tools/RetanguloTool.js';
 import { SelecaoTool } from './tools/SelecaoTool.js';
+import { Selecao } from './core/Selecao.js';
 
 // Referências aos elementos do DOM
 const svgCanvas = document.getElementById('canvas');
@@ -37,9 +38,15 @@ overlayCanvas.style.left = '0';
 overlayCanvas.style.pointerEvents = 'none'; // Coordenado com o principal
 canvasContainer.appendChild(overlayCanvas);
 
+// Inicializar a classe de seleção
+const selecaoVisual = new Selecao(overlayCanvas);
+definirGerenciadorSelecao(selecaoVisual);
+
+
+
 // Instâncias das ferramentas disponíveis
 const instanciasFerramentas = {
-  selecao: new SelecaoTool(svgCanvas, overlayCanvas),
+  selecao: new SelecaoTool(svgCanvas),
   retangulo: new RetanguloTool(svgCanvas),
   "Conta-gotas": new ColorPickerTool(svgCanvas),
   // Futuras ferramentas (elipse, linha, texto) entrarão aqui
