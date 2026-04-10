@@ -162,3 +162,42 @@ body {
   width: 100%;
   height: 100%;
 }
+
+/* =====================================================
+    Menu de Opções da Lupa/Zoom
+    ====================================================*/
+
+#zoom-options {
+  position: absolute;
+  background: var(--cor-fundo-barra);
+  border: 1px solid var(--cor-borda-ui);
+  box-shadow: var(--sombra-padrao);
+  padding: 6px;
+  border-radius: var(--raio-borda);
+  flex-direction: column;
+  gap: 4px;
+
+}
+#zoom-options.hidden {
+  display: none;
+}
+#zoom-options:not(.hidden) {
+  display: flex;
+}
+#zoom-options button {
+  background-color: #4a90d9;
+  width: 36px;
+  height: 36px;
+  /* background: transparent; */
+  border: 1px solid transparent;
+  border-radius: var(--raio-borda);
+}
+
+#zoom-options button:hover {
+  border-color: var(--cor-destaque);
+}
+
+#zoom-options button.ativo {
+  background: rgba(0, 38, 255, 0.35);
+  border-color: var(--cor-destaque);
+}
