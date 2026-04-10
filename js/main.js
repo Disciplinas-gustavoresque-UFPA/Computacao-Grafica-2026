@@ -7,18 +7,49 @@
  *  - Conectar os botões da barra de ferramentas ao StateManager
  */
 
-import { estado, definirFerramenta, definirCorPreenchimento, definirCorBorda } from './core/StateManager.js';
+import { estado, definirFerramenta, definirCorPreenchimento, definirCorBorda, definirGerenciadorSelecao } from './core/StateManager.js';
 import { ColorPickerTool } from './tools/ColorPickerTool.js';
 import { RetanguloTool } from './tools/RetanguloTool.js';
+import { SelecaoTool } from './tools/SelecaoTool.js';
+import { Selecao } from './core/Selecao.js';
 
 // Referências aos elementos do DOM
 const svgCanvas = document.getElementById('canvas');
+const areaDesenho = document.getElementById('area-desenho');
+
+// Wrapper para sincronizar perfeitamente as coordenadas do #canvas com o #overlay-canvas
+const canvasContainer = document.createElement('div');
+canvasContainer.style.position = 'relative';
+canvasContainer.style.width = '100%';
+canvasContainer.style.height = '100%';
+
+// Encapsulando o svg original
+svgCanvas.parentNode.insertBefore(canvasContainer, svgCanvas);
+canvasContainer.appendChild(svgCanvas);
+
+// 1. Camada de Interação: instanciar o novo SVG de overlay para seleções
+const overlayCanvas = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+overlayCanvas.setAttribute('id', 'overlay-canvas');
+overlayCanvas.setAttribute('width', '100%');
+overlayCanvas.setAttribute('height', '100%');
+overlayCanvas.style.position = 'absolute';
+overlayCanvas.style.top = '0';
+overlayCanvas.style.left = '0';
+overlayCanvas.style.pointerEvents = 'none'; // Coordenado com o principal
+canvasContainer.appendChild(overlayCanvas);
+
+// Inicializar a classe de seleção
+const selecaoVisual = new Selecao(overlayCanvas);
+definirGerenciadorSelecao(selecaoVisual);
+
+
 
 // Instâncias das ferramentas disponíveis
 const instanciasFerramentas = {
+  selecao: new SelecaoTool(svgCanvas),
   retangulo: new RetanguloTool(svgCanvas),
   "Conta-gotas": new ColorPickerTool(svgCanvas),
-  // Futuras ferramentas (selecao, elipse, linha, texto) entrarão aqui
+  // Futuras ferramentas (elipse, linha, texto) entrarão aqui
 };
 
 const botoesFerramenta = document.querySelectorAll('.btn-ferramenta');
