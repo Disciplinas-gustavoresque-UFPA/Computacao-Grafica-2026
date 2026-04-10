@@ -9,12 +9,14 @@ export class LupaTool extends ToolBase {
 
     this.modo = 'click'; // zoom padrão do inkscape
 
+    // controles da interação mouseOnMove
     this.isDragging = false;
     this.start = null;
     this.dragButton = null;
     this.selectionRect = null;
 
-    // Estado interno do SVG : "área visivel"  
+
+    // Estado atual da área visivel (viewbox)
     this.viewBox = {
       x: 0,
       y: 0,
@@ -22,12 +24,14 @@ export class LupaTool extends ToolBase {
       height: svg.clientHeight
     }; // <-- viewBox
 
+
     this.initialViewBox = {
       ...this.viewBox
     }; // <-- initialViewBox (guardar a posição inicial)
   } // <-- constructor
   
-  // Voltar à posição inicial do viewBox
+
+  // Restaura posição inicial do viewBox
   resetView() {
     this.viewBox = {
       ...this.initialViewBox
@@ -35,7 +39,8 @@ export class LupaTool extends ToolBase {
     this.applyViewBox();
   } // <-- resetView
 
-  // Aplica o estado atual do viewBox no SVG : atualiza o "zoom"
+
+  // Aplica o viewBox atual no SVG (atualiza o "zoom")
   applyViewBox() {
     const {
       x,
@@ -46,29 +51,60 @@ export class LupaTool extends ToolBase {
     this.svg.setAttribute('viewBox', `${x} ${y} ${width} ${height}`);
   } // <-- applyViewBox
 
-    // Define o modo de interação da lupa 
+
+  // Atualiza estado visual do botão e do cursor
+  updateUI() {
+    const btn = document.getElementById('btn-drag');
+    if (!btn) return;
+
+    const ativo = this.modo === 'drag';
+
+    btn.classList.toggle('ativo', ativo);
+
+    // muda cursor dinamicamente
+    this.svg.style.cursor = ativo ? 'crosshair' : 'zoom-in';
+  } // <-- updateUI
+
+
+  // Alterna o modo de interação da lupa 
   setModo(modo) {
     this.modo = (this.modo === modo) ? 'click' : modo;
-    this.renderOptions();
+    this.updateUI();
   } // <-- setModo
 
 
   // Renderiza dinamicamente o painel de opcoes da lupa 
   renderOptions() {
-    const panel = document.getElementById('tool-options');
+    const panel = document.getElementById('zoom-options');
 
-    panel.innerHTML = `
-    <button id="btn-drag" class="${this.modo === 'drag' ? 'ativo' : ''}">
-    &#11193;
-    </button>
-    `;
+    if (!panel.dataset.initialized) {
+      panel.innerHTML = `
+        <button id="btn-drag" title="Zoom por seleção">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+            viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
 
-    panel.querySelector('#btn-drag').onclick = () => {
-      this.setModo('drag');
-    };
-  }
+            <!-- lente -->
+            <circle cx="10" cy="10" r="8"></circle>
+            <line x1="20" y1="20" x2="15" y2="15"></line>
 
-  // Maskara para os valores dos botoes do mouse 
+            <!-- retângulo de seleção -->
+            <rect x="7" y="7" width="6" height="6" stroke-dasharray="2"></rect>
+
+          </svg>
+        </button>
+        `;
+
+      // Evento para alternar para modo 'drag' 
+      panel.querySelector('#btn-drag').onclick = () => {
+        this.setModo('drag');
+      };
+    }
+  } // <-- renderOptions
+
+  
+  // Converte botão do mouse em máscara binária (para evento.buttons)
   getButtonMask(button) {
     switch (button) {
       case 0: return 1; // esquerdo
@@ -77,6 +113,7 @@ export class LupaTool extends ToolBase {
       default: return 0;
     }
   } // <-- getButtonMask
+
 
   // Realiza zoom mantendo o ponto (cx, cy) fixo como foco
   zoom(scale, cx, cy) {
@@ -94,36 +131,28 @@ export class LupaTool extends ToolBase {
     this.applyViewBox();
   } // <-- zoom 
   
+
+  // Inicio da interação com o mouse
   onMouseDown(evento) {
-    evento.preventDefault();
-    // Converte coordenadas do mouse (viewport) para o sistema (SVG)
     const coords = obterCoordenadaSVG(evento, this.svg);
     
-    if (this.isDragging) {
-      this.cleanup();
-    }
+    if (this.isDragging) this.cleanup();
     
-    // BOTAO DO MEIO = Reset
+    
+    // Botão do meio ( Reset do viebox )
     if (evento.button === 1) {
       this.resetView();
       return;
     }
 
+    // Modo zoom padrão ('click') 
     if (this.modo === 'click') {
-      
-      // Botão esquerdo : zoom in
-      if (evento.button === 0) {
-        this.zoom(0.9, coords.x, coords.y);
-      }
-
-       // Botão direito : zoom out
-      if (evento.button === 2) {
-        this.zoom(1.1, coords.x, coords.y);
-      }
-
+      if (evento.button === 0) this.zoom(0.9, coords.x, coords.y);
+      if (evento.button === 2) this.zoom(1.1, coords.x, coords.y);
       return;
     } // <-- fim do modo de zoom padrão 
 
+    // Modo zoom por seleção ('drag')
     if (this.modo === 'drag') {
       this.isDragging = true;
       this.start = coords;
@@ -139,12 +168,14 @@ export class LupaTool extends ToolBase {
     } // <-- fim do modo de zoom com  seleção
   } // <-- onMouseDown
   
+
+  // Atualiza retangulo de seleção e posiçao
   onMouseMove(evento) {
-    evento.preventDefault();
     if (!this.isDragging || this.modo !== 'drag' || !this.selectionRect) return;
     
     const expected = this.getButtonMask(this.dragButton);
 
+    // Cancela se botão foi solto
     if ((evento.buttons & expected) === 0) {
       this.cleanup();
       return;
@@ -163,6 +194,8 @@ export class LupaTool extends ToolBase {
     this.selectionRect.setAttribute("height", height);
   } // <-- onMouseMove
 
+
+  // Finaliza seleção e aplica zoom
   onMouseUp(evento) {
     evento.preventDefault();
     if (!this.isDragging || this.modo !== 'drag') return;
@@ -178,12 +211,13 @@ export class LupaTool extends ToolBase {
     const width = Math.abs(coords.x - this.start.x);
     const height = Math.abs(coords.y - this.start.y);
 
+    // Ignora seleções muito pequenas
     if (width < 5 || height < 5) {
       this.cleanup();
       return;
     }
     
-    // BOTÃO ESQUERDO = ZOOM IN
+    // Zoom In
     if (evento.button === 0) {
       this.viewBox = {
         x,
@@ -193,7 +227,7 @@ export class LupaTool extends ToolBase {
       };
     }
 
-    // BOTÃO DIREITO = ZOOM OUT
+    // Zoom Out 
     if (evento.button === 2) { 
       const scale = Math.max(
         this.viewBox.width / width,
@@ -213,6 +247,7 @@ export class LupaTool extends ToolBase {
     this.cleanup();
   } // <-- onMouseUp
 
+
   // Remove elementos temporários e reseta o estado/modo da lupa 
   cleanup() {
     if (this.selectionRect && this.selectionRect.parentNode) {
@@ -223,27 +258,36 @@ export class LupaTool extends ToolBase {
     this.dragButton = null;
   } // <-- cleanup
 
-  onAtivar() { 
-    this.svg.style.cursor = 'zoom-in';
 
-    const panel = document.getElementById('tool-options');
+  // Ativa ferramenta e exibe painel de opcoes do zoom
+  onAtivar() { 
+    const panel = document.getElementById('zoom-options');
     const btnLupa = document.querySelector('[data-ferramenta="lupa"]');
 
     const rect = btnLupa.getBoundingClientRect();
 
     panel.style.top = `${rect.top}px`;
     panel.style.left = `${rect.right + 8}px`;
+
     panel.classList.remove('hidden');
+    
     this.renderOptions();
+    this.updateUI();
+
+    this.svg.style.cursor = this.modo === 'drag' ? 'crosshair' : 'zoom-in';
   } // <-- onAtivar
 
+
+  // Desativa ferramenta e limpa UI
   onDesativar() {
     this.cleanup();
     this.svg.style.cursor = 'default';
 
-    const panel = document.getElementById('tool-options');
+    const panel = document.getElementById('zoom-options');
     panel.classList.add('hidden');
     panel.innerHTML = '';
+
+    this.setModo('click'); // reseta modo
   } // <-- onDesativar
 } // <-- class LupaTool
 

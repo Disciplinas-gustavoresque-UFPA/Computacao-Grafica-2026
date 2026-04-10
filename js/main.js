@@ -96,9 +96,11 @@ svgCanvas.addEventListener('mouseup', (evento) => {
   }
 });
 
-// Previne o menu de opções do botao direito do mouse no svg
+// Previne o menu de opções do botao direito no canvas
 svgCanvas.addEventListener('contextmenu', (e) => {
-  e.preventDefault();
+  if (e.target.closest('#canvas')) {
+    e.preventDefault();
+  }
 });
 
 // Inicializa os valores dos inputs com os valores padrão do estado
