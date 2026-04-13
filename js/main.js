@@ -151,5 +151,19 @@ window.addEventListener("keydown", (e) => {
 
   const teclaPressionada = e.key.toLowerCase();
   const ferramentaAlvo = mapaTeclas[teclaPressionada];
+  
+  // Adicionar e feedback visual
+  if (ferramentaAlvo) {
+    e.preventDefault();
+
+    // Buscar o botão na barra lateral
+    const botao = document.querySelector(`.btn-ferramenta[data-ferramenta="${ferramentaAlvo}"]`);
+
+    if (botao) {
+      // Simular click para utilizar o eventListener que chama `atualizarBotaoAtivo()`
+      // e aplica a classe CSS '.ativo' de forma automática.
+      botao.click();
+    }
   }
+}
 )
