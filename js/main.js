@@ -126,3 +126,9 @@ svgCanvas.addEventListener('mouseup', (evento) => {
 // Inicializa os valores dos inputs com os valores padrão do estado
 inputCorPreenchimento.value = estado.corPreenchimento;
 inputCorBorda.value = estado.corBorda;
+
+// Atalhos de Teclado (Tool Selection)
+window.addEventListener("keydown", (e) => {
+  
+  }
+)
