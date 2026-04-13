@@ -129,6 +129,14 @@ inputCorBorda.value = estado.corBorda;
 
 // Atalhos de Teclado (Tool Selection)
 window.addEventListener("keydown", (e) => {
+  // Prevenção de conflitos
+  // Verifica se o usuário está focado em um campo de texto ou input de cor.
+  const elementoAtivo = document.activeElement;
+  const tagAtiva = elementoAtivo.tagName.toLocaleLowerCase();
+
+  // Se o foco estiver em um input, textArea, select ou contentEditable, ignora o atalho.
+  if (["input", "textarea", "select"].includes(tagAtiva) || elementoAtivo.isContentEditable)
+    return;
   
   }
 )
