@@ -138,5 +138,18 @@ window.addEventListener("keydown", (e) => {
   if (["input", "textarea", "select"].includes(tagAtiva) || elementoAtivo.isContentEditable)
     return;
   
+  // Mapeamento das teclas 
+  // Conforme novas ferramentas forem surgindo, só adicionar o atalho e o nome da ferramenta aqui
+  const mapaTeclas = {
+    "s" : "selecao",
+    "r" : "retangulo",
+    "e" : "elipse",
+    "l" : "linha",
+    "t" : "texto",
+    "i" : "conta-gotas"
+  }
+
+  const teclaPressionada = e.key.toLowerCase();
+  const ferramentaAlvo = mapaTeclas[teclaPressionada];
   }
 )
