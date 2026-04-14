@@ -19,6 +19,18 @@ export const estado = {
   elementoSelecionado: null,
 };
 
+let gerenciadorSelecaoVisual = null;
+
+export function definirGerenciadorSelecao(selecao) {
+  gerenciadorSelecaoVisual = selecao;
+}
+
+export function atualizarPosicaoSelecaoVisual() {
+  if (gerenciadorSelecaoVisual && estado.elementoSelecionado) {
+    gerenciadorSelecaoVisual.atualizarPosicao(estado.elementoSelecionado);
+  }
+}
+
 /**
  * Define a ferramenta de desenho ativa.
  * Invoca os métodos de ciclo de vida `onDesativar` na ferramenta anterior
@@ -70,4 +82,7 @@ export function definirCorBorda(cor) {
  */
 export function definirElementoSelecionado(elemento) {
   estado.elementoSelecionado = elemento;
+  if (gerenciadorSelecaoVisual) {
+    gerenciadorSelecaoVisual.desenhar(elemento);
+  }
 }

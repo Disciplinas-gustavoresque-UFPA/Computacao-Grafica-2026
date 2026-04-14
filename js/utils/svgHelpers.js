@@ -26,7 +26,7 @@ export function criarElementoSVG(tag, atributos = {}) {
   const elemento = document.createElementNS(SVG_NS, tag);
 
   Object.entries(atributos).forEach(([chave, valor]) => {
-    elemento.setAttribute(chave, valor);
+    elemento.setAttribute(chave, valor.toString());
   });
 
   return elemento;
