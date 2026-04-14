@@ -91,7 +91,7 @@ export function exportarDesenho(svgElement, formato) {
     const url = URL.createObjectURL(blob);
 
     baixarArquivo(url, "meu_desenho.svg");
-    URL.revokeObjectURL(url);
+    setTimeout(() => URL.revokeObjectURL(url), 0);
     mostrarMensagem("Download iniciado: meu_desenho.svg");
     return;
   }
