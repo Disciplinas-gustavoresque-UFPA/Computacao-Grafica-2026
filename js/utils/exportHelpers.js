@@ -42,18 +42,21 @@ function mostrarMensagem(texto, duracao = 2500) {
     document.body.appendChild(el);
   }
 
+  clearTimeout(el._hideTimeout);
+  clearTimeout(el._removeTimeout);
+
   el.textContent = texto;
   // forçar reflow para garantir transição
   // eslint-disable-next-line no-unused-expressions
   el.offsetWidth;
   el.style.opacity = "1";
 
-  clearTimeout(el._hideTimeout);
   el._hideTimeout = setTimeout(() => {
     el.style.opacity = "0";
-    // remove após a transição
-    setTimeout(() => {
+    // remove after transition
+    el._removeTimeout = setTimeout(() => {
       if (el && el.parentNode) el.parentNode.removeChild(el);
+      el._removeTimeout = null;
     }, 250);
   }, duracao);
 }
