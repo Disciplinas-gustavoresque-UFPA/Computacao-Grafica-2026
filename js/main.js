@@ -12,6 +12,7 @@ import { ColorPickerTool } from './tools/ColorPickerTool.js';
 import { RetanguloTool } from './tools/RetanguloTool.js';
 import { SelecaoTool } from './tools/SelecaoTool.js';
 import { Selecao } from './core/Selecao.js';
+import { inicializarImageTracer } from './tools/ImageTracer.js';
 
 // Referências aos elementos do DOM
 const svgCanvas = document.getElementById('canvas');
@@ -126,3 +127,6 @@ svgCanvas.addEventListener('mouseup', (evento) => {
 // Inicializa os valores dos inputs com os valores padrão do estado
 inputCorPreenchimento.value = estado.corPreenchimento;
 inputCorBorda.value = estado.corBorda;
+
+// Inicializa o imagetracer
+inicializarImageTracer(svgCanvas);
