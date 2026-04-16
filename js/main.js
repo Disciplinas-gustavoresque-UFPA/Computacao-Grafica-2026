@@ -11,6 +11,7 @@ import { estado, definirFerramenta, definirCorPreenchimento, definirCorBorda, de
 import { ColorPickerTool } from './tools/ColorPickerTool.js';
 import { RetanguloTool } from './tools/RetanguloTool.js';
 import { SelecaoTool } from './tools/SelecaoTool.js';
+import { SideBar } from './core/SideBar.js';
 import { Selecao } from './core/Selecao.js';
 
 // Referências aos elementos do DOM
@@ -26,6 +27,9 @@ canvasContainer.style.height = '100%';
 // Encapsulando o svg original
 svgCanvas.parentNode.insertBefore(canvasContainer, svgCanvas);
 canvasContainer.appendChild(svgCanvas);
+
+// Inicializar as abas da barra lateral direita
+const sideBar = new SideBar();
 
 // 1. Camada de Interação: instanciar o novo SVG de overlay para seleções
 const overlayCanvas = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
