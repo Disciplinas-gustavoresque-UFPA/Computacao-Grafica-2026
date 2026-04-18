@@ -126,3 +126,44 @@ svgCanvas.addEventListener('mouseup', (evento) => {
 // Inicializa os valores dos inputs com os valores padrão do estado
 inputCorPreenchimento.value = estado.corPreenchimento;
 inputCorBorda.value = estado.corBorda;
+
+// Atalhos de Teclado (Tool Selection)
+window.addEventListener("keydown", (e) => {
+  // Prevenção de conflitos
+  // Verifica se o usuário está focado em um campo de texto ou input de cor.
+  const elementoAtivo = document.activeElement;
+  const tagAtiva = elementoAtivo.tagName.toLocaleLowerCase();
+
+  // Se o foco estiver em um input, textArea, select ou contentEditable, ignora o atalho.
+  if (["input", "textarea", "select"].includes(tagAtiva) || elementoAtivo.isContentEditable)
+    return;
+  
+  // Mapeamento das teclas 
+  // Conforme novas ferramentas forem surgindo, só adicionar o atalho e o nome da ferramenta aqui
+  const mapaTeclas = {
+    "s" : "selecao",
+    "r" : "retangulo",
+    "e" : "elipse",
+    "l" : "linha",
+    "t" : "texto",
+    "i" : "conta-gotas"
+  }
+
+  const teclaPressionada = e.key.toLowerCase();
+  const ferramentaAlvo = mapaTeclas[teclaPressionada];
+  
+  // Adicionar e feedback visual
+  if (ferramentaAlvo) {
+    e.preventDefault();
+
+    // Buscar o botão na barra lateral
+    const botao = document.querySelector(`.btn-ferramenta[data-ferramenta="${ferramentaAlvo}"]`);
+
+    if (botao) {
+      // Simular click para utilizar o eventListener que chama `atualizarBotaoAtivo()`
+      // e aplica a classe CSS '.ativo' de forma automática.
+      botao.click();
+    }
+  }
+}
+)
