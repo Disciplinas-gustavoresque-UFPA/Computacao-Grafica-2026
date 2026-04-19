@@ -1,71 +1,153 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Editor Vetorial — Computação Gráfica 2026</title>
+        <link rel="stylesheet" href="css/style.css" />
+    </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Editor Vetorial — Computação Gráfica 2026</title>
-  <link rel="stylesheet" href="css/style.css" />
-</head>
+    <body>
+        <div id="app">
+            <!-- Painel Superior: propriedades (cor de preenchimento, cor de borda, etc.) -->
+            <header id="painel-propriedades">
+                <span class="propriedade-label">Preenchimento:</span>
+                <input
+                    type="color"
+                    id="cor-preenchimento"
+                    value="#4a90d9"
+                    title="Cor de preenchimento"
+                />
 
-<body>
-  <div id="app">
+                <span class="propriedade-label">Borda:</span>
+                <input
+                    type="color"
+                    id="cor-borda"
+                    value="#1a1a2e"
+                    title="Cor da borda"
+                />
 
-    <!-- Painel Superior: propriedades (cor de preenchimento, cor de borda, etc.) -->
-    <header id="painel-propriedades">
-      <span class="propriedade-label">Preenchimento:</span>
-      <input type="color" id="cor-preenchimento" value="#4a90d9" title="Cor de preenchimento" />
+                <span id="ferramenta-atual-label"
+                    >Ferramenta:
+                    <strong id="nome-ferramenta">Nenhuma</strong></span
+                >
+                <!-- Botão de exportar/descarregar desenho -->
+                <label for="export-format" class="propriedade-label"
+                    >Exportar:</label
+                >
+                <div class="select-wrapper">
+                    <select
+                        class="select-format"
+                        id="export-format"
+                        title="Formato de exportação"
+                    >
+                        <option value="png" selected>PNG</option>
+                        <option value="jpg">JPG</option>
+                        <option value="svg">SVG</option>
+                    </select>
 
-      <span class="propriedade-label">Borda:</span>
-      <input type="color" id="cor-borda" value="#1a1a2e" title="Cor da borda" />
+                    <svg
+                        class="select-arrow"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                        focusable="false"
+                    >
+                        <path d="M7 10l5 5 5-5z" />
+                    </svg>
+                </div>
+                <button
+                    class="btn-exportar"
+                    id="btn-exportar"
+                    title="Salvar/Exportar desenho"
+                >
+                    Baixar 💾
+                </button>
+            </header>
 
-      <span id="ferramenta-atual-label">Ferramenta: <strong id="nome-ferramenta">Nenhuma</strong></span>
-    </header>
+            <div id="workspace">
+                <!-- Barra Lateral: botões das ferramentas de desenho -->
+                <aside id="barra-ferramentas">
+                    <button
+                        class="btn-ferramenta"
+                        data-ferramenta="selecao"
+                        title="Seleção (S)"
+                    >
+                        &#9654;
+                    </button>
+                    <button
+                        class="btn-ferramenta"
+                        data-ferramenta="retangulo"
+                        title="Retângulo (R)"
+                    >
+                        &#9645;
+                    </button>
+                    <button
+                        class="btn-ferramenta"
+                        data-ferramenta="elipse"
+                        title="Elipse (E)"
+                    >
+                        &#9711;
+                    </button>
+                    <button
+                        class="btn-ferramenta"
+                        data-ferramenta="linha"
+                        title="Linha (L)"
+                    >
+                        &#9135;
+                    </button>
+                    <button
+                        class="btn-ferramenta"
+                        data-ferramenta="texto"
+                        title="Texto (T)"
+                    >
+                        T
+                    </button>
+                    <button
+                        class="btn-ferramenta"
+                        data-ferramenta="Conta-gotas"
+                        title="Conta-gotas"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-pipette-icon lucide-pipette"
+                        >
+                            <path
+                                d="m12 9-8.414 8.414A2 2 0 0 0 3 18.828v1.344a2 2 0 0 1-.586 1.414A2 2 0 0 1 3.828 21h1.344a2 2 0 0 0 1.414-.586L15 12"
+                            />
+                            <path
+                                d="m18 9 .4.4a1 1 0 1 1-3 3l-3.8-3.8a1 1 0 1 1 3-3l.4.4 3.4-3.4a1 1 0 1 1 3 3z"
+                            />
+                            <path d="m2 22 .414-.414" />
+                        </svg>
+                    </button>
+                </aside>
 
-    <div id="workspace">
+                <!-- Área Central de Desenho -->
+                <main id="area-desenho">
+                    <svg
+                        id="canvas"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="100%"
+                        height="100%"
+                        aria-label="Área de desenho vetorial"
+                    >
+                        <!-- Os elementos SVG criados pelo usuário serão inseridos aqui -->
+                    </svg>
+                </main>
+            </div>
+            <!-- /#workspace -->
+        </div>
+        <!-- /#app -->
 
-      <!-- Barra Lateral: botões das ferramentas de desenho -->
-      <aside id="barra-ferramentas">
-        <button class="btn-ferramenta" data-ferramenta="selecao" title="Seleção (S)">
-          &#9654;
-        </button>
-        <button class="btn-ferramenta" data-ferramenta="retangulo" title="Retângulo (R)">
-          &#9645;
-        </button>
-        <button class="btn-ferramenta" data-ferramenta="elipse" title="Elipse (E)">
-          &#9711;
-        </button>
-        <button class="btn-ferramenta" data-ferramenta="linha" title="Linha (L)">
-          &#9135;
-        </button>
-        <button class="btn-ferramenta" data-ferramenta="texto" title="Texto (T)">
-          T
-        </button>
-        <button class="btn-ferramenta" data-ferramenta="Conta-gotas" title="Conta-gotas">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            class="lucide lucide-pipette-icon lucide-pipette">
-            <path
-              d="m12 9-8.414 8.414A2 2 0 0 0 3 18.828v1.344a2 2 0 0 1-.586 1.414A2 2 0 0 1 3.828 21h1.344a2 2 0 0 0 1.414-.586L15 12" />
-            <path d="m18 9 .4.4a1 1 0 1 1-3 3l-3.8-3.8a1 1 0 1 1 3-3l.4.4 3.4-3.4a1 1 0 1 1 3 3z" />
-            <path d="m2 22 .414-.414" />
-          </svg>
-        </button>
-      </aside>
-
-      <!-- Área Central de Desenho -->
-      <main id="area-desenho">
-        <svg id="canvas" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"
-          aria-label="Área de desenho vetorial">
-          <!-- Os elementos SVG criados pelo usuário serão inseridos aqui -->
-        </svg>
-      </main>
-
-    </div><!-- /#workspace -->
-  </div><!-- /#app -->
-
-  <!-- Ponto de entrada da aplicação: ES6 Module -->
-  <script type="module" src="js/main.js"></script>
-</body>
-
+        <!-- Ponto de entrada da aplicação: ES6 Module -->
+        <script type="module" src="js/main.js"></script>
+    </body>
 </html>
