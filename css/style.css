@@ -175,6 +175,30 @@ body {
   position: relative;
   top: 0;
   color: #0f3460;
+  transition: transform 0.3s ease; /* Faz o deslize suave */
+}
+
+#barra-configuracoes.escondida {
+  transform: translateX(300px); /*Define a quantidade de barra a ser escondida*/
+}
+
+/* Estilo do botão de toggle */
+#btn-toggle-sidebar {
+  position: absolute;
+  left: -20px; /* Fica pendurado para fora da barra */
+  top: 50%;
+  transform: translateY(-50%);
+  background: #eee;
+  border: 1px solid #ddd;
+  border-radius: 5px 0 0 5px;
+  cursor: pointer;
+  padding: 10px 5px;
+  z-index: 10;
+}
+
+/* Rotaciona a setinha quando esconder */
+#barra-configuracoes.escondida #btn-toggle-sidebar {
+  transform: translateY(-50%) rotate(180deg);
 }
 
 /* Navegação das Abas */
