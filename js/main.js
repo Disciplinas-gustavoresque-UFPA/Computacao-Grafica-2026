@@ -13,6 +13,7 @@ import { RetanguloTool } from './tools/RetanguloTool.js';
 import { exportarDesenho } from './utils/exportHelpers.js';
 import { SelecaoTool } from './tools/SelecaoTool.js';
 import { Selecao } from './core/Selecao.js';
+import { NodeEditTool } from './tools/NodeEditTool.js';
 
 // Referências aos elementos do DOM
 const svgCanvas = document.getElementById('canvas');
@@ -48,6 +49,7 @@ definirGerenciadorSelecao(selecaoVisual);
 // Instâncias das ferramentas disponíveis
 const instanciasFerramentas = {
   selecao: new SelecaoTool(svgCanvas),
+  edicaoVertices: new NodeEditTool(svgCanvas),
   retangulo: new RetanguloTool(svgCanvas),
   "Conta-gotas": new ColorPickerTool(svgCanvas),
   // Futuras ferramentas (elipse, linha, texto) entrarão aqui
