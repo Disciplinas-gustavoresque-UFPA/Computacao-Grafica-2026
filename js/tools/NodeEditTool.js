@@ -1,5 +1,6 @@
 import { ToolBase } from './ToolBase.js';
-import { estado } from '../core/StateManager.js';
+import { SelecaoTool } from './SelecaoTool.js';
+import { definirElementoSelecionado, estado } from '../core/StateManager.js';
 import { obterCoordenadaSVG, criarElementoSVG } from '../utils/svgHelpers.js';
 
 /**
@@ -17,9 +18,25 @@ export class NodeEditTool extends ToolBase {
     /**
      * Executado ao selecionar a ferramenta na barra lateral.
      */
-    onAtivar() {
-        // Verifica se há algo selecionado no estado global
-        this.elementoAlvo = estado.elementoSelecionado;
+    onMouseDown(evento) {
+        const pt = obterCoordenadaSVG(evento, this.svgCanvas);
+        const target = evento.target;
+        this.limparSelecao();
+
+        const allowedTags = ['rect'];
+        const tag = target.tagName ? target.tagName.toLowerCase() : '';
+
+        // Se o clique não foi no canvas vazio e for um elemento permitido
+        if (
+            target !== this.svgCanvas &&
+            target.parentNode === this.svgCanvas &&
+            allowedTags.includes(tag)
+        ) {
+            // Verifica se há algo selecionado no estado global
+            this.elementoAlvo = target;
+            // Chama a função definindo o elemento selecionado no gerenciador de estado, o que atualiza a camada visual de seleção.
+            definirElementoSelecionado(target);
+        }
         
         if (this.elementoAlvo) {
             console.log("Editando vértices de:", this.elementoAlvo.tagName);
@@ -42,38 +59,64 @@ export class NodeEditTool extends ToolBase {
     }
 
     /**
-     * Lógica inicial para identificar os pontos estruturais.
-     * Focaremos inicialmente em elementos do tipo 'rect'.
+     * Identifica os pontos e solicita a renderização.
      */
     identificarVertices() {
+        let vertices = [];
+
         if (this.elementoAlvo.tagName === 'rect') {
             const x = parseFloat(this.elementoAlvo.getAttribute('x'));
             const y = parseFloat(this.elementoAlvo.getAttribute('y'));
             const w = parseFloat(this.elementoAlvo.getAttribute('width'));
             const h = parseFloat(this.elementoAlvo.getAttribute('height'));
 
-            // Define os 4 cantos do retângulo
-            const vertices = [
-                { x: x, y: y, tipo: 'superior-esquerdo' },
-                { x: x + w, y: y, tipo: 'superior-direito' },
-                { x: x + w, y: y + h, tipo: 'inferior-direito' },
-                { x: x, y: y + h, tipo: 'inferior-esquerdo' }
+            vertices = [
+                { x: x, y: y, id: 'top-left' },
+                { x: x + w, y: y, id: 'top-right' },
+                { x: x + w, y: y + h, id: 'bottom-right' },
+                { x: x, y: y + h, id: 'bottom-left' }
             ];
-
-            console.log("Vértices identificados:", vertices);
-            return vertices;
         }
-        return [];
+
+        // Renderiza cada vértice identificado
+        vertices.forEach(ponto => this.renderizarHandle(ponto));
+    }
+
+    /**
+     * Cria a representação visual (alça) de um vértice no overlay.
+     * @param {Object} ponto - Coordenadas e ID do ponto.
+     */
+    renderizarHandle(ponto) {
+        const handle = criarElementoSVG('rect', {
+            'x': ponto.x - 4, // Centraliza o handle de 8x8 no ponto exato
+            'y': ponto.y - 4,
+            'width': 8,
+            'height': 8,
+            'fill': 'white',
+            'stroke': '#4a90d9',
+            'stroke-width': 1,
+            'style': 'cursor: move;',
+            'class': 'node-handle',
+            'data-node-id': ponto.id
+        });
+
+        this.grupoOverlay.appendChild(handle);
     }
 
     /**
      * Limpa os elementos de interface ao trocar de ferramenta.
      */
     onDesativar() {
+        this.limparSelecao();
+    }
+
+    limparSelecao() {
         if (this.grupoOverlay) {
             this.grupoOverlay.remove();
             this.grupoOverlay = null;
         }
         this.elementoAlvo = null;
-    }
+        definirElementoSelecionado(null);
+      }
+    
 }
