@@ -34,6 +34,7 @@ body {
   color: var(--cor-texto);
   height: 100vh;
   overflow: hidden;
+  overscroll-behavior: contain;
 }
 
 /* =========================================================
@@ -236,4 +237,81 @@ body {
   cursor: crosshair;
   width: 100%;
   height: 100%;
+}
+
+/* Nova Barra Lateral Direita */
+#barra-configuracoes {
+  width: 300px;
+  height:auto;
+  background-color: #f4f4f4;
+  border-left: 1px solid #ccc;
+  display:flex;
+  flex-direction: column;
+  position: relative;
+  top: 0;
+  color: #0f3460;
+  transition: transform 0.3s ease; /* Faz o deslize suave */
+}
+
+#barra-configuracoes.escondida {
+  transform: translateX(300px); /*Define a quantidade de barra a ser escondida*/
+}
+
+/* Estilo do botão de toggle */
+#btn-toggle-sidebar {
+  position: absolute;
+  left: -20px; /* Fica pendurado para fora da barra */
+  top: 50%;
+  transform: translateY(-50%);
+  background: #eee;
+  border: 1px solid #ddd;
+  border-radius: 5px 0 0 5px;
+  cursor: pointer;
+  padding: 10px 5px;
+  z-index: 10;
+}
+
+/* Rotaciona a setinha quando esconder */
+#barra-configuracoes.escondida #btn-toggle-sidebar {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+/* Navegação das Abas */
+.tabs-nav {
+  display: flex;
+  background-color: #e0e0e0;
+  border-bottom: 1px solid #ccc;
+}
+
+/* Botão das abas */
+.tab-btn {
+  flex: 1;
+  padding: 10px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-size: 1.2rem;
+}
+
+/* Destaca a aba que está clicada */
+.tab-btn.ativo {
+  background-color: #f4f4f4;
+  border-bottom: 2px solid #4a90d9;
+}
+
+/* Container do conteúdo */
+.tabs-container {
+  flex:content;
+  overflow-y:scroll;
+  overflow-x:none;
+  height: auto
+}
+
+.tab-content {
+  display: none;
+  height: auto;
+}
+
+.tab-content.ativo {
+  display: block;
 }
