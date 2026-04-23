@@ -11,12 +11,13 @@
  *  - elementoSelecionado {SVGElement|null} - Elemento SVG atualmente selecionado.
  */
 
-/** @type {{ ferramentaAtual: import('../tools/ToolBase.js').ToolBase|null, corPreenchimento: string, corBorda: string, elementoSelecionado: SVGElement|null }} */
+/** @type {{ ferramentaAtual: import('../tools/ToolBase.js').ToolBase|null, corPreenchimento: string, corBorda: string, elementoSelecionado: SVGElement|null, interfaceAtual: string }} */
 export const estado = {
   ferramentaAtual: null,
   corPreenchimento: '#4a90d9',
   corBorda: '#1a1a2e',
   elementoSelecionado: null,
+  interfaceAtual: 'inicio', // Nova flag para sabermos onde o usuário está
 };
 
 let gerenciadorSelecaoVisual = null;
@@ -85,4 +86,9 @@ export function definirElementoSelecionado(elemento) {
   if (gerenciadorSelecaoVisual) {
     gerenciadorSelecaoVisual.desenhar(elemento);
   }
+}
+
+
+export function definirInterface(novaInterface) {
+  estado.interfaceAtual = novaInterface;
 }
