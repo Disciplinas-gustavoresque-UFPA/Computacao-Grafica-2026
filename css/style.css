@@ -237,3 +237,76 @@ body {
   width: 100%;
   height: 100%;
 }
+
+.oculto {
+  display: none !important;
+}
+
+#tela-inicial {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: var(--cor-fundo-app);
+  color: var(--cor-texto);
+}
+
+#tela-inicial h1 {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  color: var(--cor-texto);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.menu-opcoes {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background-color: var(--cor-fundo-painel);
+  padding: 32px;
+  border-radius: var(--raio-borda);
+  border: 1px solid var(--cor-borda-ui);
+  box-shadow: var(--sombra-padrao);
+  width: 100%;
+  max-width: 400px;
+}
+
+.grupo-opcao {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+/* Reutilizando a estrutura de botão para o menu */
+.btn-menu {
+  background-color: transparent;
+  color: var(--cor-texto);
+  border: 1px solid var(--cor-borda-ui);
+  border-radius: var(--raio-borda);
+  padding: 12px 16px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.btn-menu:hover {
+  border-color: var(--cor-destaque);
+  background-color: rgba(74, 144, 217, 0.1);
+  color: var(--cor-destaque);
+}
+
+/* O botão de criar novo documento merece destaque */
+#btn-novo-doc {
+  background-color: var(--cor-destaque);
+  color: #fff;
+  border-color: var(--cor-destaque);
+  font-weight: bold;
+}
+
+#btn-novo-doc:hover {
+  background-color: #3a7bc2; /* Tom levemente mais escuro */
+  transform: translateY(-2px);
+}

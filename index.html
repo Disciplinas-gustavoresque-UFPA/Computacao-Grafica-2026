@@ -8,7 +8,31 @@
     </head>
 
     <body>
-        <div id="app">
+        <div id="tela-inicial">
+            <h1>Editor Vetorial 2026</h1>
+            <nav class="menu-opcoes">
+                <button id="btn-novo-doc" class="btn-menu">Criar novo documento</button>
+
+                <div class="grupo-opcao">
+                    <label for+"select-tamanho" class"propriedade-label">Tamanho da página:</label>
+                    <div class="select-wrapper">
+                        <select id="select-tamanho" class="select-format">
+                            <option value="livre" selected>Livre</option>
+                            <option value="a4">A4 (800x1131)</option>
+                            <option value="a3">A3 (1131x1600)</option>
+                        </select>
+                        <svg class="select-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                            <path d="M7 10l5 5 5-5z" />
+                        </svg>
+                    </div>
+                </div>
+
+                <button id="btn-abrir-arq" class="btn-menu">Abrir arquivo</button>
+                <button id="btn-modelos" class="btn-menu">Modelos (templates)</button>
+                <button id="btn-config" class="btn-menu">Configurações</button>
+            </nav>
+        </div>
+        <div id="app" class="oculto">
             <!-- Painel Superior: propriedades (cor de preenchimento, cor de borda, etc.) -->
             <header id="painel-propriedades">
                 <span class="propriedade-label">Preenchimento:</span>

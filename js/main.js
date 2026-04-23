@@ -13,9 +13,11 @@ import { RetanguloTool } from './tools/RetanguloTool.js';
 import { exportarDesenho } from './utils/exportHelpers.js';
 import { SelecaoTool } from './tools/SelecaoTool.js';
 import { Selecao } from './core/Selecao.js';
+import { inicializarMenuInicial } from './core/UIManager.js';
 
 // Referências aos elementos do DOM
 const svgCanvas = document.getElementById('canvas');
+inicializarMenuInicial(svgCanvas);
 const areaDesenho = document.getElementById('area-desenho');
 
 // Wrapper para sincronizar perfeitamente as coordenadas do #canvas com o #overlay-canvas
