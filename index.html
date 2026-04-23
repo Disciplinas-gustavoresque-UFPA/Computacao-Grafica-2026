@@ -1,145 +1,99 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Editor Vetorial — Computação Gráfica 2026</title>
-  <link rel="stylesheet" href="css/style.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Editor Vetorial — Computação Gráfica 2026</title>
+    <link rel="stylesheet" href="css/style.css" />
 </head>
 
 <body>
-  <div id="app">
+    <div id="app">
+        <header id="painel-propriedades">
+            <span class="propriedade-label">Preenchimento:</span>
+            <input type="color" id="cor-preenchimento" value="#4a90d9" title="Cor de preenchimento" />
 
-    <!-- Painel Superior: propriedades (cor de preenchimento, cor de borda, etc.) -->
-    <header id="painel-propriedades">
-      <span class="propriedade-label">Preenchimento:</span>
-      <input type="color" id="cor-preenchimento" value="#4a90d9" title="Cor de preenchimento" />
+            <span class="propriedade-label">Borda:</span>
+            <input type="color" id="cor-borda" value="#1a1a2e" title="Cor da borda" />
 
-      <span class="propriedade-label">Borda:</span>
-      <input type="color" id="cor-borda" value="#1a1a2e" title="Cor da borda" />
+            <span id="ferramenta-atual-label">Ferramenta: <strong id="nome-ferramenta">Nenhuma</strong></span>
 
-      <span id="ferramenta-atual-label">Ferramenta: <strong id="nome-ferramenta">Nenhuma</strong></span>
-    </header>
+            <label for="export-format" class="propriedade-label">Exportar:</label>
+            <div class="select-wrapper">
+                <select class="select-format" id="export-format" title="Formato de exportação">
+                    <option value="png" selected>PNG</option>
+                    <option value="jpg">JPG</option>
+                    <option value="svg">SVG</option>
+                </select>
+                <svg class="select-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M7 10l5 5 5-5z" />
+                </svg>
+            </div>
+            <button class="btn-exportar" id="btn-exportar" title="Salvar/Exportar desenho">
+                Baixar 💾
+            </button>
+        </header>
 
-    <div id="workspace">
+        <div id="workspace">
+            <aside id="barra-ferramentas">
+                <button class="btn-ferramenta" data-ferramenta="selecao" title="Seleção (S)">&#9654;</button>
+                <button class="btn-ferramenta" data-ferramenta="retangulo" title="Retângulo (R)">&#9645;</button>
+                <button class="btn-ferramenta" data-ferramenta="elipse" title="Elipse (E)">&#9711;</button>
+                <button class="btn-ferramenta" data-ferramenta="linha" title="Linha (L)">&#9135;</button>
+                <button class="btn-ferramenta" data-ferramenta="texto" title="Texto (T)">T</button>
+                <button class="btn-ferramenta" data-ferramenta="Conta-gotas" title="Conta-gotas">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pipette">
+                        <path d="m12 9-8.414 8.414A2 2 0 0 0 3 18.828v1.344a2 2 0 0 1-.586 1.414A2 2 0 0 1 3.828 21h1.344a2 2 0 0 0 1.414-.586L15 12" />
+                        <path d="m18 9 .4.4a1 1 0 1 1-3 3l-3.8-3.8a1 1 0 1 1 3-3l.4.4 3.4-3.4a1 1 0 1 1 3 3z" />
+                        <path d="m2 22 .414-.414" />
+                    </svg>
+                </button>
+            </aside>
 
-      <!-- Barra Lateral: botões das ferramentas de desenho -->
-      <aside id="barra-ferramentas">
-        <button class="btn-ferramenta" data-ferramenta="selecao" title="Seleção (S)">
-          &#9654;
-        </button>
-        <button class="btn-ferramenta" data-ferramenta="retangulo" title="Retângulo (R)">
-          &#9645;
-        </button>
-        <button class="btn-ferramenta" data-ferramenta="elipse" title="Elipse (E)">
-          &#9711;
-        </button>
-        <button class="btn-ferramenta" data-ferramenta="linha" title="Linha (L)">
-          &#9135;
-        </button>
-        <button class="btn-ferramenta" data-ferramenta="texto" title="Texto (T)">
-          T
-        </button>
-        <button class="btn-ferramenta" data-ferramenta="Conta-gotas" title="Conta-gotas">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            class="lucide lucide-pipette-icon lucide-pipette">
-            <path
-              d="m12 9-8.414 8.414A2 2 0 0 0 3 18.828v1.344a2 2 0 0 1-.586 1.414A2 2 0 0 1 3.828 21h1.344a2 2 0 0 0 1.414-.586L15 12" />
-            <path d="m18 9 .4.4a1 1 0 1 1-3 3l-3.8-3.8a1 1 0 1 1 3-3l.4.4 3.4-3.4a1 1 0 1 1 3 3z" />
-            <path d="m2 22 .414-.414" />
-          </svg>
-        </button>
-      </aside>
+            <main id="area-desenho">
+                <svg id="canvas" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" aria-label="Área de desenho vetorial">
+                    </svg>
+            </main>
 
-      <!-- Área Central de Desenho -->
-      <main id="area-desenho">
-        <svg id="canvas" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"
-          aria-label="Área de desenho vetorial">
-          <!-- Os elementos SVG criados pelo usuário serão inseridos aqui -->
-        </svg>
-      </main>
-      
-      <!-- Side Bar-->
-      <aside id="barra-configuracoes">
-        <button id="btn-toggle-sidebar" title="Esconder Painel">❯</button>
-        <nav class="tabs-nav">
-          <button class="tab-btn ativo" data-target="tab-estilo" title="Estilo (Preenchimento e Borda)">
-            <!-- Cada svg deste é um ícone para o botão das configurações -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-palette">
-              <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/>
-              <circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/>
-              <circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/>
-              <circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/>
-              <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.92 0 1.7-.39 2.3-1.03.35-.37.56-.86.56-1.38 0-1.53 1.1-2.59 2.59-2.59H20c1.1 0 2-.9 2-2 0-7.18-4.5-13-10-13z"/>
-            </svg>
-          </button>
-          
-          <button class="tab-btn" data-target="tab-tracer" title="Vetorizar Imagem">
-            <!-- Cada svg deste é um ícone para o botão das configurações -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-image">
-              <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
-              <circle cx="9" cy="9" r="2"/>
-              <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
-            </svg>
-          </button>
-          
-          <button class="tab-btn" data-target="tab-camadas" title="Camadas">
-            <!-- Cada svg deste é um ícone para o botão das configurações -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layers">
-              <path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/>
-              <path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/>
-              <path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/>
-            </svg>
-          </button>
+            <aside id="barra-configuracoes">
+                <button id="btn-toggle-sidebar" title="Esconder Painel">❯</button>
+                
+                <nav class="tabs-nav">
+                    <button class="tab-btn ativo" data-target="tab-estilo" title="Estilo">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-palette"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.92 0 1.7-.39 2.3-1.03.35-.37.56-.86.56-1.38 0-1.53 1.1-2.59 2.59-2.59H20c1.1 0 2-.9 2-2 0-7.18-4.5-13-10-13z"/></svg>
+                    </button>
+                    <button class="tab-btn" data-target="tab-tracer" title="Vetorizar">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-image"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                    </button>
+                    <button class="tab-btn" data-target="tab-camadas" title="Camadas">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layers"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg>
+                    </button>
+                </nav>
 
-          <!-- <button> Outros botões de funcionalidade devem ser postos aqui </button> -->
-        
-        </nav>
+                <div class="tabs-container">
+                    <div id="tab-estilo" class="tab-content ativo">
+                        <h3>Estilo do Objeto</h3>
+                        <label>Preenchimento:
+                            <input type="color" id="cor-preenchimento-sidebar" value="#000000" />
+                        </label>
+                        <br><br>
+                        <label>Borda:
+                            <input type="color" id="cor-borda-sidebar" value="#000000" />
+                        </label>
+                    </div>
 
-        <div class="tabs-container">
-          <div id="tab-estilo" class="tab-content ativo">
-            <h3>Estilo do Objeto</h3>
-            <!-- Exemplo de uso para as cores. Elas precisam migrar para cá futuramente. -->
-            <label>
-              Preenchimento:
-              <input type="color" id="cor-preenchimento" value="#000000" />
-            </label>
-            <br>
-            <br>
-            <label>
-              Borda:
-              <input type="color" id="cor-borda" value="#000000" />
-            </label>
-          </div>
-          
+                    <div id="tab-tracer" class="tab-content">
+                        <h3>Image Tracer</h3>
+                        <p>Importe uma imagem para converter em vetor.</p>  
+                        <button id="btn-trace-sidebar">Importar Imagem</button>
+                    </div>
 
-          <div id="tab-estilo" class="tab-content ativo">
-              <h3>Configurações de Estilo</h3>
-          </div>
-          
-          <div id="tab-tracer" class="tab-content">
-            <h3>Image Tracer</h3>
-            <p>Importe uma imagem para converter em vetor.</p>
-            <button id="btn-trace-sidebar">Importar Imagem</button>
-          </div>
-          
-          <div id="tab-camadas" class="tab-content">
-            <h3>Camadas</h3>
-            <p>Gerenciador de camadas entrará aqui...</p>
-          </div>
-          
-          <!-- Outras divs de funcionalidades devem ser postas aqui -->
-        </div>
-
-      </aside> <!-- Side Bar -->
-
-    </div><!-- /#workspace -->
-  </div><!-- /#app -->
-
-  <!-- Ponto de entrada da aplicação: ES6 Module -->
-  <script type="module" src="js/main.js"></script>
+                    <div id="tab-camadas" class="tab-content">
+                        <h3>Camadas</h3>
+                        <p>Gerenciador de camadas entrará aqui...</p>
+                    </div>
+                </div>
+            </aside>
+        </div> </div> <script type="module" src="js/main.js"></script>
 </body>
-
 </html>
