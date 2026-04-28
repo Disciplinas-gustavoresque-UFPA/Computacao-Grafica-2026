@@ -1,5 +1,6 @@
 import { ToolBase } from "./ToolBase.js";
 import { criarElementoSVG, obterCoordenadaSVG } from "../utils/svgHelpers.js";
+import { estado } from "../core/StateManager.js";
 
 export class EllipseTool extends ToolBase {
     constructor(svgCanvas) {
@@ -23,8 +24,8 @@ export class EllipseTool extends ToolBase {
             cy: this.startY,
             rx: 0,
             ry: 0,
-            fill: 'transparent',
-            stroke: 'black',
+            fill: estado.corPreenchimento,
+            stroke: estado.corBorda,
             'stroke-width': 2
         });
 
