@@ -55,4 +55,19 @@ export class EllipseTool extends ToolBase {
             this.ellipseElement = null
         }
     }
+
+    onDesativar() {
+        // Se a ferramenta for desativada durante um desenho em andamento,
+        // removemos a elipse parcial e resetamos o estado interno.
+        if (this.isDrawing && this.ellipseElement) {
+            const parent = this.ellipseElement.parentNode;
+            if (parent) {
+                parent.removeChild(this.ellipseElement);
+            }
+        }
+        this.isDrawing = false;
+        this.ellipseElement = null;
+        this.startX = 0;
+        this.startY = 0;
+    }
 }
