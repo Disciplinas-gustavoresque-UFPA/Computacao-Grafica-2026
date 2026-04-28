@@ -19,7 +19,12 @@
       <span class="propriedade-label">Borda:</span>
       <input type="color" id="cor-borda" value="#1a1a2e" title="Cor da borda" />
 
+      <div>
+        <div id="zoom-options" class="hidden"></div> <!-- Menu de opçoes para a lupa/zoom -->
+        <div id="zoom-indicator">Zoom: 100%</div>
+      </div>
       <span id="ferramenta-atual-label">Ferramenta: <strong id="nome-ferramenta">Nenhuma</strong></span>
+
     </header>
 
     <div id="workspace">
@@ -46,15 +51,12 @@
           viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2"
           stroke-linecap="round" stroke-linejoin="round">
-
           <!-- lente -->
           <circle cx="11" cy="11" r="7"></circle>
           <!-- cabo -->
           <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-
         </svg>
       </button>
-      <div id="zoom-options" class="hidden"></div> <!-- Menu de opçoes para a lupa/zoom -->
 
         <button class="btn-ferramenta" data-ferramenta="Conta-gotas" title="Conta-gotas">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -67,7 +69,7 @@
           </svg>
         </button>
       </aside>
-   
+
       <!-- Área Central de Desenho -->
       <main id="area-desenho">
         <svg id="canvas" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"
@@ -76,6 +78,7 @@
         </svg>
       </main>
 
+      
     </div><!-- /#workspace -->
   </div><!-- /#app -->
 

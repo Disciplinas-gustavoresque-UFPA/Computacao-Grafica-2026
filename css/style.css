@@ -201,3 +201,25 @@ body {
   background: rgba(0, 38, 255, 0.35);
   border-color: var(--cor-destaque);
 }
+
+#zoom-indicator {
+  display: grid;
+  width: 120px;
+  height: 36px;
+  position: relative;
+  top: 8%;
+  right: 0%;
+
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+
+  padding: 6px 12px;
+  border-radius: 8px;
+
+  font-size: 14px;
+  font-family: sans-serif;
+
+  pointer-events: none;
+  overflow: hidden;
+  
+}

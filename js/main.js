@@ -50,7 +50,8 @@ const instanciasFerramentas = {
   selecao: new SelecaoTool(svgCanvas),
   retangulo: new RetanguloTool(svgCanvas),
   "Conta-gotas": new ColorPickerTool(svgCanvas),
-  // Futuras ferramentas (selecao, elipse, linha, texto) entrarão aqui
+  lupa: new LupaTool(svgCanvas),
+  // Futuras ferramentas (elipse, linha, texto) entrarão aqui
 };
 
 
