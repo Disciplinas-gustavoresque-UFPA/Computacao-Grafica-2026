@@ -130,6 +130,12 @@ svgCanvas.addEventListener('mouseup', (evento) => {
 inputCorPreenchimento.value = estado.corPreenchimento;
 inputCorBorda.value = estado.corBorda;
 
+// Exportar / Salvar desenho
+btnExportar.addEventListener('click', () => {
+  const formato = exportFormat.value || 'png';
+  exportarDesenho(svgCanvas, formato);
+});
+
 // Atalhos de Teclado (Tool Selection)
 window.addEventListener("keydown", (e) => {
   // Prevenção de conflitos
