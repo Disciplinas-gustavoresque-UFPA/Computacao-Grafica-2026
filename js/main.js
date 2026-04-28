@@ -13,6 +13,7 @@ import { RetanguloTool } from './tools/RetanguloTool.js';
 import { exportarDesenho } from './utils/exportHelpers.js';
 import { SelecaoTool } from './tools/SelecaoTool.js';
 import { Selecao } from './core/Selecao.js';
+import { LupaTool } from './tools/LupaTool.js';
 
 // Referências aos elementos do DOM
 const svgCanvas = document.getElementById('canvas');
@@ -50,8 +51,10 @@ const instanciasFerramentas = {
   selecao: new SelecaoTool(svgCanvas),
   retangulo: new RetanguloTool(svgCanvas),
   "Conta-gotas": new ColorPickerTool(svgCanvas),
+  lupa: new LupaTool(svgCanvas),
   // Futuras ferramentas (elipse, linha, texto) entrarão aqui
 };
+
 
 const botoesFerramenta = document.querySelectorAll('.btn-ferramenta');
 const inputCorPreenchimento = (
@@ -64,6 +67,7 @@ const inputCorBorda = (
 const nomeFerramenta = document.getElementById('nome-ferramenta');
 const btnExportar = document.getElementById('btn-exportar');
 const exportFormat = document.getElementById('export-format');
+
 
 /**
  * Atualiza o estado visual dos botões da barra lateral,
@@ -123,6 +127,13 @@ svgCanvas.addEventListener('mousemove', (evento) => {
 svgCanvas.addEventListener('mouseup', (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseUp(evento);
+  }
+});
+
+// Previne o menu de opções do botao direito no canvas
+svgCanvas.addEventListener('contextmenu', (e) => {
+  if (e.target.closest('#canvas')) {
+    e.preventDefault();
   }
 });
 
