@@ -18,7 +18,7 @@ const svgCanvas = document.getElementById('canvas');
 const instanciasFerramentas = {
   retangulo: new RetanguloTool(svgCanvas),
   elipse: new EllipseTool(svgCanvas),
-  // Futuras ferramentas (selecao, elipse, linha, texto) entrarão aqui
+  // Futuras ferramentas (selecao, linha, texto) entrarão aqui
 };
 
 const botoesFerramenta = document.querySelectorAll('.btn-ferramenta');
