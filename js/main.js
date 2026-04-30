@@ -8,6 +8,7 @@
  */
 
 import { estado, definirFerramenta, definirCorPreenchimento, definirCorBorda } from './core/StateManager.js';
+import { Lapis } from './tools/LapisTool.js';
 import { RetanguloTool } from './tools/RetanguloTool.js';
 
 // Referências aos elementos do DOM
@@ -16,7 +17,7 @@ const svgCanvas = document.getElementById('canvas');
 // Instâncias das ferramentas disponíveis
 const instanciasFerramentas = {
   retangulo: new RetanguloTool(svgCanvas),
-  // Futuras ferramentas (selecao, elipse, linha, texto) entrarão aqui
+  lapis: new Lapis(svgCanvas)
 };
 
 const botoesFerramenta = document.querySelectorAll('.btn-ferramenta');
