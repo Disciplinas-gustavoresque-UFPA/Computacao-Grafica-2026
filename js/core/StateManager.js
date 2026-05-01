@@ -86,3 +86,17 @@ export function definirElementoSelecionado(elemento) {
     gerenciadorSelecaoVisual.desenhar(elemento);
   }
 }
+
+
+/**
+ * Remove o elemento atualmente selecionado do DOM e limpa a seleção.
+ */
+export function removerElementoSelecionado() {
+  if (estado.elementoSelecionado) {
+    // Remove o nó SVG diretamente do DOM
+    estado.elementoSelecionado.remove();
+    
+    // Limpa o estado global e remove a borda de seleção visual
+    definirElementoSelecionado(null);
+  }
+}
