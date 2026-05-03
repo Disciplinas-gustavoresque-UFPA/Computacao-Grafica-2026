@@ -12,6 +12,7 @@ import { ColorPickerTool } from './tools/ColorPickerTool.js';
 import { RetanguloTool } from './tools/RetanguloTool.js';
 import { SelecaoTool } from './tools/SelecaoTool.js';
 import { Selecao } from './core/Selecao.js';
+import { BorrachaTool } from './tools/BorrachaTool.js';
 
 // Referências aos elementos do DOM
 const svgCanvas = document.getElementById('canvas');
@@ -49,6 +50,7 @@ const instanciasFerramentas = {
   selecao: new SelecaoTool(svgCanvas),
   retangulo: new RetanguloTool(svgCanvas),
   "Conta-gotas": new ColorPickerTool(svgCanvas),
+  borracha: new BorrachaTool(svgCanvas),
   // Futuras ferramentas (elipse, linha, texto) entrarão aqui
 };
 
