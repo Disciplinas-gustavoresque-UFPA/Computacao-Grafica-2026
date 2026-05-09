@@ -2,261 +2,161 @@ import { ToolBase } from './ToolBase.js';
 import { obterCoordenadaSVG } from '../utils/svgHelpers.js';
 
 
-// Ferramenta responsavel por controlar zoom no canvas SVG via viewBox
-export class LupaTool extends ToolBase {
+/* ============================================
+                  CameraSVG
+============================================ */
+class CameraSVG {
   constructor(svg) {
-    super();
     this.svg = svg;
 
-    this.modo = 'click'; // zoom padrão do inkscape
+    const hasViewBox = svg.hasAttribute('viewBox');
 
-    // controles da interação mouseOnMove
-    this.isDragging = false;
-    this.start = null;
-    this.dragButton = null;
-    this.selectionRect = null;
+    if (hasViewBox) {
 
-    // Estado atual da área visivel (viewbox)
-    this.viewBox = {
-      x: 0,
-      y: 0,
-      width: svg.clientWidth,
-      height: svg.clientHeight
-    }; // <-- viewBox
+      // Guarda valores base do viewbox atual (x,y,width,height)
+      const vb = svg.viewBox.baseVal;
 
+      // Estado atual do viewbox de acordo com os valores base
+      this.viewBox = {
+        x: vb.width ? vb.x : 0,
+        y: vb.height ? vb.y : 0,
+        width: vb.width || svg.clientWidth,
+        height: vb.height || svg.clientHeight
+      };
 
-    this.initialViewBox = {
-      ...this.viewBox
-    }; // <-- initialViewBox (guardar a posição inicial)
-  } // <-- constructor
-  
+    } else {
 
-  
-  // Restaura posição inicial do viewBox
-  resetView() {
-    this.viewBox = {
-      ...this.initialViewBox
-    };
-    this.applyViewBox();
-  } // <-- resetView
-
-
-  // Aplica o viewBox atual no SVG (atualiza o "zoom")
-  applyViewBox() {
-    const {
-      x,
-      y,
-      width,
-      height
-    } = this.viewBox;
-    this.svg.setAttribute('viewBox', `${x} ${y} ${width} ${height}`);
-
-    this.updateZoomIndicator();
-  } // <-- applyViewBox
-
-
-  // Atualiza estado visual do botão e do cursor
-  updateCursorStyle(btnName) {
-    const btn = document.getElementById(btnName);
-    if (!btn) return;
-
-    let ativo;
-    // muda cursor dinamicamente
-    switch (btnName) {
-      case 'drag':
-        ativo = this.modo === 'drag';
-        btn.classList.toggle('ativo', ativo);
-        this.svg.style.cursor = 'crosshair';
-        break;
-    
-      default:
-        ativo = this.modo === 'click';
-        btn.classList.toggle('ativo', ativo);
-        this.svg.style.cursor = 'zoom-in';
-        break;
-    }    
+      // Define um viewBox para o svg se não houver um
+      this.viewBox = {
+        x: 0,
+        y: 0,
+        width: svg.clientWidth,
+        height: svg.clientHeight
+      };
+      
+      // Guarda posição inicial do viewBox
+      this.initialViewBox = { ...this.viewBox }; 
+      this.applyViewBox();
+    }
   }
 
+  // Aproxima o viewBox atual no SVG (aplica o "zoom")
+  applyViewBox() {
+    const { x, y, width, height } = this.viewBox;
+    this.svg.setAttribute('viewBox', `${x} ${y} ${width} ${height}`);
+  }
+
+  // Retorna a posição inicial do viewBox
+  resetView() {
+    this.viewBox = { ...this.initialViewBox };
+    this.applyViewBox();
+  } 
+
+  // Retorna o nivel atual de zoom em relação ao viewbox inicial
   getZoomLevel() {
     const scale = this.initialViewBox.width / this.viewBox.width;
     return Math.round(scale * 100);
   }
 
-  updateZoomIndicator() {
-    const el = document.getElementById('zoom-indicator');
-    if (!el) return;
-
-    const zoom = this.getZoomLevel();
-    el.textContent = `Zoom: ${zoom}%`;
-  }
-
-  // Alterna o modo de interação da lupa 
-  setModo(modo) {
-    this.modo = (this.modo === modo) ? 'click' : modo;
-    this.updateCursorStyle(modo);
-  } // <-- setModo
-
-
-
-  // Realiza zoom mantendo o ponto (cx, cy) fixo como foco
+  // Realiza zoom de acordo com a escal mantendo o ponto (cx, cy) fixo como foco
   zoom(scale, cx, cy) {
-    const newWidth = this.viewBox.width * scale;
-    const newHeight = this.viewBox.height * scale;
+    const old = this.viewBox;
+
+    const newWidth = old.width * scale;
+    const newHeight = old.height * scale;
   
     // Reposiciona o viewBox para manter o cursor fixo
-    this.viewBox.x = cx - (cx - this.viewBox.x) * (newWidth / this.viewBox.width);
-    this.viewBox.y = cy - (cy - this.viewBox.y) * (newHeight / this.viewBox.height);
+    this.viewBox.x = cx - (cx - old.x) * (newWidth / old.width);
+    this.viewBox.y = cy - (cy - old.y) * (newHeight / old.height);
     
     // Atualiza as dimensões do viewBox 
     this.viewBox.width = newWidth;
     this.viewBox.height = newHeight;
 
+    // aplica o zoom
     this.applyViewBox();
-  } // <-- zoom 
-  
+  } 
 
-  // Inicio da interação com o mouse
-  onMouseDown(evento) {
-    const coords = obterCoordenadaSVG(evento, this.svg);
-    
-    if (this.isDragging) this.cleanup();
-    
-    
-    // Botão do meio ( Reset do viebox )
-    if (evento.button === 1) {
-      this.resetView();
-      return;
-    }
-
-    // Modo zoom padrão ('click') 
-    if (this.modo === 'click') {
-      if (evento.button === 0) this.zoom(0.9, coords.x, coords.y);
-      if (evento.button === 2) this.zoom(1.1, coords.x, coords.y);
-      return;
-    } // <-- fim do modo de zoom padrão 
-
-    // Modo zoom por seleção ('drag')
-    if (this.modo === 'drag') {
-      this.isDragging = true;
-      this.start = coords;
-      this.dragButton = evento.button;
-
-      // Cria retangulo de seleção
-      this.selectionRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-      this.selectionRect.setAttribute("fill", "rgba(0,0,255,0.2)");
-      this.selectionRect.setAttribute("stroke", "blue");
-      this.selectionRect.setAttribute("stroke-dasharray", "4");
-
-      this.svg.appendChild(this.selectionRect); 
-    } // <-- fim do modo de zoom com  seleção
-  } // <-- onMouseDown
-  
-
-  // Atualiza retangulo de seleção e posiçao
-  onMouseMove(evento) {
-    if (!this.isDragging || this.modo !== 'drag' || !this.selectionRect) return;
-    
-    const expected = this.getButtonMask(this.dragButton);
-
-    // Cancela se botão foi solto
-    if ((evento.buttons & expected) === 0) {
-      this.cleanup();
-      return;
-    } 
-
-    const coords = obterCoordenadaSVG(evento, this.svg);
-
-    const x = Math.min(this.start.x, coords.x);
-    const y = Math.min(this.start.y, coords.y);
-    const width = Math.abs(coords.x - this.start.x);
-    const height = Math.abs(coords.y - this.start.y);
-
-    this.selectionRect.setAttribute("x", x);
-    this.selectionRect.setAttribute("y", y);
-    this.selectionRect.setAttribute("width", width);
-    this.selectionRect.setAttribute("height", height);
-  } // <-- onMouseMove
-
-
-  // Finaliza seleção e aplica zoom
-  onMouseUp(evento) {
-    evento.preventDefault();
-    if (!this.isDragging || this.modo !== 'drag') return;
-    if (evento.button !== this.dragButton) {
-      this.cleanup();
-      return;
-    }
-
-    const coords = obterCoordenadaSVG(evento,this.svg);
-
-    const x = Math.min(this.start.x, coords.x);
-    const y = Math.min(this.start.y, coords.y);
-    const width = Math.abs(coords.x - this.start.x);
-    const height = Math.abs(coords.y - this.start.y);
-
-    // Ignora seleções muito pequenas
-    if (width < 5 || height < 5) {
-      this.cleanup();
-      return;
-    }
-    
-    // Zoom In
-    if (evento.button === 0) {
-      this.viewBox = {
-        x,
-        y,
-        width,
-        height
-      };
-    }
-
-    // Zoom Out 
-    if (evento.button === 2) { 
-      const scale = Math.max(
-        this.viewBox.width / width,
-        this.viewBox.height / height
-      );
-
-      const newWidth = this.viewBox.width * scale;
-      const newHeight = this.viewBox.height * scale;
-
-      this.viewBox.x = x - (newWidth - width) / 2;
-      this.viewBox.y = y - (newHeight - height) / 2;
-      this.viewBox.width = newWidth;
-      this.viewBox.height = newHeight;
-    }
-
+  // Zoom-In -> Modo 'drag'
+  zoomToRect(x, y, width, height) {
+    this.viewBox = {x, y, width, height};
     this.applyViewBox();
-    this.cleanup();
-  } // <-- onMouseUp
-
-  onWheel(evento) {
-    evento.preventDefault();
-
-    const coords = obterCoordenadaSVG(evento, this.svg);
-
-    //
-    const zoomFactor = 0.1;
-
-    //
-    //
-    const scale = evento.deltaY > 0
-      ? 1 + zoomFactor
-      : 1 - zoomFactor;
-
-      this.zoom(scale, coords.x, coords.y);
   }
 
-  // Remove elementos temporários e reseta o estado/modo da lupa 
-  cleanup() {
-    if (this.selectionRect && this.selectionRect.parentNode) {
-      this.selectionRect.parentNode.removeChild(this.selectionRect);
-    }
-    this.selectionRect = null;
-    this.isDragging = false;
-    this.dragButton = null;
-  } // <-- cleanup
+  // Zoom-Out -> Modo 'drag'
+  zoomOutFromRect(x, y, width, height) {
+    const scale = Math.max(
+      this.viewBox.width / width,
+      this.viewBox.height / height
+    );
+    const newWidth = this.viewBox.width * scale;
+    const newHeight = this.viewBox.height * scale;
 
+    this.viewBox = {
+      x: x - (newWidth - width) / 2,
+      y: y - (newHeight - height) / 2,
+      width: newWidth,
+      height: newHeight
+    };
+    this.applyViewBox();
+  }
+
+}
+
+/* ============================================
+                  LupaTool
+============================================ */
+export class LupaTool extends ToolBase {
+  constructor(svg) {
+    super();
+
+    this.svg = svg;
+    this.camera = new CameraSVG(svg);
+
+    this.modo = 'click'; // zoom padrão do inkscape
+
+    // controles da interação mouseOnMove | Modo drag
+    this.drag = {
+      active: false,  // se 
+      start: null,    // 
+      button: null,   // 
+      rect: null      // 
+    }; 
+  }
+  
+  /* ============================================
+    Interface e Butoes
+  ============================================ */
+
+  // Atualiza o indicador de acordo com o nivel de zoom
+  updateZoomIndicator() {
+    const el = document.getElementById('zoom-indicator');
+    if (!el) return;
+    el.textContent = `Zoom: ${this.camera.getZoomLevel()}%`;
+  }
+
+  // Atualiza o cursos de acordo com o modo
+  updateCursor() {
+    this.svg.style.cursor = 
+      this.modo === 'drag' 
+      ? 'crosshair' 
+      : 'zoom-in';
+  }
+
+  // Atualiza o btn-drag quando pressionado
+  updateButtons() {
+    const btnDrag = document.getElementById('btn-drag');
+    if (!btnDrag) return;
+    btnDrag.classList.toggle('ativo', this.modo === 'drag');
+  }
+
+
+  // Alterna o modo de interação da lupa 
+  setModo(modo) {
+    this.modo = (this.modo === modo) ? 'click' : modo;
+    this.updateCursor();
+    this.updateButtons();
+  } 
 
 
   // Renderiza dinamicamente o painel de opcoes da lupa 
@@ -264,19 +164,16 @@ export class LupaTool extends ToolBase {
     const panel =
       document.getElementById('zoom-options');
 
-    if (!panel) return;
+    if (!panel || panel.dataset.initialized) return;
 
+    // Define o botão: 'btn-drag'
     panel.innerHTML = `
       <button
         id="btn-drag"
-        class="${
-          this.modo === 'drag'
-            ? 'ativo'
-            : ''
-        }"
         title="Zoom por seleção">
 
-        <svg xmlns="http://www.w3.org/2000/svg"
+        <svg 
+          xmlns="http://www.w3.org/2000/svg"
           width="22"
           height="22"
           viewBox="0 0 24 24"
@@ -284,9 +181,18 @@ export class LupaTool extends ToolBase {
           stroke="currentColor"
           stroke-width="2">
 
-          <circle cx="10" cy="10" r="8"></circle>
-          <line x1="20" y1="20"
-                x2="15" y2="15"></line>
+          <circle 
+            cx="10" 
+            cy="10" 
+            r="8">
+          </circle>
+
+          <line 
+            x1="20" 
+            y1="20" 
+            x2="15" 
+            y2="15">
+          </line>
 
           <rect x="7"
                 y="7"
@@ -298,31 +204,21 @@ export class LupaTool extends ToolBase {
         </svg>
       </button>
     `;
-
-    panel.querySelector('#btn-drag')
-      .onclick = () => {
-        this.setModo('drag');
-        this.renderOptions();
-      };
-  } // <-- renderOptions
-
+    // Atualiza o modo para 'drag' quando pressionado
+    panel.querySelector('#btn-drag').onclick = () => {
+      this.setModo('drag');
+    };
+    // Define que o painel existe (visivel)
+    panel.dataset.initialized = 'true';
+    this.updateButtons();
+  } 
   
-  // Converte botão do mouse em máscara binária (para evento.buttons)
-  getButtonMask(button) {
-    switch (button) {
-      case 0: return 1; // esquerdo
-      case 1: return 4; // meio
-      case 2: return 2; // direito
-      default: return 0;
-    }
-  } // <-- getButtonMask
-
-  // Ativa ferramenta e exibe painel de opcoes do zoom
-  onAtivar() { 
-    this._wheelHandler = (e) => this.onWheel(e);
-    this.svg.addEventListener('wheel', this._wheelHandler, {passive: false});
+  // Cria e posiciona o painel em relação ao 'btn-Lupa' da main.js
+  openPanel() {
     const panel = document.getElementById('zoom-options');
     const btnLupa = document.querySelector('[data-ferramenta="lupa"]');
+
+    if (!panel || !btnLupa) return;
 
     const rect = btnLupa.getBoundingClientRect();
 
@@ -330,45 +226,173 @@ export class LupaTool extends ToolBase {
     panel.style.left = `${rect.right + 8}px`;
 
     panel.classList.remove('hidden');
+
+    this.renderOptions();
+
+  }
+
+  // Destroi o painel de opções (oculto)
+  closePanel() {
+    const panel = document.getElementById('zoom-options');
+    if (!panel) return;
+    panel.classList.add('hidden');
+    panel.innerHTML = '';
+    delete panel.dataset.initialized;
+  }
+
+
+  /* ============================================
+    Retangulo Selecao
+  ============================================ */
+
+  // Define o retangulo de seleção
+  createSelectionRect() {
+    const rect = document.createElementNS(
+      'http://www.w3.org/2000/svg','rect');
+    rect.setAttribute('fill', 'rgba(0,0,255,0.15)');
+    rect.setAttribute('stroke','blue');
+    rect.setAttribute('stroke-dasharray','4');
+    this.svg.appendChild(rect);
+    this.drag.rect = rect;
+  }
+
+  // Remove elemento retangulo de seleção e reseta o estado/modo da lupa 
+  cleanupDrag() {
+    if (this.drag.rect && this.drag.rect.parentNode) {
+      this.drag.rect.parentNode.removeChild(this.drag.rect);
+    }
+    this.drag = {
+      active: false,
+      start: null,
+      button: null,
+      rect: null
+    };
+  } 
+  
+  /* ============================================
+    Eventos
+  ============================================ */
+
+  // Inicio da interação com o mouse 
+  onMouseDown(evento) {
+    const coords = obterCoordenadaSVG(evento, this.svg);
+  
+    // Botão do meio ( Reset do viebox, independente do modo)
+    if (evento.button === 1) {
+      this.camera.resetView();
+      this.updateZoomIndicator();
+      return;
+    }
+
+    // Modo zoom padrão ('click') 
+    if (this.modo === 'click') {
+      if (evento.button === 0) this.camera.zoom(0.9, coords.x, coords.y);
+      if (evento.button === 2) this.camera.zoom(1.1, coords.x, coords.y);
+      this.updateZoomIndicator();
+      return;
+    } 
+
+    // Modo zoom por seleção ('drag')
+    if (this.modo === 'drag') {
+      this.drag.active= true;
+      this.drag.start = coords;
+      this.drag.button = evento.button;
+
+      // Cria retangulo de seleção
+      this.createSelectionRect();
+    } 
+  } 
+  
+
+  // Atualiza retangulo de seleção em relação a posiçao
+  onMouseMove(evento) {
+    if (!this.drag.active || !this.drag.rect) return;
+
+    const coords = obterCoordenadaSVG(evento, this.svg);
+    const x = Math.min(this.drag.start.x, coords.x);
+    const y = Math.min(this.drag.start.y, coords.y);
+    const width = Math.abs(coords.x - this.drag.start.x);
+    const height = Math.abs(coords.y - this.drag.start.y);
+
+    this.drag.rect.setAttribute('x', x);
+    this.drag.rect.setAttribute('y', y);
+    this.drag.rect.setAttribute('width', width);
+    this.drag.rect.setAttribute('height', height);
+  } 
+
+
+  // Finaliza zoom de seleção e aplica zoom
+  onMouseUp(evento) {
+    evento.preventDefault();
+
+    if (!this.drag.active) return;
+
+    const coords = obterCoordenadaSVG(evento,this.svg);
+    const x = Math.min(this.drag.start.x, coords.x);
+    const y = Math.min(this.drag.start.y, coords.y);
+    const width = Math.abs(coords.x - this.drag.start.x);
+    const height = Math.abs(coords.y - this.drag.start.y);
+
+    // Ignora seleções muito pequenas
+    if (width < 5 || height < 5) {
+      this.cleanupDrag();
+      return;
+    }
     
-      if (panel && btnLupa) {
-        const rect =
-          btnLupa.getBoundingClientRect();
+    // Zoom In
+    if (evento.button === 0) {
+      this.camera.zoomToRect(x, y, width, height);
+    }
 
-        panel.style.top = `${rect.top}px`;
-        panel.style.left = `${rect.right + 8}px`;
-
-        panel.classList.remove('hidden');
-
-        this.renderOptions();
-      }
-    this.updateCursorStyle(this.modo);
-
-    this.svg.style.cursor = this.modo === 'drag' ? 'crosshair' : 'zoom-in';
-  } // <-- onAtivar
+    // Zoom Out 
+    if (evento.button === 2) { 
+      this.camera.zoomOutFromRect(x,y,width,height);
+    }
 
 
-  // Desativa ferramenta e limpa UI
+    this.updateZoomIndicator();
+    this.cleanupDrag();
+  } 
+
+  // Interação do scroll do mouse (zoom conforme movimento do scroll)
+  onWheel(evento) {
+    evento.preventDefault();
+    const coords = obterCoordenadaSVG(evento, this.svg);
+    const zoomFactor = 0.1;
+    const scale = evento.deltaY > 0
+      ? 1 + zoomFactor      // scroll-up = zoom-in
+      : 1 - zoomFactor;     // scroll-down = zoom-out
+    this.camera.zoom(scale, coords.x, coords.y);
+    this.updateZoomIndicator();
+  }
+
+  /* ============================================
+    Ciclo de Vida
+  ============================================ */
+
+  // Ativa ferramenta, exibe painel de opcoes do zoom e o Indicador de Zoom
+  onAtivar() { 
+    this._wheelHandler = (e) => this.onWheel(e);
+    this.svg.addEventListener('wheel', this._wheelHandler, {passive: false});
+    this.openPanel();
+    this.updateCursor();
+    this.updateZoomIndicator();
+  } 
+
+
+  // Desativa ferramenta, limpa UI, retorna para o modo padrão
   onDesativar() {
     if (this._wheelHandler) {
       this.svg.removeEventListener('wheel', this._wheelHandler);
       this._wheelHandler = null;
     }
-    this.cleanup();
+
+    this.cleanupDrag();
+    this.closePanel();
+
+    this.setModo('click');
     this.svg.style.cursor = 'default';
-
-      const panel =
-    document.getElementById(
-      'zoom-options'
-    );
-
-    if (panel) {
-      panel.classList.add('hidden');
-      panel.innerHTML = '';
-    }
-
-    this.setModo('click'); // reseta modo
-  } // <-- onDesativar
-} // <-- class LupaTool
+  } 
+} 
 
 
