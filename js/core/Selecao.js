@@ -7,29 +7,21 @@ export class Selecao {
   }
 
   /**
-   * Desenha a borda de seleção ao redor do elemento.
-   * @param {SVGElement} elementoSelecionado 
+   * Desenha a borda de seleção ao redor do conjunto de elementos.
+   * @param {SVGElement[]} elementosSelecionados 
    */
-  desenhar(elementoSelecionado) {
+  desenhar(elementosSelecionados) {
     this.limpar();
 
-    if (!elementoSelecionado) return;
+    if (!elementosSelecionados || elementosSelecionados.length === 0) return;
 
-    // Obtém o retângulo delimitador no sistema de coordenadas do viewport (tela)
-    const rect = elementoSelecionado.getBoundingClientRect();
-    
-    // Converte os pontos do viewport para o sistema de coordenadas interno do SVG de overlay
-    const ptSuperiorEsquerda = converterCoordenadaClienteParaSVG(rect.left, rect.top, this.overlaySvg);
-    const ptInferiorDireita = converterCoordenadaClienteParaSVG(rect.right, rect.bottom, this.overlaySvg);
-
-    const largura = ptInferiorDireita.x - ptSuperiorEsquerda.x;
-    const altura = ptInferiorDireita.y - ptSuperiorEsquerda.y;
+    const bounds = this._calcularBoundsUnificados(elementosSelecionados);
 
     this.bordaSelecao = criarElementoSVG('rect', {
-      x: ptSuperiorEsquerda.x - 2,
-      y: ptSuperiorEsquerda.y - 2,
-      width: largura + 4,
-      height: altura + 4,
+      x: bounds.minX - 2,
+      y: bounds.minY - 2,
+      width: bounds.maxX - bounds.minX + 4,
+      height: bounds.maxY - bounds.minY + 4,
       fill: 'none',
       stroke: "blue",
       'stroke-width': 1.5,
@@ -40,23 +32,39 @@ export class Selecao {
   }
 
   /**
-   * Atualiza a posição e dimensões da borda de seleção.
-   * @param {SVGElement} elementoSelecionado 
+   * Atualiza a posição e dimensões da borda de seleção para múltiplos elementos.
+   * @param {SVGElement[]} elementosSelecionados 
    */
-  atualizarPosicao(elementoSelecionado) {
-    if (this.bordaSelecao && elementoSelecionado) {
-      const rect = elementoSelecionado.getBoundingClientRect();
-      const ptSuperiorEsquerda = converterCoordenadaClienteParaSVG(rect.left, rect.top, this.overlaySvg);
-      const ptInferiorDireita = converterCoordenadaClienteParaSVG(rect.right, rect.bottom, this.overlaySvg);
+  atualizarPosicao(elementosSelecionados) {
+    if (this.bordaSelecao && elementosSelecionados && elementosSelecionados.length > 0) {
+      const bounds = this._calcularBoundsUnificados(elementosSelecionados);
 
-      const largura = ptInferiorDireita.x - ptSuperiorEsquerda.x;
-      const altura = ptInferiorDireita.y - ptSuperiorEsquerda.y;
-
-      this.bordaSelecao.setAttribute('x', String(ptSuperiorEsquerda.x - 2));
-      this.bordaSelecao.setAttribute('y', String(ptSuperiorEsquerda.y - 2));
-      this.bordaSelecao.setAttribute('width', String(largura + 4));
-      this.bordaSelecao.setAttribute('height', String(altura + 4));
+      this.bordaSelecao.setAttribute('x', String(bounds.minX - 2));
+      this.bordaSelecao.setAttribute('y', String(bounds.minY - 2));
+      this.bordaSelecao.setAttribute('width', String(bounds.maxX - bounds.minX + 4));
+      this.bordaSelecao.setAttribute('height', String(bounds.maxY - bounds.minY + 4));
     }
+  }
+
+  /**
+   * Calcula os limites (min/max) de um conjunto de elementos no espaço do SVG de overlay.
+   * @private
+   */
+  _calcularBoundsUnificados(elementos) {
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+
+    elementos.forEach(el => {
+      const rect = el.getBoundingClientRect();
+      const pt1 = converterCoordenadaClienteParaSVG(rect.left, rect.top, this.overlaySvg);
+      const pt2 = converterCoordenadaClienteParaSVG(rect.right, rect.bottom, this.overlaySvg);
+
+      minX = Math.min(minX, pt1.x, pt2.x);
+      minY = Math.min(minY, pt1.y, pt2.y);
+      maxX = Math.max(maxX, pt1.x, pt2.x);
+      maxY = Math.max(maxY, pt1.y, pt2.y);
+    });
+
+    return { minX, minY, maxX, maxY };
   }
 
   limpar() {
