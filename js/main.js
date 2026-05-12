@@ -108,19 +108,19 @@ inputCorBorda.addEventListener('input', (evento) => {
 });
 
 // Event listeners globais do SVG (delegados para a ferramenta ativa)
-svgCanvas.addEventListener('mousedown', (evento) => {
+canvasContainer.addEventListener('mousedown', (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseDown(evento);
   }
 });
 
-svgCanvas.addEventListener('mousemove', (evento) => {
+canvasContainer.addEventListener('mousemove', (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseMove(evento);
   }
 });
 
-svgCanvas.addEventListener('mouseup', (evento) => {
+canvasContainer.addEventListener('mouseup', (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseUp(evento);
   }
