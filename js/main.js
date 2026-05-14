@@ -13,6 +13,7 @@ import { RetanguloTool } from './tools/RetanguloTool.js';
 import { exportarDesenho } from './utils/exportHelpers.js';
 import { SelecaoTool } from './tools/SelecaoTool.js';
 import { Selecao } from './core/Selecao.js';
+import { NodeEditTool } from './tools/NodeEditTool.js';
 import { LinhaTool } from './tools/LinhaTool.js';
 import { ElipseTool } from './tools/ElipseTool.js';
 
@@ -50,6 +51,7 @@ definirGerenciadorSelecao(selecaoVisual);
 // Instâncias das ferramentas disponíveis
 const instanciasFerramentas = {
   selecao: new SelecaoTool(svgCanvas),
+  edicaoVertices: new NodeEditTool(svgCanvas),
   retangulo: new RetanguloTool(svgCanvas),
   linha: new LinhaTool(svgCanvas),    
   elipse: new ElipseTool(svgCanvas),  
