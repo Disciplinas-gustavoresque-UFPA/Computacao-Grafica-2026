@@ -147,7 +147,48 @@
         </div>
         <!-- /#app -->
 
-        <!-- Ponto de entrada da aplicação: ES6 Module -->
-        <script type="module" src="js/main.js"></script>
-    </body>
+      <!-- Barra Lateral: botões das ferramentas de desenho -->
+      <aside id="barra-ferramentas">
+        <button class="btn-ferramenta" data-ferramenta="selecao" title="Seleção (S)">
+          &#9654;
+        </button>
+        <button class="btn-ferramenta" data-ferramenta="retangulo" title="Retângulo (R)">
+          &#9645;
+        </button>
+        <button class="btn-ferramenta" data-ferramenta="elipse" title="Elipse (E)">
+          &#9711;
+        </button>
+        <button class="btn-ferramenta" data-ferramenta="linha" title="Linha (L)">
+          &#9135;
+        </button>
+        <button class="btn-ferramenta" data-ferramenta="texto" title="Texto (T)">
+          T
+        </button>
+        <button class="btn-ferramenta" data-ferramenta="conta-gotas" title="Conta-gotas (I)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="lucide lucide-pipette-icon lucide-pipette">
+            <path
+              d="m12 9-8.414 8.414A2 2 0 0 0 3 18.828v1.344a2 2 0 0 1-.586 1.414A2 2 0 0 1 3.828 21h1.344a2 2 0 0 0 1.414-.586L15 12" />
+            <path d="m18 9 .4.4a1 1 0 1 1-3 3l-3.8-3.8a1 1 0 1 1 3-3l.4.4 3.4-3.4a1 1 0 1 1 3 3z" />
+            <path d="m2 22 .414-.414" />
+          </svg>
+        </button>
+      </aside>
+
+      <!-- Área Central de Desenho -->
+      <main id="area-desenho">
+        <svg id="canvas" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"
+          aria-label="Área de desenho vetorial">
+          <!-- Os elementos SVG criados pelo usuário serão inseridos aqui -->
+        </svg>
+      </main>
+
+    </div><!-- /#workspace -->
+  </div><!-- /#app -->
+
+  <!-- Ponto de entrada da aplicação: ES6 Module -->
+  <script type="module" src="js/main.js"></script>
+</body>
+
 </html>
