@@ -10,6 +10,7 @@
 import { estado, definirFerramenta, definirCorPreenchimento, definirCorBorda, definirGerenciadorSelecao } from './core/StateManager.js';
 import { ColorPickerTool } from './tools/ColorPickerTool.js';
 import { RetanguloTool } from './tools/RetanguloTool.js';
+import { TextoTool } from './tools/TextoTool.js';
 import { exportarDesenho } from './utils/exportHelpers.js';
 import { SelecaoTool } from './tools/SelecaoTool.js';
 import { Selecao } from './core/Selecao.js';
@@ -57,6 +58,7 @@ const instanciasFerramentas = {
   linha: new LinhaTool(svgCanvas),    
   elipse: new ElipseTool(svgCanvas),  
   "Conta-gotas": new ColorPickerTool(svgCanvas),
+  texto: new TextoTool(svgCanvas),
   borracha: new BorrachaTool(svgCanvas),
 };
 
