@@ -13,6 +13,7 @@ import { RetanguloTool } from './tools/RetanguloTool.js';
 import { exportarDesenho } from './utils/exportHelpers.js';
 import { SelecaoTool } from './tools/SelecaoTool.js';
 import { Selecao } from './core/Selecao.js';
+import { BorrachaTool } from './tools/BorrachaTool.js';
 import { NodeEditTool } from './tools/NodeEditTool.js';
 import { LinhaTool } from './tools/LinhaTool.js';
 import { ElipseTool } from './tools/ElipseTool.js';
@@ -56,6 +57,7 @@ const instanciasFerramentas = {
   linha: new LinhaTool(svgCanvas),    
   elipse: new ElipseTool(svgCanvas),  
   "Conta-gotas": new ColorPickerTool(svgCanvas),
+  borracha: new BorrachaTool(svgCanvas),
 };
 
 const botoesFerramenta = document.querySelectorAll('.btn-ferramenta');
