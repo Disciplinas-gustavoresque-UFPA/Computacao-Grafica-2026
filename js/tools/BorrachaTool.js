@@ -29,7 +29,7 @@ export class BorrachaTool extends ToolBase {
   apagarElemento(evento) {
     const target = evento.target;
 
-    const allowedTags = ['rect', 'text', 'image', 'circle', 'ellipse'];
+    const allowedTags = ['rect', 'text', 'image', 'circle', 'ellipse', 'line', 'path', 'polygon', 'polyline'];
     const tag = target.tagName ? target.tagName.toLowerCase() : '';
 
     if (
