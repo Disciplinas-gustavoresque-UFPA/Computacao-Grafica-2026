@@ -238,6 +238,11 @@ body {
   height: 100%;
 }
 
+.node-handle:hover {
+    fill: #4a90d9; /* Inverte a cor ao passar o mouse */
+    stroke: white;
+}
+
 /* =====================================================
     Menu de Opções da Lupa/Zoom
     ====================================================*/
