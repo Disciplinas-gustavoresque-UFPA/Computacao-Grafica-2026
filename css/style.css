@@ -240,16 +240,18 @@ body {
   height: 100%;
 }
 
+/* =========================================================
+   Barra Lateral
+   ========================================================= */
+
 /* Nova Barra Lateral Direita */
 #barra-configuracoes {
   width: 300px;
-  height:auto;
+  height: auto;
   background-color: #f4f4f4;
   border-left: 1px solid #ccc;
-  display:flex;
+  display: flex;
   flex-direction: column;
-  position: relative;
-  top: 0;
   color: #0f3460;
   flex-shrink: 0;
   
@@ -309,12 +311,9 @@ body {
 
 /* Container do conteúdo */
 .tabs-container {
-  flex:content;
-  overflow-y:scroll;
-  overflow-x:none;
-  height: auto
+  overflow-y: scroll; 
+  overflow-x: hidden;
 }
-
 .tab-content {
   display: none;
   height: auto;
