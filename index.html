@@ -85,6 +85,13 @@
                     </button>
                     <button
                         class="btn-ferramenta"
+                        data-ferramenta="edicaoVertices"
+                        title="Edição por Vértices (E-V)"
+                    >
+                        &#9688;
+                    </button>
+                    <button
+                        class="btn-ferramenta"
                         data-ferramenta="retangulo"
                         title="Retângulo (R)"
                     >
@@ -137,6 +144,14 @@
                             <path d="m2 22 .414-.414" />
                         </svg>
                     </button>
+                    <button class="btn-ferramenta" data-ferramenta="borracha" title="Borracha (B)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                        viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 20H7L3 16L14 5L21 12L13 20"/>
+                        </svg>
+                    </button>
                 </aside>
 
                 <!-- Área Central de Desenho -->
@@ -151,12 +166,12 @@
                         <!-- Os elementos SVG criados pelo usuário serão inseridos aqui -->
                     </svg>
                 </main>
-            </div>
-            <!-- /#workspace -->
-        </div>
-        <!-- /#app -->
+            </div><!-- /#workspace -->
+        </div><!-- /#app -->
 
-        <!-- Ponto de entrada da aplicação: ES6 Module -->
-        <script type="module" src="js/main.js"></script>
-    </body>
+
+  <!-- Ponto de entrada da aplicação: ES6 Module -->
+  <script type="module" src="js/main.js"></script>
+</body>
+
 </html>
