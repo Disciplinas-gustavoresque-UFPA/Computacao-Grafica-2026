@@ -94,6 +94,7 @@ body {
 #workspace {
   display: flex;
   overflow: hidden;
+  position: relative;
 }
 
 /* =========================================================
@@ -257,10 +258,10 @@ body {
   transform: translateX(300px); /*Define a quantidade de barra a ser escondida*/
 }
 
-/* Estilo do botão de toggle */
+/* Estilo do botão de toggle posicionado dinamicamente */
 #btn-toggle-sidebar {
   position: absolute;
-  left: -20px; /* Fica pendurado para fora da barra */
+  right: 300px;
   top: 50%;
   transform: translateY(-50%);
   background: #eee;
@@ -269,6 +270,7 @@ body {
   cursor: pointer;
   padding: 10px 5px;
   z-index: 10;
+  transition: right 0.3s ease, transform 0.3s ease;
 }
 
 /* Rotaciona a setinha quando esconder */
