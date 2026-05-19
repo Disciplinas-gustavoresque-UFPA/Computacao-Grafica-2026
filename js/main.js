@@ -101,14 +101,54 @@ botoesFerramenta.forEach((btn) => {
   });
 });
 
-// Atualiza a cor de preenchimento no estado global
-inputCorPreenchimento.addEventListener('input', (evento) => {
-  definirCorPreenchimento(inputCorPreenchimento.value);
+
+// Ouvir mudanças no input de preenchimento da Sidebar
+inputCorPreenchimento.addEventListener('input', () => {
+  const novaCor = inputCorPreenchimento.value;
+  
+  // Atualiza o estado global para as próximas formas que forem desenhadas
+  definirCorPreenchimento(novaCor);
+
+  // Se houver um objeto selecionado na tela, aplica a cor nele em tempo real
+  if (estado.elementoSelecionado) {
+    estado.elementoSelecionado.setAttribute('fill', novaCor);
+  }
 });
 
-// Atualiza a cor da borda no estado global
-inputCorBorda.addEventListener('input', (evento) => {
-  definirCorBorda(inputCorBorda.value);
+// Ouvir mudanças no input de borda da Sidebar
+inputCorBorda.addEventListener('input', () => {
+  const novaCor = inputCorBorda.value;
+  
+  // Atualiza o estado global para as próximas formas que forem desenhadas
+  definirCorBorda(novaCor);
+
+  // Se houver um objeto selecionado na tela, aplica a cor da borda nele em tempo real
+  if (estado.elementoSelecionado) {
+    estado.elementoSelecionado.setAttribute('stroke', novaCor);
+  }
+});
+
+// Atualizar os inputs da barra lateral quando o usuário selecionar um objeto
+// Usamos um MutationObserver ou interceptamos cliques no Canvas para capturar a seleção.
+svgCanvas.addEventListener('mouseup', (evento) => {
+  if (estado.ferramentaAtual) {
+    estado.ferramentaAtual.onMouseUp(evento);
+  }
+
+  // Verifica se a ferramenta de seleção acabou de selecionar um elemento
+  // Se houver um elemento selecionado, sincroniza a sidebar com as cores dele
+  if (estado.elementoSelecionado) {
+    const corPreenchimentoAtual = estado.elementoSelecionado.getAttribute('fill') || '#ffffff';
+    const corBordaAtual = estado.elementoSelecionado.getAttribute('stroke') || '#000000';
+
+    // Atualiza o valor visual dos inputs para bater com o objeto selecionado
+    inputCorPreenchimento.value = corPreenchimentoAtual;
+    inputCorBorda.value = corBordaAtual;
+
+    // Atualiza também os valores armazenados no StateManager para consistência
+    definirCorPreenchimento(corPreenchimentoAtual);
+    definirCorBorda(corBordaAtual);
+  }
 });
 
 // Event listeners globais do SVG (delegados para a ferramenta ativa)
