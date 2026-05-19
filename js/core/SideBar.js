@@ -10,22 +10,27 @@ export class SideBar {
   }
 
   init() {
-    // Evento das abas que você já tinha
     this.botoes.forEach(botao => {
       botao.addEventListener('click', () => this.onClick(botao));
     });
 
-    // Evento para esconder/mostrar
     if (this.btnToggle && this.sidebarElement) {
       this.btnToggle.addEventListener('click', () => {
         this.sidebarElement.classList.toggle('escondida');
+        this.btnToggle.classList.toggle('sidebar-escondida'); // Controla a posição/seta do botão
       });
     }
   }
 
   onClick(botao) {
-    // Se clicar numa aba e a barra estiver escondida, podemos mostrar ela automaticamente
+    // Proteção essencial caso o elemento não exista no DOM
+    if (!this.sidebarElement) return;
+
+    // Se a barra estiver oculta e o usuário clicar em uma aba, reabre automaticamente
     this.sidebarElement.classList.remove('escondida');
+    if (this.btnToggle) {
+      this.btnToggle.classList.remove('sidebar-escondida');
+    }
 
     const alvoId = botao.getAttribute('data-target');
     this.botoes.forEach(b => b.classList.remove('ativo'));
