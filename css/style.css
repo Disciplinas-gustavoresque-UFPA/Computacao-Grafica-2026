@@ -251,11 +251,16 @@ body {
   position: relative;
   top: 0;
   color: #0f3460;
-  transition: transform 0.3s ease; /* Faz o deslize suave */
+  flex-shrink: 0;
+  
+  /* Transição por margem faz o Canvas redimensionar dinamicamente */
+  transition: margin-right 0.3s ease; 
+  margin-right: 0; 
 }
 
+/* Quando escondida, puxa a barra para fora e cede o espaço no Flexbox */
 #barra-configuracoes.escondida {
-  transform: translateX(300px); /*Define a quantidade de barra a ser escondida*/
+  margin-right: -300px; 
 }
 
 /* Estilo do botão de toggle posicionado dinamicamente */
@@ -274,7 +279,8 @@ body {
 }
 
 /* Rotaciona a setinha quando esconder */
-#barra-configuracoes.escondida #btn-toggle-sidebar {
+#btn-toggle-sidebar.sidebar-escondida {
+  right: 0;
   transform: translateY(-50%) rotate(180deg);
 }
 
