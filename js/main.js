@@ -156,6 +156,46 @@ btnExportar.addEventListener('click', () => {
   exportarDesenho(svgCanvas, formato);
 });
 
+// --- Controle de Camadas (Z-Index) ---
+const btnSendToBack = document.getElementById('btn-send-to-back');
+const btnStepBackward = document.getElementById('btn-step-backward');
+const btnStepForward = document.getElementById('btn-step-forward');
+const btnBringToFront = document.getElementById('btn-bring-to-front');
+
+function moverCamada(acao) {
+  const el = estado.elementoSelecionado;
+  if (!el) return;
+
+  const pai = el.parentNode;
+  if (!pai) return;
+
+  switch (acao) {
+    case 'fundo':
+      pai.prepend(el);
+      break;
+    case 'recuar':
+      if (el.previousElementSibling) {
+        el.previousElementSibling.before(el);
+      }
+      break;
+    case 'avancar':
+      if (el.nextElementSibling) {
+        el.nextElementSibling.after(el);
+      }
+      break;
+    case 'frente':
+      pai.appendChild(el);
+      break;
+  }
+  
+  // TODO: Registrar ação no HistoryManager (Issue #10)
+}
+
+btnSendToBack.addEventListener('click', () => moverCamada('fundo'));
+btnStepBackward.addEventListener('click', () => moverCamada('recuar'));
+btnStepForward.addEventListener('click', () => moverCamada('avancar'));
+btnBringToFront.addEventListener('click', () => moverCamada('frente'));
+
 // Atalhos de Teclado (Tool Selection)
 window.addEventListener("keydown", (e) => {
   // Prevenção de conflitos
