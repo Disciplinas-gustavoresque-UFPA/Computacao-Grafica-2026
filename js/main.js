@@ -221,4 +221,10 @@ window.addEventListener("keydown", (e) => {
 }
 )
 
+// Import de imagens
+
+btnImportarImagem.addEventListener('click', () => {
+  inputImagem.click();
+});
+
 inicializarImportadorImagem(svgCanvas, inputImagem);
