@@ -102,35 +102,6 @@ botoesFerramenta.forEach((btn) => {
   });
 });
 
-// --- Importação de Imagens Raster ---
-btnImportarImagem.addEventListener('click', () => {
-  inputImagem.click();
-});
-
-inputImagem.addEventListener('change', (evento) => {
-  const arquivo = evento.target.files[0];
-  if (!arquivo) return;
-
-  const reader = new FileReader();
-  
-  reader.onload = function(e) {
-    const dataUrl = e.target.result;
-
-    const svgImage = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-    svgImage.setAttribute('href', dataUrl);
-    svgImage.setAttribute('x', '50');
-    svgImage.setAttribute('y', '50');
-    svgImage.setAttribute('width', '300');
-    svgImage.setAttribute('height', '300');
-    svgImage.classList.add('elemento-desenho'); 
-
-    svgCanvas.appendChild(svgImage);
-    inputImagem.value = ''; // Reseta para permitir re-upload do mesmo arquivo
-  };
-
-  reader.readAsDataURL(arquivo);
-});
-
 // --- Controles de Cor ---
 inputCorPreenchimento.addEventListener('input', () => {
   definirCorPreenchimento(inputCorPreenchimento.value);
