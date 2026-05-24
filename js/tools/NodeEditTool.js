@@ -24,27 +24,23 @@ export class NodeEditTool extends ToolBase {
         const pt = obterCoordenadaSVG(evento, this.svgCanvas);
         const target = evento.target;
 
-        // Verifica se o clique foi em um handle de nó
         if (this.grupoOverlay && this.grupoOverlay.contains(target)) {
             this.isDraggingNode = true;
             this.activeNodeId = target.getAttribute('data-node-id');
-            
-            // Impede que o evento selecione outros elementos abaixo
             evento.stopPropagation();
             return;
         }
         this.limparSelecao();
 
-        const allowedTags = ['rect'];
+        // ADICIONADO: 'image' agora é uma tag permitida
+        const allowedTags = ['rect', 'image'];
         const tag = target.tagName ? target.tagName.toLowerCase() : '';
 
-        // Se o clique não foi no canvas vazio e for um elemento permitido
         if (
             target !== this.svgCanvas &&
             target.parentNode === this.svgCanvas &&
             allowedTags.includes(tag)
         ) {
-            // Verifica se há algo selecionado no estado global
             this.elementoAlvo = target;
         }
         
@@ -63,9 +59,11 @@ export class NodeEditTool extends ToolBase {
         // Por enquanto, apenas movemos visualmente a alça no overlay
         // No próximo passo (Passo 4), conectaremos isso à forma real
         this.atualizarPosicaoHandle(coordenadas);
-        // Atualiza a geometria da forma real
-        if (this.elementoAlvo.tagName === 'rect') {
-            this.atualizarRetangulo(coordenadas);
+        
+        // ADICIONADO: Valida se é rect ou image
+        const tag = this.elementoAlvo.tagName.toLowerCase();
+        if (['rect', 'image'].includes(tag)) {
+            this.atualizarDimensoes(coordenadas);
         }
     }
 
@@ -92,8 +90,10 @@ export class NodeEditTool extends ToolBase {
     // Identifica os pontos e solicita a renderização.
     identificarVertices() {
         let vertices = [];
+        const tag = this.elementoAlvo.tagName.toLowerCase();
 
-        if (this.elementoAlvo.tagName === 'rect') {
+        // ADICIONADO: Funciona tanto para rect quanto para image
+        if (['rect', 'image'].includes(tag)) {
             const x = parseFloat(this.elementoAlvo.getAttribute('x'));
             const y = parseFloat(this.elementoAlvo.getAttribute('y'));
             const w = parseFloat(this.elementoAlvo.getAttribute('width'));
@@ -117,7 +117,7 @@ export class NodeEditTool extends ToolBase {
      */
     renderizarHandle(ponto) {
         const handle = criarElementoSVG('rect', {
-            'x': ponto.x - 4, // Centraliza o handle de 8x8 no ponto exato
+            'x': ponto.x - 4,
             'y': ponto.y - 4,
             'width': 8,
             'height': 8,
@@ -141,8 +141,8 @@ export class NodeEditTool extends ToolBase {
         }
     }
 
-    // Lógica matemática para redimensionar o retângulo com base no vértice arrastado.
-    atualizarRetangulo(coords) {
+    // RENOMEADO E GENERALIZADO: Agora serve para rect e image
+    atualizarDimensoes(coords) {
         const x = parseFloat(this.elementoAlvo.getAttribute('x'));
         const y = parseFloat(this.elementoAlvo.getAttribute('y'));
         const w = parseFloat(this.elementoAlvo.getAttribute('width'));
@@ -181,7 +181,10 @@ export class NodeEditTool extends ToolBase {
 
     // Re-posiciona todas as alças do overlay com base nos novos atributos do elemento alvo.
     sincronizarTodosOsHandles() {
-        if (this.elementoAlvo.tagName === 'rect') {
+        const tag = this.elementoAlvo.tagName.toLowerCase();
+        
+        // ADICIONADO: Funciona tanto para rect quanto para image
+        if (['rect', 'image'].includes(tag)) {
             const x = parseFloat(this.elementoAlvo.getAttribute('x'));
             const y = parseFloat(this.elementoAlvo.getAttribute('y'));
             const w = parseFloat(this.elementoAlvo.getAttribute('width'));
@@ -210,6 +213,5 @@ export class NodeEditTool extends ToolBase {
             this.grupoOverlay = null;
         }
         this.elementoAlvo = null;
-      }
-    
+    }
 }
