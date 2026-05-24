@@ -24,9 +24,12 @@ export class NodeEditTool extends ToolBase {
         const pt = obterCoordenadaSVG(evento, this.svgCanvas);
         const target = evento.target;
 
+        // Verifica se o clique foi em um handle de nó
         if (this.grupoOverlay && this.grupoOverlay.contains(target)) {
             this.isDraggingNode = true;
             this.activeNodeId = target.getAttribute('data-node-id');
+            
+            // Impede que o evento selecione outros elementos abaixo
             evento.stopPropagation();
             return;
         }
@@ -41,6 +44,7 @@ export class NodeEditTool extends ToolBase {
             target.parentNode === this.svgCanvas &&
             allowedTags.includes(tag)
         ) {
+            // Verifica se há algo selecionado no estado global
             this.elementoAlvo = target;
         }
         
@@ -117,7 +121,7 @@ export class NodeEditTool extends ToolBase {
      */
     renderizarHandle(ponto) {
         const handle = criarElementoSVG('rect', {
-            'x': ponto.x - 4,
+            'x': ponto.x - 4, // Centraliza o handle de 8x8 no ponto exato
             'y': ponto.y - 4,
             'width': 8,
             'height': 8,
