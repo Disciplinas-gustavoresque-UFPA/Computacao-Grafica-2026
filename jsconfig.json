@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
         "target": "es2024",
-        "checkJs": true
+        "checkJs": false
     }
 }

@@ -16,9 +16,15 @@ import {
 } from './core/StateManager.js';
 import { ColorPickerTool } from './tools/ColorPickerTool.js';
 import { RetanguloTool } from './tools/RetanguloTool.js';
+import { TextoTool } from './tools/TextoTool.js';
+import { exportarDesenho } from './utils/exportHelpers.js';
 import { SelecaoTool } from './tools/SelecaoTool.js';
 import { Selecao } from './core/Selecao.js';
-import { exportarDesenho } from './utils/exportHelpers.js';
+import { BorrachaTool } from './tools/BorrachaTool.js';
+import { NodeEditTool } from './tools/NodeEditTool.js';
+import { LinhaTool } from './tools/LinhaTool.js';
+import { ElipseTool } from './tools/ElipseTool.js';
+import { inicializarImportadorImagem } from './services/ImageImporter.js';
 
 const svgCanvas = document.getElementById('canvas');
 const areaDesenho = document.getElementById('area-desenho');
@@ -30,6 +36,10 @@ const inputCorBorda = document.getElementById('cor-borda');
 const nomeFerramenta = document.getElementById('nome-ferramenta');
 const btnExportar = document.getElementById('btn-exportar');
 const exportFormat = document.getElementById('export-format');
+
+// Referências ao import de imagem
+const btnImportarImagem = document.getElementById('btn-importar-imagem');
+const inputImagem = document.getElementById('input-imagem');
 
 // Wrapper para sincronizar perfeitamente as coordenadas do #canvas com o #overlay-canvas
 const canvasContainer = document.createElement('div');
@@ -59,9 +69,13 @@ definirGerenciadorSelecao(selecaoVisual);
 // Instâncias das ferramentas disponíveis
 const instanciasFerramentas = {
   selecao: new SelecaoTool(svgCanvas),
+  edicaoVertices: new NodeEditTool(svgCanvas),
   retangulo: new RetanguloTool(svgCanvas),
+  linha: new LinhaTool(svgCanvas),    
+  elipse: new ElipseTool(svgCanvas),  
   "Conta-gotas": new ColorPickerTool(svgCanvas),
-  // Futuras ferramentas (elipse, linha, texto) entrarão aqui
+  texto: new TextoTool(svgCanvas),
+  borracha: new BorrachaTool(svgCanvas),
 };
 
 /**
@@ -130,24 +144,118 @@ inputCorBorda.addEventListener('input', () => {
   definirCorBorda(inputCorBorda.value);
 });
 
-// --- Ações de Exportação ---
+// Event listeners globais do SVG (delegados para a ferramenta ativa)
+svgCanvas.addEventListener('mousedown', (evento) => {
+  if (estado.ferramentaAtual) {
+    estado.ferramentaAtual.onMouseDown(evento);
+  }
+});
+
+svgCanvas.addEventListener('mousemove', (evento) => {
+  if (estado.ferramentaAtual) {
+    estado.ferramentaAtual.onMouseMove(evento);
+  }
+});
+
+svgCanvas.addEventListener('mouseup', (evento) => {
+  if (estado.ferramentaAtual) {
+    estado.ferramentaAtual.onMouseUp(evento);
+  }
+});
+
+btnImportarImagem.addEventListener('click', () => {
+  inputImagem.click();
+});
+
+// Inicializa os valores dos inputs com os valores padrão do estado
+inputCorPreenchimento.value = estado.corPreenchimento;
+inputCorBorda.value = estado.corBorda;
+
+// Exportar / Salvar desenho
 btnExportar.addEventListener('click', () => {
   const formato = exportFormat.value || 'png';
   exportarDesenho(svgCanvas, formato);
 });
 
-// --- Interações do Canvas (Delegação para a ferramenta ativa) ---
-svgCanvas.addEventListener('mousedown', (evento) => {
-  if (estado.ferramentaAtual) estado.ferramentaAtual.onMouseDown(evento);
-});
+// --- Controle de Camadas (Z-Index) ---
+const btnSendToBack = document.getElementById('btn-send-to-back');
+const btnStepBackward = document.getElementById('btn-step-backward');
+const btnStepForward = document.getElementById('btn-step-forward');
+const btnBringToFront = document.getElementById('btn-bring-to-front');
 
-svgCanvas.addEventListener('mousemove', (evento) => {
-  if (estado.ferramentaAtual) estado.ferramentaAtual.onMouseMove(evento);
-});
+function moverCamada(acao) {
+  const el = estado.elementoSelecionado;
+  if (!el) return;
 
-svgCanvas.addEventListener('mouseup', (evento) => {
-  if (estado.ferramentaAtual) estado.ferramentaAtual.onMouseUp(evento);
-});
+  const pai = el.parentNode;
+  if (!pai) return;
 
-inputCorPreenchimento.value = estado.corPreenchimento;
-inputCorBorda.value = estado.corBorda;
+  switch (acao) {
+    case 'fundo':
+      pai.prepend(el);
+      break;
+    case 'recuar':
+      if (el.previousElementSibling) {
+        el.previousElementSibling.before(el);
+      }
+      break;
+    case 'avancar':
+      if (el.nextElementSibling) {
+        el.nextElementSibling.after(el);
+      }
+      break;
+    case 'frente':
+      pai.appendChild(el);
+      break;
+  }
+  
+  // TODO: Registrar ação no HistoryManager (Issue #10)
+}
+
+btnSendToBack.addEventListener('click', () => moverCamada('fundo'));
+btnStepBackward.addEventListener('click', () => moverCamada('recuar'));
+btnStepForward.addEventListener('click', () => moverCamada('avancar'));
+btnBringToFront.addEventListener('click', () => moverCamada('frente'));
+
+// Atalhos de Teclado (Tool Selection)
+window.addEventListener("keydown", (e) => {
+  // Prevenção de conflitos
+  // Verifica se o usuário está focado em um campo de texto ou input de cor.
+  const elementoAtivo = document.activeElement;
+  const tagAtiva = elementoAtivo.tagName.toLocaleLowerCase();
+
+  // Se o foco estiver em um input, textArea, select ou contentEditable, ignora o atalho.
+  if (["input", "textarea", "select"].includes(tagAtiva) || elementoAtivo.isContentEditable)
+    return;
+  
+  // Mapeamento das teclas 
+  // Conforme novas ferramentas forem surgindo, só adicionar o atalho e o nome da ferramenta aqui
+  const mapaTeclas = {
+    "s" : "selecao",
+    "r" : "retangulo",
+    "e" : "elipse",
+    "l" : "linha",
+    "t" : "texto",
+    "i" : "conta-gotas"
+  }
+
+  const teclaPressionada = e.key.toLowerCase();
+  const ferramentaAlvo = mapaTeclas[teclaPressionada];
+  
+  // Adicionar e feedback visual
+  if (ferramentaAlvo) {
+    e.preventDefault();
+
+    // Buscar o botão na barra lateral
+    const botao = document.querySelector(`.btn-ferramenta[data-ferramenta="${ferramentaAlvo}"]`);
+
+    if (botao) {
+      // Simular click para utilizar o eventListener que chama `atualizarBotaoAtivo()`
+      // e aplica a classe CSS '.ativo' de forma automática.
+      botao.click();
+    }
+  }
+}
+)
+
+inicializarImportadorImagem(svgCanvas, inputImagem);

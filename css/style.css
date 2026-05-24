@@ -87,6 +87,39 @@ body {
 }
 
 /* =========================================================
+   Controles de Camada (Z-Index)
+   ========================================================= */
+.layer-controls {
+  display: flex;
+  gap: 4px;
+  margin-right: auto;
+  margin-left: 16px;
+  border-left: 1px solid var(--cor-borda-ui);
+  padding-left: 16px;
+}
+
+.btn-layer {
+  background: transparent;
+  border: 1px solid var(--cor-borda-ui);
+  color: var(--cor-texto-secundario);
+  border-radius: var(--raio-borda);
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.btn-layer:hover {
+  background-color: rgba(74, 144, 217, 0.2);
+  color: var(--cor-destaque);
+  border-color: var(--cor-destaque);
+}
+
+.btn-layer:active {
+  transform: scale(0.95);
+}
+
+/* =========================================================
    Workspace: Barra Lateral + Área de Desenho
    Usa CSS Flexbox para layout horizontal
    ========================================================= */
@@ -236,4 +269,9 @@ body {
   cursor: crosshair;
   width: 100%;
   height: 100%;
+}
+
+.node-handle:hover {
+    fill: #4a90d9; /* Inverte a cor ao passar o mouse */
+    stroke: white;
 }
