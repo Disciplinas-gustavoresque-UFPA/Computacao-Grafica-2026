@@ -18,10 +18,15 @@ import { BorrachaTool } from './tools/BorrachaTool.js';
 import { NodeEditTool } from './tools/NodeEditTool.js';
 import { LinhaTool } from './tools/LinhaTool.js';
 import { ElipseTool } from './tools/ElipseTool.js';
+import { inicializarImportadorImagem } from './services/ImageImporter.js';
 
 // Referências aos elementos do DOM
 const svgCanvas = document.getElementById('canvas');
 const areaDesenho = document.getElementById('area-desenho');
+
+// Referências ao import de imagem
+const btnImportarImagem = document.getElementById('btn-importar-imagem');
+const inputImagem = document.getElementById('input-imagem');
 
 // Wrapper para sincronizar perfeitamente as coordenadas do #canvas com o #overlay-canvas
 const canvasContainer = document.createElement('div');
@@ -135,6 +140,10 @@ svgCanvas.addEventListener('mouseup', (evento) => {
   }
 });
 
+btnImportarImagem.addEventListener('click', () => {
+  inputImagem.click();
+});
+
 // Inicializa os valores dos inputs com os valores padrão do estado
 inputCorPreenchimento.value = estado.corPreenchimento;
 inputCorBorda.value = estado.corBorda;
@@ -225,3 +234,5 @@ window.addEventListener("keydown", (e) => {
   }
 }
 )
+
+inicializarImportadorImagem(svgCanvas, inputImagem);
