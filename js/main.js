@@ -24,7 +24,7 @@ import { BorrachaTool } from './tools/BorrachaTool.js';
 import { NodeEditTool } from './tools/NodeEditTool.js';
 import { LinhaTool } from './tools/LinhaTool.js';
 import { ElipseTool } from './tools/ElipseTool.js';
-import { inicializarImportadorImagem } from './services/ImageImporter.js';
+import { inicializarImportadorImagem } from './tools/ImageImporter.js';
 
 const svgCanvas = document.getElementById('canvas');
 const areaDesenho = document.getElementById('area-desenho');
