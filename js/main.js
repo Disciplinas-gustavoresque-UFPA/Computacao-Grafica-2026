@@ -37,10 +37,6 @@ const nomeFerramenta = document.getElementById('nome-ferramenta');
 const btnExportar = document.getElementById('btn-exportar');
 const exportFormat = document.getElementById('export-format');
 
-// Referências ao import de imagem
-const btnImportarImagem = document.getElementById('btn-importar-imagem');
-const inputImagem = document.getElementById('input-imagem');
-
 // Wrapper para sincronizar perfeitamente as coordenadas do #canvas com o #overlay-canvas
 const canvasContainer = document.createElement('div');
 canvasContainer.style.position = 'relative';
@@ -161,10 +157,6 @@ svgCanvas.addEventListener('mouseup', (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseUp(evento);
   }
-});
-
-btnImportarImagem.addEventListener('click', () => {
-  inputImagem.click();
 });
 
 // Inicializa os valores dos inputs com os valores padrão do estado
