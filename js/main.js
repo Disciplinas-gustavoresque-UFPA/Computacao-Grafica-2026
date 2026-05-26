@@ -59,7 +59,7 @@ const instanciasFerramentas = {
   linha: new LinhaTool(svgCanvas),    
   elipse: new ElipseTool(svgCanvas),  
   "Conta-gotas": new ColorPickerTool(svgCanvas),
-  lupa: new LupaTool(svgCanvas),
+  lupa: new LupaTool(svgCanvas, overlayCanvas),
   texto: new TextoTool(svgCanvas),
   borracha: new BorrachaTool(svgCanvas),
 };
