@@ -10,10 +10,15 @@
 import { estado, definirFerramenta, definirCorPreenchimento, definirCorBorda, definirGerenciadorSelecao } from './core/StateManager.js';
 import { ColorPickerTool } from './tools/ColorPickerTool.js';
 import { RetanguloTool } from './tools/RetanguloTool.js';
+import { TextoTool } from './tools/TextoTool.js';
 import { exportarDesenho } from './utils/exportHelpers.js';
 import { SelecaoTool } from './tools/SelecaoTool.js';
 import { SideBar } from './core/SideBar.js';
 import { Selecao } from './core/Selecao.js';
+import { BorrachaTool } from './tools/BorrachaTool.js';
+import { NodeEditTool } from './tools/NodeEditTool.js';
+import { LinhaTool } from './tools/LinhaTool.js';
+import { ElipseTool } from './tools/ElipseTool.js';
 
 // Referências aos elementos do DOM
 const svgCanvas = document.getElementById('canvas');
@@ -52,9 +57,13 @@ definirGerenciadorSelecao(selecaoVisual);
 // Instâncias das ferramentas disponíveis
 const instanciasFerramentas = {
   selecao: new SelecaoTool(svgCanvas),
+  edicaoVertices: new NodeEditTool(svgCanvas),
   retangulo: new RetanguloTool(svgCanvas),
+  linha: new LinhaTool(svgCanvas),    
+  elipse: new ElipseTool(svgCanvas),  
   "Conta-gotas": new ColorPickerTool(svgCanvas),
-  // Futuras ferramentas (elipse, linha, texto) entrarão aqui
+  texto: new TextoTool(svgCanvas),
+  borracha: new BorrachaTool(svgCanvas),
 };
 
 const botoesFerramenta = document.querySelectorAll('.btn-ferramenta');
@@ -179,3 +188,84 @@ btnExportar.addEventListener('click', () => {
   const formato = exportFormat.value || 'png';
   exportarDesenho(svgCanvas, formato);
 });
+
+// --- Controle de Camadas (Z-Index) ---
+const btnSendToBack = document.getElementById('btn-send-to-back');
+const btnStepBackward = document.getElementById('btn-step-backward');
+const btnStepForward = document.getElementById('btn-step-forward');
+const btnBringToFront = document.getElementById('btn-bring-to-front');
+
+function moverCamada(acao) {
+  const el = estado.elementoSelecionado;
+  if (!el) return;
+
+  const pai = el.parentNode;
+  if (!pai) return;
+
+  switch (acao) {
+    case 'fundo':
+      pai.prepend(el);
+      break;
+    case 'recuar':
+      if (el.previousElementSibling) {
+        el.previousElementSibling.before(el);
+      }
+      break;
+    case 'avancar':
+      if (el.nextElementSibling) {
+        el.nextElementSibling.after(el);
+      }
+      break;
+    case 'frente':
+      pai.appendChild(el);
+      break;
+  }
+  
+  // TODO: Registrar ação no HistoryManager (Issue #10)
+}
+
+btnSendToBack.addEventListener('click', () => moverCamada('fundo'));
+btnStepBackward.addEventListener('click', () => moverCamada('recuar'));
+btnStepForward.addEventListener('click', () => moverCamada('avancar'));
+btnBringToFront.addEventListener('click', () => moverCamada('frente'));
+
+// Atalhos de Teclado (Tool Selection)
+window.addEventListener("keydown", (e) => {
+  // Prevenção de conflitos
+  // Verifica se o usuário está focado em um campo de texto ou input de cor.
+  const elementoAtivo = document.activeElement;
+  const tagAtiva = elementoAtivo.tagName.toLocaleLowerCase();
+
+  // Se o foco estiver em um input, textArea, select ou contentEditable, ignora o atalho.
+  if (["input", "textarea", "select"].includes(tagAtiva) || elementoAtivo.isContentEditable)
+    return;
+  
+  // Mapeamento das teclas 
+  // Conforme novas ferramentas forem surgindo, só adicionar o atalho e o nome da ferramenta aqui
+  const mapaTeclas = {
+    "s" : "selecao",
+    "r" : "retangulo",
+    "e" : "elipse",
+    "l" : "linha",
+    "t" : "texto",
+    "i" : "conta-gotas"
+  }
+
+  const teclaPressionada = e.key.toLowerCase();
+  const ferramentaAlvo = mapaTeclas[teclaPressionada];
+  
+  // Adicionar e feedback visual
+  if (ferramentaAlvo) {
+    e.preventDefault();
+
+    // Buscar o botão na barra lateral
+    const botao = document.querySelector(`.btn-ferramenta[data-ferramenta="${ferramentaAlvo}"]`);
+
+    if (botao) {
+      // Simular click para utilizar o eventListener que chama `atualizarBotaoAtivo()`
+      // e aplica a classe CSS '.ativo' de forma automática.
+      botao.click();
+    }
+  }
+}
+)
