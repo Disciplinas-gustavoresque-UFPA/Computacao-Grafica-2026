@@ -26,6 +26,7 @@
                     value="#1a1a2e"
                     title="Cor da borda"
                 />
+                <span id="zoom-indicator">Zoom: 100%</span>
 
                 <span id="ferramenta-atual-label"
                     >Ferramenta:
@@ -152,6 +153,21 @@
                         <path d="M20 20H7L3 16L14 5L21 12L13 20"/>
                         </svg>
                     </button>
+
+                    <button id="btn-zoom-click" class="btn-ferramenta" data-ferramenta="lupa" title="Zoom padrão">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+                          viewBox="0 0 24 24" fill="none"
+                          stroke="currentColor" stroke-width="2"
+                          stroke-linecap="round" stroke-linejoin="round">
+
+                          <!-- lente -->
+                          <circle cx="11" cy="11" r="7"></circle>
+                          <!-- cabo -->
+                          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+
+                        </svg>
+                      </button>
+                      <div id="zoom-options" class="hidden"></div> <!-- Menu de opçoes para a lupa/zoom -->
                     <button
                         class="btn-ferramenta"
                         id="btn-importar-imagem"

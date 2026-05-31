@@ -24,6 +24,7 @@ import { BorrachaTool } from './tools/BorrachaTool.js';
 import { NodeEditTool } from './tools/NodeEditTool.js';
 import { LinhaTool } from './tools/LinhaTool.js';
 import { ElipseTool } from './tools/ElipseTool.js';
+import { LupaTool } from './tools/LupaTool.js';
 import { inicializarImportadorImagem } from './tools/ImageImporter.js';
 
 const svgCanvas = document.getElementById('canvas');
@@ -70,9 +71,13 @@ const instanciasFerramentas = {
   linha: new LinhaTool(svgCanvas),    
   elipse: new ElipseTool(svgCanvas),  
   "Conta-gotas": new ColorPickerTool(svgCanvas),
+  lupa: new LupaTool(svgCanvas, overlayCanvas),
   texto: new TextoTool(svgCanvas),
   borracha: new BorrachaTool(svgCanvas),
 };
+
+
+
 
 /**
  * Atualiza o estado visual dos botões da barra lateral,
@@ -127,6 +132,13 @@ svgCanvas.addEventListener('mousemove', (evento) => {
 svgCanvas.addEventListener('mouseup', (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseUp(evento);
+  }
+});
+
+// Previne o menu de opções do botao direito no canvas
+svgCanvas.addEventListener('contextmenu', (e) => {
+  if (e.target.closest('#canvas')) {
+    e.preventDefault();
   }
 });
 
