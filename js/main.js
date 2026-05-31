@@ -2,12 +2,18 @@
  * main.js — Ponto de entrada da aplicação do Editor Vetorial.
  *
  * Responsabilidades:
- *  - Inicializar o estado global via StateManager
- *  - Registrar os event listeners globais no elemento SVG (#canvas)
- *  - Conectar os botões da barra de ferramentas ao StateManager
+ * - Inicializar o estado global via StateManager
+ * - Registrar os event listeners globais no elemento SVG (#canvas)
+ * - Conectar os botões da barra de ferramentas ao StateManager
  */
 
-import { estado, definirFerramenta, definirCorPreenchimento, definirCorBorda, definirGerenciadorSelecao } from './core/StateManager.js';
+import { 
+  estado, 
+  definirFerramenta, 
+  definirCorPreenchimento, 
+  definirCorBorda, 
+  definirGerenciadorSelecao 
+} from './core/StateManager.js';
 import { ColorPickerTool } from './tools/ColorPickerTool.js';
 import { RetanguloTool } from './tools/RetanguloTool.js';
 import { TextoTool } from './tools/TextoTool.js';
@@ -19,10 +25,18 @@ import { NodeEditTool } from './tools/NodeEditTool.js';
 import { LinhaTool } from './tools/LinhaTool.js';
 import { ElipseTool } from './tools/ElipseTool.js';
 import { LupaTool } from './tools/LupaTool.js';
+import { inicializarImportadorImagem } from './tools/ImageImporter.js';
 
-// Referências aos elementos do DOM
 const svgCanvas = document.getElementById('canvas');
 const areaDesenho = document.getElementById('area-desenho');
+const botoesFerramenta = document.querySelectorAll('.btn-ferramenta');
+const btnImportarImagem = document.getElementById('btn-importar-imagem');
+const inputImagem = document.getElementById('input-imagem');
+const inputCorPreenchimento = document.getElementById('cor-preenchimento');
+const inputCorBorda = document.getElementById('cor-borda');
+const nomeFerramenta = document.getElementById('nome-ferramenta');
+const btnExportar = document.getElementById('btn-exportar');
+const exportFormat = document.getElementById('export-format');
 
 // Wrapper para sincronizar perfeitamente as coordenadas do #canvas com o #overlay-canvas
 const canvasContainer = document.createElement('div');
@@ -34,7 +48,7 @@ canvasContainer.style.height = '100%';
 svgCanvas.parentNode.insertBefore(canvasContainer, svgCanvas);
 canvasContainer.appendChild(svgCanvas);
 
-// 1. Camada de Interação: instanciar o novo SVG de overlay para seleções
+// Camada de Interação: instanciar o novo SVG de overlay para seleções
 const overlayCanvas = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 overlayCanvas.setAttribute('id', 'overlay-canvas');
 overlayCanvas.setAttribute('width', '100%');
@@ -45,11 +59,9 @@ overlayCanvas.style.left = '0';
 overlayCanvas.style.pointerEvents = 'none'; // Coordenado com o principal
 canvasContainer.appendChild(overlayCanvas);
 
-// Inicializar a classe de seleção
+// Inicializar a classe de seleção visual
 const selecaoVisual = new Selecao(overlayCanvas);
 definirGerenciadorSelecao(selecaoVisual);
-
-
 
 // Instâncias das ferramentas disponíveis
 const instanciasFerramentas = {
@@ -95,14 +107,10 @@ function atualizarBotaoAtivo(nomeDaFerramenta) {
   nomeFerramenta.textContent = nomeDaFerramenta || 'Nenhuma';
 }
 
-// --- Registro dos Event Listeners ---
-
-// Seleciona a ferramenta ao clicar nos botões da barra lateral
+// --- Barra de Ferramentas & Modos ---
 botoesFerramenta.forEach((btn) => {
   btn.addEventListener('click', () => {
     const ferramentaId = btn.getAttribute('data-ferramenta');
-
-    // Obtém a instância da ferramenta atual correspondente (se implementada)
     const ferramentaInstancia = instanciasFerramentas[ferramentaId] || null;
 
     definirFerramenta(ferramentaInstancia);
@@ -110,13 +118,12 @@ botoesFerramenta.forEach((btn) => {
   });
 });
 
-// Atualiza a cor de preenchimento no estado global
-inputCorPreenchimento.addEventListener('input', (evento) => {
+// --- Controles de Cor ---
+inputCorPreenchimento.addEventListener('input', () => {
   definirCorPreenchimento(inputCorPreenchimento.value);
 });
 
-// Atualiza a cor da borda no estado global
-inputCorBorda.addEventListener('input', (evento) => {
+inputCorBorda.addEventListener('input', () => {
   definirCorBorda(inputCorBorda.value);
 });
 
@@ -236,3 +243,11 @@ window.addEventListener("keydown", (e) => {
   }
 }
 )
+
+// Import de imagens
+
+btnImportarImagem.addEventListener('click', () => {
+  inputImagem.click();
+});
+
+inicializarImportadorImagem(svgCanvas, inputImagem);
