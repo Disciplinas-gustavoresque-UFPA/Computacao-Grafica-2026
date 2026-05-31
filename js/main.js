@@ -77,17 +77,6 @@ const instanciasFerramentas = {
 };
 
 
-const botoesFerramenta = document.querySelectorAll('.btn-ferramenta');
-const inputCorPreenchimento = (
-  document.getElementById('cor-preenchimento')
-);
-const inputCorBorda = (
-  document.getElementById('cor-borda')
-);
-
-const nomeFerramenta = document.getElementById('nome-ferramenta');
-const btnExportar = document.getElementById('btn-exportar');
-const exportFormat = document.getElementById('export-format');
 
 
 /**
