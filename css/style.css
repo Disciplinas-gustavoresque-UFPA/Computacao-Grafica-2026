@@ -209,6 +209,10 @@ body {
     display: inline-block;
 }
 
+.select-wrapper select {
+  width: 100%;
+}
+
 .select-format {
     appearance: none;
     -webkit-appearance: none;
