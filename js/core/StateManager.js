@@ -5,17 +5,19 @@
  * evitando variáveis globais soltas e facilitando a depuração.
  *
  * Propriedades do estado:
- *  - ferramentaAtual {ToolBase|null} - Instância da ferramenta de desenho ativa.
- *  - corPreenchimento {string}       - Cor de preenchimento dos elementos (formato hex).
- *  - corBorda {string}               - Cor da borda/stroke dos elementos (formato hex).
- *  - elementoSelecionado {SVGElement|null} - Elemento SVG atualmente selecionado.
+ * - ferramentaAtual {ToolBase|null} - Instância da ferramenta de desenho ativa.
+ * - corPreenchimento {string}       - Cor de preenchimento dos elementos (formato hex).
+ * - corBorda {string}               - Cor da borda/stroke dos elementos (formato hex).
+ * - elementosSelecionados {SVGElement[]} - Elementos SVG atualmente selecionados.
+ * - interfaceAtual {string}         - Flag para sabermos a tela onde o usuário está.
  */
 
-/** @type {{ ferramentaAtual: import('../tools/ToolBase.js').ToolBase|null, corPreenchimento: string, corBorda: string, elementosSelecionados: SVGElement[] }} */
+/** @type {{ ferramentaAtual: import('../tools/ToolBase.js').ToolBase|null, corPreenchimento: string, corBorda: string, elementosSelecionados: SVGElement[], interfaceAtual: string }} */
 export const estado = {
   ferramentaAtual: null,
   corPreenchimento: '#4a90d9',
   corBorda: '#1a1a2e',
+  interfaceAtual: 'inicio', // Nova flag para sabermos onde o usuário está
   elementosSelecionados: [],
 };
 
@@ -37,7 +39,7 @@ export function atualizarPosicaoSelecaoVisual() {
  * e `onAtivar` na nova ferramenta, quando aplicável.
  *
  * @param {import('../tools/ToolBase.js').ToolBase|string|null} ferramenta
- *   Instância de uma ferramenta (ToolBase) ou string identificadora.
+ * Instância de uma ferramenta (ToolBase) ou string identificadora.
  */
 export function definirFerramenta(ferramenta) {
   const anterior = estado.ferramentaAtual;
@@ -124,4 +126,8 @@ export function removerElementoSelecao(elemento) {
   if (gerenciadorSelecaoVisual) {
     gerenciadorSelecaoVisual.desenhar(estado.elementosSelecionados);
   }
+}
+
+export function definirInterface(novaInterface) {
+  estado.interfaceAtual = novaInterface;
 }
