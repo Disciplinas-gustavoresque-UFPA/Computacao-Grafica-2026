@@ -248,7 +248,7 @@ body {
    ====================================================*/
 
 .node-handle:hover {
-    fill: #4a90d9;
+    fill: #4a90d9; /* Inverte a cor ao passar o mouse */
     stroke: white;
 }
 
