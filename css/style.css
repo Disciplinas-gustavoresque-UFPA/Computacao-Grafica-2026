@@ -203,6 +203,11 @@ body {
     border-color: #000;
 }
 
+.select-format option {
+    background-color: var(--cor-fundo-painel); /* Usa a cor escura do painel */
+    color: var(--cor-texto); /* Usa a cor clara do texto */
+}
+
 /* Minimal Chevron */
 .select-arrow {
     position: absolute;
