@@ -11,12 +11,12 @@
  *  - elementoSelecionado {SVGElement|null} - Elemento SVG atualmente selecionado.
  */
 
-/** @type {{ ferramentaAtual: import('../tools/ToolBase.js').ToolBase|null, corPreenchimento: string, corBorda: string, elementoSelecionado: SVGElement|null }} */
+/** @type {{ ferramentaAtual: import('../tools/ToolBase.js').ToolBase|null, corPreenchimento: string, corBorda: string, elementosSelecionados: SVGElement[] }} */
 export const estado = {
   ferramentaAtual: null,
   corPreenchimento: '#4a90d9',
   corBorda: '#1a1a2e',
-  elementoSelecionado: null,
+  elementosSelecionados: [],
 };
 
 let gerenciadorSelecaoVisual = null;
@@ -26,8 +26,8 @@ export function definirGerenciadorSelecao(selecao) {
 }
 
 export function atualizarPosicaoSelecaoVisual() {
-  if (gerenciadorSelecaoVisual && estado.elementoSelecionado) {
-    gerenciadorSelecaoVisual.atualizarPosicao(estado.elementoSelecionado);
+  if (gerenciadorSelecaoVisual && estado.elementosSelecionados.length > 0) {
+    gerenciadorSelecaoVisual.atualizarPosicao(estado.elementosSelecionados);
   }
 }
 
@@ -38,8 +38,6 @@ export function atualizarPosicaoSelecaoVisual() {
  *
  * @param {import('../tools/ToolBase.js').ToolBase|string|null} ferramenta
  *   Instância de uma ferramenta (ToolBase) ou string identificadora.
- *   Futuras implementações de ferramentas deverão passar a instância;
- *   por ora, aceita string para permitir a seleção via botões da UI.
  */
 export function definirFerramenta(ferramenta) {
   const anterior = estado.ferramentaAtual;
@@ -76,13 +74,54 @@ export function definirCorBorda(cor) {
 }
 
 /**
- * Define o elemento SVG atualmente selecionado.
+ * Define os elementos SVG atualmente selecionados.
  *
- * @param {SVGElement|null} elemento - Elemento SVG selecionado ou null para limpar a seleção.
+ * @param {SVGElement|SVGElement[]|null} elementos - Elemento(s) SVG selecionado(s) ou null para limpar.
+ */
+export function definirElementosSelecionados(elementos) {
+  if (!elementos) {
+    estado.elementosSelecionados = [];
+  } else if (Array.isArray(elementos)) {
+    estado.elementosSelecionados = elementos;
+  } else {
+    estado.elementosSelecionados = [elementos];
+  }
+
+  if (gerenciadorSelecaoVisual) {
+    gerenciadorSelecaoVisual.desenhar(estado.elementosSelecionados);
+  }
+}
+
+/**
+ * Alias para compatibilidade ou seleção única.
+ * @deprecated Use definirElementosSelecionados
  */
 export function definirElementoSelecionado(elemento) {
-  estado.elementoSelecionado = elemento;
+  definirElementosSelecionados(elemento);
+}
+
+/**
+ * Adiciona um elemento à seleção atual.
+ *
+ * @param {SVGElement} elemento
+ */
+export function adicionarElementoSelecao(elemento) {
+  if (!estado.elementosSelecionados.includes(elemento)) {
+    estado.elementosSelecionados.push(elemento);
+    if (gerenciadorSelecaoVisual) {
+      gerenciadorSelecaoVisual.desenhar(estado.elementosSelecionados);
+    }
+  }
+}
+
+/**
+ * Remove um elemento da seleção atual.
+ *
+ * @param {SVGElement} elemento
+ */
+export function removerElementoSelecao(elemento) {
+  estado.elementosSelecionados = estado.elementosSelecionados.filter(el => el !== elemento);
   if (gerenciadorSelecaoVisual) {
-    gerenciadorSelecaoVisual.desenhar(elemento);
+    gerenciadorSelecaoVisual.desenhar(estado.elementosSelecionados);
   }
 }

@@ -26,11 +26,21 @@
                     value="#1a1a2e"
                     title="Cor da borda"
                 />
+                <span id="zoom-indicator">Zoom: 100%</span>
 
                 <span id="ferramenta-atual-label"
                     >Ferramenta:
                     <strong id="nome-ferramenta">Nenhuma</strong></span
                 >
+
+                <!-- Controle de Camadas -->
+                <div class="layer-controls">
+                    <button id="btn-send-to-back" title="Enviar para o Fundo" class="btn-layer">⏮</button>
+                    <button id="btn-step-backward" title="Recuar" class="btn-layer">⏪</button>
+                    <button id="btn-step-forward" title="Avançar" class="btn-layer">⏩</button>
+                    <button id="btn-bring-to-front" title="Trazer para a Frente" class="btn-layer">⏭</button>
+                </div>
+
                 <!-- Botão de exportar/descarregar desenho -->
                 <label for="export-format" class="propriedade-label"
                     >Exportar:</label
@@ -73,6 +83,13 @@
                         title="Seleção (S)"
                     >
                         &#9654;
+                    </button>
+                    <button
+                        class="btn-ferramenta"
+                        data-ferramenta="edicaoVertices"
+                        title="Edição por Vértices (E-V)"
+                    >
+                        &#9688;
                     </button>
                     <button
                         class="btn-ferramenta"
@@ -128,9 +145,47 @@
                             <path d="m2 22 .414-.414" />
                         </svg>
                     </button>
+                    <button class="btn-ferramenta" data-ferramenta="borracha" title="Borracha (B)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                        viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 20H7L3 16L14 5L21 12L13 20"/>
+                        </svg>
+                    </button>
+
                     <button class="btn-ferramenta" data-ferramenta="lapis" title="Lápis (P)">
-          &#128393;
-        </button>
+                        &#128393;
+                    </button>
+
+                    <button id="btn-zoom-click" class="btn-ferramenta" data-ferramenta="lupa" title="Zoom padrão">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+                          viewBox="0 0 24 24" fill="none"
+                          stroke="currentColor" stroke-width="2"
+                          stroke-linecap="round" stroke-linejoin="round">
+
+                          <!-- lente -->
+                          <circle cx="11" cy="11" r="7"></circle>
+                          <!-- cabo -->
+                          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+
+                        </svg>
+                      </button>
+                      <div id="zoom-options" class="hidden"></div> <!-- Menu de opçoes para a lupa/zoom -->
+                    <button
+                        class="btn-ferramenta"
+                        id="btn-importar-imagem"
+                        title="Importar Imagem (Raster)"
+                    >
+                        🖼️
+                    </button>
+
+                    <input 
+                        type="file" 
+                        id="input-imagem" 
+                        accept="image/png, image/jpeg, image/svg+xml" 
+                        style="display: none;" 
+                    />
       </aside>
 
                 <!-- Área Central de Desenho -->
@@ -145,12 +200,12 @@
                         <!-- Os elementos SVG criados pelo usuário serão inseridos aqui -->
                     </svg>
                 </main>
-            </div>
-            <!-- /#workspace -->
-        </div>
-        <!-- /#app -->
+            </div><!-- /#workspace -->
+        </div><!-- /#app -->
 
-        <!-- Ponto de entrada da aplicação: ES6 Module -->
-        <script type="module" src="js/main.js"></script>
-    </body>
+
+  <!-- Ponto de entrada da aplicação: ES6 Module -->
+  <script type="module" src="js/main.js"></script>
+</body>
+
 </html>
