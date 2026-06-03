@@ -53,7 +53,7 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 0 16px;
+  padding: 0 25px 0 60px ;
   background-color: var(--cor-fundo-painel);
   border-bottom: 1px solid var(--cor-borda-ui);
   box-shadow: var(--sombra-padrao);
