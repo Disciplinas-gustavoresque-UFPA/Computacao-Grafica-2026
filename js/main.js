@@ -35,6 +35,10 @@ import { HistoryManager } from './core/HistoryManager.js';
 
 const svgCanvas = document.getElementById('canvas');
 
+// Instancia HistoryManager
+const historyManager = new HistoryManager(svgCanvas);
+definirGerenciadorHistorico(historyManager);
+
 // Inicializar a tela de menu inicial
 inicializarMenuInicial(svgCanvas);
 
