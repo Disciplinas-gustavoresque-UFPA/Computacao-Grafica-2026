@@ -211,6 +211,20 @@ window.addEventListener("keydown", (e) => {
   if (["input", "textarea", "select"].includes(tagAtiva) || elementoAtivo.isContentEditable)
     return;
   
+  // Atalhos de teclado para o histórico
+  if (e.ctrlKey || e.metaKey) { // metaKey é o Cmd do Mac
+    if (e.key.toLowerCase() === 'z') {
+      e.preventDefault();
+      e.shiftKey ? refazerAcao() : desfazerAcao(); // Suporta Ctrl+Z e Ctrl+Shift+Z
+      return;
+    }
+    if (e.key.toLowerCase() === 'y') {
+      e.preventDefault();
+      refazerAcao(); // Suporta Ctrl+Y
+      return;
+    }
+  }
+
   const mapaTeclas = {
     "s" : "selecao",
     "r" : "retangulo",
