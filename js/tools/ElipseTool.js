@@ -1,6 +1,7 @@
 import { ToolBase } from './ToolBase.js';
 import { criarElementoSVG, obterCoordenadaSVG } from '../utils/svgHelpers.js';
 import { estado } from '../core/StateManager.js';
+import { registrarAcaoHistorico } from '../core/StateManager.js';
 
 /**
  * ElipseTool
@@ -62,7 +63,9 @@ export class ElipseTool extends ToolBase {
   onMouseUp(evento) {
     this.isDrawing = false;
     this.elipseElement = null;
-    // Integração futura com HistoryManager aqui
+
+    // Integração com o History Manager
+    registrarAcaoHistorico();
   }
 
   onDesativar() {
