@@ -194,6 +194,8 @@ function moverCamada(acao) {
       pai.appendChild(el);
       break;
   }
+
+  registrarAcaoHistorico();
 }
 
 btnSendToBack.addEventListener('click', () => moverCamada('fundo'));
