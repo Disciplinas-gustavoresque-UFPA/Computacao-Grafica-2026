@@ -1,3 +1,4 @@
+import { definirElementosSelecionados } from '../core/StateManager.js';
 import { MementoSVG } from './MementoSVG.js';
 
 export class HistoryManager {
