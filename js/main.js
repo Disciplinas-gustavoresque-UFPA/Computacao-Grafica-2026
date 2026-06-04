@@ -12,7 +12,11 @@ import {
   definirFerramenta, 
   definirCorPreenchimento, 
   definirCorBorda, 
-  definirGerenciadorSelecao 
+  definirGerenciadorSelecao,
+  definirGerenciadorHistorico,
+  desfazerAcao,
+  refazerAcao,
+  registrarAcaoHistorico
 } from './core/StateManager.js';
 import { ColorPickerTool } from './tools/ColorPickerTool.js';
 import { RetanguloTool } from './tools/RetanguloTool.js';
@@ -27,6 +31,7 @@ import { ElipseTool } from './tools/ElipseTool.js';
 import { LupaTool } from './tools/LupaTool.js';
 import { inicializarImportadorImagem } from './tools/ImageImporter.js';
 import { inicializarMenuInicial } from './core/UIManager.js';
+import { HistoryManager } from './core/HistoryManager.js';
 
 const svgCanvas = document.getElementById('canvas');
 
