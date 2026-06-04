@@ -57,4 +57,9 @@ export class HistoryManager {
       this.#aplicarEstado(proximoEstado.getConteudo());
     }
   }
+
+  #aplicarEstado(conteudoSvg) {
+    definirElementosSelecionados(null);
+    this.#svgCanvas.innerHTML = conteudoSvg;
+  }
 }
