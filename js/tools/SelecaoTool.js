@@ -5,7 +5,8 @@ import {
   definirElementosSelecionados, 
   adicionarElementoSelecao, 
   removerElementoSelecao, 
-  atualizarPosicaoSelecaoVisual 
+  atualizarPosicaoSelecaoVisual,
+  registrarAcaoHistorico
 } from '../core/StateManager.js';
 
 /**
@@ -17,7 +18,8 @@ export class SelecaoTool extends ToolBase {
     this.svgCanvas = svgCanvas;
 
     this.isDragging = false;
-    this.offsets = []; // Armazena offsets para múltiplos elementos
+    this.offsets = [];
+    this.estadoInicialMovimento = null;
   }
 
   onMouseDown(evento) {
@@ -40,19 +42,17 @@ export class SelecaoTool extends ToolBase {
           adicionarElementoSelecao(elementoAlvo);
         }
       } else {
-        // Seleção única: limpa se clicar em algo novo, mantém se clicar em um já selecionado (para drag)
         if (!estado.elementosSelecionados.includes(elementoAlvo)) {
           definirElementosSelecionados([elementoAlvo]);
         }
       }
 
-      // Prepara o arraste se houver seleção
       if (estado.elementosSelecionados.length > 0) {
         this.isDragging = true;
         this._calcularOffsets(pt);
+        this._salvarEstadoInicialMovimento();
       }
     } else {
-      // Clique no vazio limpa a seleção se não estiver usando Shift
       if (!isShift) {
         this.limparSelecao();
       }
@@ -89,14 +89,45 @@ export class SelecaoTool extends ToolBase {
           el.setAttribute('x2', String(parseFloat(el.getAttribute('x2') || 0) + dx));
           el.setAttribute('y2', String(parseFloat(el.getAttribute('y2') || 0) + dy));
       }
-      // Grupos (g) e Paths seriam movidos via transform (não implementado aqui para simplicidade)
     });
 
     atualizarPosicaoSelecaoVisual();
   }
 
   onMouseUp(evento) {
+    if (this.isDragging) {
+      const houveMovimento = this._houveMovimentoReal();
+      if (houveMovimento) {
+        registrarAcaoHistorico();
+      }
+    }
     this.isDragging = false;
+    this.estadoInicialMovimento = null;
+  }
+
+  onKeyDown(evento) {
+    if (evento.key === 'Delete' || evento.key === 'Backspace') {
+      evento.preventDefault();
+      this.deletarElementosSelecionados();
+    }
+  }
+
+  deletarElementosSelecionados() {
+    const elementos = [...estado.elementosSelecionados];
+    if (elementos.length === 0) return;
+    
+
+    elementos.forEach(el => {
+      if (el && el.parentNode) {
+        el.remove();
+      }
+    });
+    
+    // Limpa a seleção
+    definirElementosSelecionados([]);
+    
+    // Registrar a exclusão no histórico
+    registrarAcaoHistorico();
   }
 
   onDesativar() {
@@ -106,11 +137,64 @@ export class SelecaoTool extends ToolBase {
   limparSelecao() {
     this.isDragging = false;
     this.offsets = [];
+    this.estadoInicialMovimento = null;
     definirElementosSelecionados([]);
   }
 
   /**
-   * Busca o elemento selecionável mais próximo na hierarquia.
+   * @private
+   */
+  _salvarEstadoInicialMovimento() {
+    this.estadoInicialMovimento = estado.elementosSelecionados.map(el => {
+      const tag = el.tagName.toLowerCase();
+      let x = 0, y = 0;
+      
+      if (tag === 'rect' || tag === 'text' || tag === 'image') {
+        x = parseFloat(el.getAttribute('x') || 0);
+        y = parseFloat(el.getAttribute('y') || 0);
+      } else if (tag === 'circle' || tag === 'ellipse') {
+        x = parseFloat(el.getAttribute('cx') || 0);
+        y = parseFloat(el.getAttribute('cy') || 0);
+      } else if (tag === 'line') {
+        x = parseFloat(el.getAttribute('x1') || 0);
+        y = parseFloat(el.getAttribute('y1') || 0);
+      }
+      
+      return { elemento: el, x, y, tag };
+    });
+  }
+
+  /**
+   * @private
+   */
+  _houveMovimentoReal() {
+    if (!this.estadoInicialMovimento) return false;
+    
+    for (const estadoInicial of this.estadoInicialMovimento) {
+      const el = estadoInicial.elemento;
+      const tag = estadoInicial.tag;
+      let xAtual = 0, yAtual = 0;
+      
+      if (tag === 'rect' || tag === 'text' || tag === 'image') {
+        xAtual = parseFloat(el.getAttribute('x') || 0);
+        yAtual = parseFloat(el.getAttribute('y') || 0);
+      } else if (tag === 'circle' || tag === 'ellipse') {
+        xAtual = parseFloat(el.getAttribute('cx') || 0);
+        yAtual = parseFloat(el.getAttribute('cy') || 0);
+      } else if (tag === 'line') {
+        xAtual = parseFloat(el.getAttribute('x1') || 0);
+        yAtual = parseFloat(el.getAttribute('y1') || 0);
+      }
+      
+      if (xAtual !== estadoInicial.x || yAtual !== estadoInicial.y) {
+        return true;
+      }
+    }
+    
+    return false;
+  }
+
+  /**
    * @private
    */
   _buscarElementoValido(target, allowedTags) {
@@ -128,7 +212,6 @@ export class SelecaoTool extends ToolBase {
   }
 
   /**
-   * Calcula a distância entre o clique e a posição de cada elemento selecionado.
    * @private
    */
   _calcularOffsets(pontoMouse) {
