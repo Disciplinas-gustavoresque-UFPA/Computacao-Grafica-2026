@@ -1,3 +1,5 @@
+import { criarElementoSVG } from "../utils/svgHelpers.js";
+
 /**
  * ShapeBase.js — Classe base abstrata para todas as lógicas de modificação estrutural
  *
@@ -10,20 +12,20 @@
  *
  * export class RetanguloShape extends ShapeBase {
  *   renderizarTodosHandles(elemento) { ... }
- *   onMouseMove(evento) { ... }
- *   onMouseUp(evento)   { ... }
+ *   atualizarForma(coords) { ... }
+ *   sincronizarTodosOsHandles(elemento)   { ... }
  * }
  */
 export class ShapeBase {
 
-  // Funções que devem ser implementadas pela classe base
+  // Funções que são implementadas pela classe base
   // renderizarHandle, atualizarPosicaoHandle
 
   /**
   * Cria a representação visual (alça) de um vértice no overlay.
   * @param {Object} ponto - Coordenadas e ID do ponto.
   */
-  renderizarHandle(ponto) {
+  renderizarHandle(ponto, grupoOverlay) {
     const handle = criarElementoSVG('rect', {
       'x': ponto.x - 4, // Centraliza o handle de 8x8 no ponto exato
       'y': ponto.y - 4,
@@ -37,12 +39,12 @@ export class ShapeBase {
       'data-node-id': ponto.id
     });
   
-    this.grupoOverlay.appendChild(handle);
+    grupoOverlay.appendChild(handle);
   }
 
   // Move visualmente o quadradinho azul no overlay
-  atualizarPosicaoHandle(coords) {
-    const handle = this.grupoOverlay.querySelector(`[data-node-id="${this.activeNodeId}"]`);
+  atualizarPosicaoHandle(coords, grupoOverlay) {
+    const handle = grupoOverlay.querySelector(`[data-node-id="${this.activeNodeId}"]`);
     if (handle) {
       handle.setAttribute('x', coords.x - 4);
       handle.setAttribute('y', coords.y - 4);
@@ -53,7 +55,7 @@ export class ShapeBase {
    *
    * @param {SVGAElement} elemento - elemento svg
    */
-  renderizarTodosHandles(targetElement) {
+  renderizarTodosHandles(targetElement, grupoOverlay) {
     // Deve ser sobrescrito pela ferramenta concreta.
   }
 
@@ -62,7 +64,7 @@ export class ShapeBase {
    *
    * @param {coordenadas} coordenadas - coordenadas da forma.
    */
-  atualizarForma(coords) {
+  atualizarForma(coords, targetElement, activeNode, grupoOverlay) {
     // Deve ser sobrescrito pela ferramenta concreta.
   }
 
@@ -71,7 +73,7 @@ export class ShapeBase {
    *
    * @param {SVGAElement} elemento - elemento SVG.
    */
-  sincronizarTodosOsHandles(targetElement) {
+  sincronizarTodosOsHandles(targetElement, grupoOverlay) {
     // Deve ser sobrescrito pela ferramenta concreta.
   }
 }
