@@ -52,6 +52,65 @@ const nomeFerramenta = document.getElementById('nome-ferramenta');
 const btnExportar = document.getElementById('btn-exportar');
 const exportFormat = document.getElementById('export-format');
 
+// Botões de histórico
+const btnDesfazer = document.getElementById('btn-desfazer');
+const btnRefazer = document.getElementById('btn-refazer');
+
+// Função para atualizar o estado dos botões de histórico
+function atualizarBotoesHistorico() {
+    if (!historyManager) return;
+    
+    const podeDesfazer = historyManager.podeDesfazer();
+    const podeRefazer = historyManager.podeRefazer();
+    
+    if (btnDesfazer) {
+        btnDesfazer.disabled = !podeDesfazer;
+        btnDesfazer.title = podeDesfazer ? 'Desfazer (Ctrl+Z)' : 'Nada para desfazer';
+    }
+    
+    if (btnRefazer) {
+        btnRefazer.disabled = !podeRefazer;
+        btnRefazer.title = podeRefazer ? 'Refazer (Ctrl+Y)' : 'Nada para refazer';
+    }
+}
+
+// Sobrescrever o método salvarEstado do historyManager para atualizar os botões
+const salvarEstadoOriginal = historyManager.salvarEstado.bind(historyManager);
+historyManager.salvarEstado = function() {
+    const resultado = salvarEstadoOriginal();
+    atualizarBotoesHistorico();
+    return resultado;
+};
+
+const desfazerOriginal = historyManager.desfazer.bind(historyManager);
+historyManager.desfazer = function() {
+    const resultado = desfazerOriginal();
+    atualizarBotoesHistorico();
+    return resultado;
+};
+
+const refazerOriginal = historyManager.refazer.bind(historyManager);
+historyManager.refazer = function() {
+    const resultado = refazerOriginal();
+    atualizarBotoesHistorico();
+    return resultado;
+};
+
+// Configurar event listeners dos botões de histórico
+if (btnDesfazer) {
+    btnDesfazer.addEventListener('click', () => {
+        desfazerAcao();
+        atualizarBotoesHistorico();
+    });
+}
+
+if (btnRefazer) {
+    btnRefazer.addEventListener('click', () => {
+        refazerAcao();
+        atualizarBotoesHistorico();
+    });
+}
+
 // Wrapper para sincronizar perfeitamente as coordenadas do #canvas com o #overlay-canvas
 const canvasContainer = document.createElement('div');
 canvasContainer.style.position = 'relative';
@@ -170,7 +229,11 @@ const btnStepForward = document.getElementById('btn-step-forward');
 const btnBringToFront = document.getElementById('btn-bring-to-front');
 
 function moverCamada(acao) {
-  const el = estado.elementoSelecionado;
+  const elementos = estado.elementosSelecionados;
+  if (!elementos || elementos.length === 0) return;
+  
+  // Move o primeiro elemento selecionado (para simplicidade)
+  const el = elementos[0];
   if (!el) return;
 
   const pai = el.parentNode;
@@ -196,6 +259,7 @@ function moverCamada(acao) {
   }
 
   registrarAcaoHistorico();
+  atualizarBotoesHistorico();
 }
 
 btnSendToBack.addEventListener('click', () => moverCamada('fundo'));
@@ -215,12 +279,18 @@ window.addEventListener("keydown", (e) => {
   if (e.ctrlKey || e.metaKey) { // metaKey é o Cmd do Mac
     if (e.key.toLowerCase() === 'z') {
       e.preventDefault();
-      e.shiftKey ? refazerAcao() : desfazerAcao(); // Suporta Ctrl+Z e Ctrl+Shift+Z
+      if (e.shiftKey) {
+        refazerAcao();
+      } else {
+        desfazerAcao();
+      }
+      atualizarBotoesHistorico();
       return;
     }
     if (e.key.toLowerCase() === 'y') {
       e.preventDefault();
-      refazerAcao(); // Suporta Ctrl+Y
+      refazerAcao();
+      atualizarBotoesHistorico();
       return;
     }
   }
@@ -252,3 +322,6 @@ btnImportarImagem.addEventListener('click', () => {
 });
 
 inicializarImportadorImagem(svgCanvas, inputImagem);
+
+// Inicializar o estado dos botões de histórico
+atualizarBotoesHistorico();

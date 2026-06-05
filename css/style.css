@@ -417,3 +417,51 @@ body {
   background-color: #3a7bc2;
   transform: translateY(-2px);
 }
+
+.history-controls {
+    display: flex;
+    gap: 4px;
+    margin-left: 16px;
+    border-left: 1px solid var(--cor-borda-ui);
+    padding-left: 16px;
+}
+
+.btn-history {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid var(--cor-borda-ui);
+    color: var(--cor-texto-secundario);
+    border-radius: var(--raio-borda);
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-history:hover {
+    background-color: rgba(74, 144, 217, 0.2);
+    color: var(--cor-destaque);
+    border-color: var(--cor-destaque);
+}
+
+.btn-history:active {
+    transform: scale(0.95);
+}
+
+/* Indicador visual de que há ação disponível */
+.btn-history:not(:disabled) {
+    color: var(--cor-texto);
+}
+
+.btn-history:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-history:disabled:hover {
+    background-color: transparent;
+    border-color: var(--cor-borda-ui);
+    color: var(--cor-texto-secundario);
+}
