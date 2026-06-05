@@ -90,7 +90,7 @@ export class NodeEditTool extends ToolBase {
     }
 
     // Identifica os pontos e solicita a renderização.
-    identificarVertices() {
+    renderizarTodosHandles() {
         let vertices = [];
 
         if (this.elementoAlvo.tagName === 'rect') {
