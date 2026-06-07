@@ -12,7 +12,9 @@ import {
   definirFerramenta, 
   definirCorPreenchimento, 
   definirCorBorda, 
-  definirGerenciadorSelecao 
+  definirGerenciadorSelecao,
+  definirCallbackPainelAlinhamento,
+  atualizarPosicaoSelecaoVisual
 } from './core/StateManager.js';
 import { ColorPickerTool } from './tools/ColorPickerTool.js';
 import { RetanguloTool } from './tools/RetanguloTool.js';
@@ -27,6 +29,16 @@ import { ElipseTool } from './tools/ElipseTool.js';
 import { LupaTool } from './tools/LupaTool.js';
 import { inicializarImportadorImagem } from './tools/ImageImporter.js';
 import { inicializarMenuInicial } from './core/UIManager.js';
+import {
+  alinharEsquerda,
+  alinharCentroHorizontal,
+  alinharDireita,
+  alinharTopo,
+  alinharCentroVertical,
+  alinharBase,
+  distribuirHorizontalmente,
+  distribuirVerticalmente,
+} from './utils/alignHelpers.js';
 
 const svgCanvas = document.getElementById('canvas');
 
@@ -67,6 +79,17 @@ canvasContainer.appendChild(overlayCanvas);
 // Inicializar a classe de seleção visual
 const selecaoVisual = new Selecao(overlayCanvas);
 definirGerenciadorSelecao(selecaoVisual);
+
+// --- Painel de Alinhamento (multi-seleção) ---
+const painelAlinhamento = document.getElementById('painel-alinhamento');
+function atualizarVisibilidadePainelAlinhamento(qtd) {
+  if (qtd >= 2) {
+    painelAlinhamento.classList.remove('oculto');
+  } else {
+    painelAlinhamento.classList.add('oculto');
+  }
+}
+definirCallbackPainelAlinhamento(atualizarVisibilidadePainelAlinhamento);
 
 // Instâncias das ferramentas disponíveis com todas as implementações da main
 const instanciasFerramentas = {
@@ -227,3 +250,18 @@ btnImportarImagem.addEventListener('click', () => {
 });
 
 inicializarImportadorImagem(svgCanvas, inputImagem);
+
+// --- Botões de Alinhamento ---
+function executarAlinhamento(fn) {
+  fn(estado.elementosSelecionados);
+  atualizarPosicaoSelecaoVisual();
+}
+
+document.getElementById('btn-alinhar-esquerda').addEventListener('click', () => executarAlinhamento(alinharEsquerda));
+document.getElementById('btn-alinhar-centro-h').addEventListener('click', () => executarAlinhamento(alinharCentroHorizontal));
+document.getElementById('btn-alinhar-direita').addEventListener('click',  () => executarAlinhamento(alinharDireita));
+document.getElementById('btn-alinhar-topo').addEventListener('click',     () => executarAlinhamento(alinharTopo));
+document.getElementById('btn-alinhar-centro-v').addEventListener('click', () => executarAlinhamento(alinharCentroVertical));
+document.getElementById('btn-alinhar-base').addEventListener('click',     () => executarAlinhamento(alinharBase));
+document.getElementById('btn-distribuir-h').addEventListener('click',     () => executarAlinhamento(distribuirHorizontalmente));
+document.getElementById('btn-distribuir-v').addEventListener('click',     () => executarAlinhamento(distribuirVerticalmente));

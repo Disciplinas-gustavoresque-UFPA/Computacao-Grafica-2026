@@ -22,9 +22,20 @@ export const estado = {
 };
 
 let gerenciadorSelecaoVisual = null;
+let callbackPainelAlinhamento = null;
 
 export function definirGerenciadorSelecao(selecao) {
   gerenciadorSelecaoVisual = selecao;
+}
+
+export function definirCallbackPainelAlinhamento(fn) {
+  callbackPainelAlinhamento = fn;
+}
+
+function _notificarPainelAlinhamento() {
+  if (typeof callbackPainelAlinhamento === 'function') {
+    callbackPainelAlinhamento(estado.elementosSelecionados.length);
+  }
 }
 
 export function atualizarPosicaoSelecaoVisual() {
@@ -92,6 +103,7 @@ export function definirElementosSelecionados(elementos) {
   if (gerenciadorSelecaoVisual) {
     gerenciadorSelecaoVisual.desenhar(estado.elementosSelecionados);
   }
+  _notificarPainelAlinhamento();
 }
 
 /**
@@ -113,6 +125,7 @@ export function adicionarElementoSelecao(elemento) {
     if (gerenciadorSelecaoVisual) {
       gerenciadorSelecaoVisual.desenhar(estado.elementosSelecionados);
     }
+    _notificarPainelAlinhamento();
   }
 }
 
@@ -126,6 +139,7 @@ export function removerElementoSelecao(elemento) {
   if (gerenciadorSelecaoVisual) {
     gerenciadorSelecaoVisual.desenhar(estado.elementosSelecionados);
   }
+  _notificarPainelAlinhamento();
 }
 
 export function definirInterface(novaInterface) {
