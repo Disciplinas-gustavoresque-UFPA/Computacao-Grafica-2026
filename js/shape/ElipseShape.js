@@ -2,11 +2,11 @@ import { ShapeBase } from "./ShapeBase.js";
 
 export class ElipseShape extends ShapeBase {
 
-  constructor() {
-    super();
+  constructor(svgCanvas) {
+    super(svgCanvas);
   }
 
-  renderizarTodosHandles(targetElement, grupoOverlay) {
+  renderizarTodosHandles(targetElement) {
     let vertices = [];
 
     const cx = parseFloat(targetElement.getAttribute('cx'));
@@ -23,10 +23,10 @@ export class ElipseShape extends ShapeBase {
     ];
 
     // Renderiza cada vértice identificado usando o método da classe base
-    vertices.forEach(ponto => super.renderizarHandle(ponto, grupoOverlay));
+    vertices.forEach(ponto => super.renderizarHandle(ponto));
   }
 
-  atualizarForma(coords, targetElement, activeNode, grupoOverlay) {
+  atualizarForma(coords, targetElement, activeNode) {
     const cx = parseFloat(targetElement.getAttribute('cx'));
     const cy = parseFloat(targetElement.getAttribute('cy'));
     const rx = parseFloat(targetElement.getAttribute('rx'));
@@ -34,8 +34,8 @@ export class ElipseShape extends ShapeBase {
 
     switch (activeNode) {
       case 'top':
-        // Altera o raio vertical (ry). Opcionalmente ajusta o cy se quiser travar a base.
-        // Aqui mantemos o centro fixo, que é o padrão matemático mais limpo:
+        // Altera o raio vertical (ry).
+        // Aqui mantenho o centro fixo, que é o padrão matemático mais limpo:
         targetElement.setAttribute('ry', Math.max(0, cy - coords.y));
         break;
 
@@ -55,11 +55,11 @@ export class ElipseShape extends ShapeBase {
         break;
     }
 
-    // Sincroniza os nodes (vértices) com a nova geometria da elipse
-    this.sincronizarTodosOsHandles(targetElement, grupoOverlay);
+    // Sincroniza os nodes (vértices) com a geometria da elipse
+    this.sincronizarTodosOsHandles(targetElement);
   }
 
-  sincronizarTodosOsHandles(targetElement, grupoOverlay) {
+  sincronizarTodosOsHandles(targetElement) {
     const cx = parseFloat(targetElement.getAttribute('cx'));
     const cy = parseFloat(targetElement.getAttribute('cy'));
     const rx = parseFloat(targetElement.getAttribute('rx'));
@@ -73,7 +73,7 @@ export class ElipseShape extends ShapeBase {
     };
 
     for (const [id, pos] of Object.entries(posicoes)) {
-        const handle = grupoOverlay.querySelector(`[data-node-id="${id}"]`);
+        const handle = this.grupoOverlay.querySelector(`[data-node-id="${id}"]`);
         if (handle) {
             handle.setAttribute('x', pos.x - 4);
             handle.setAttribute('y', pos.y - 4);

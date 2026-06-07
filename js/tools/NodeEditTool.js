@@ -12,15 +12,14 @@ export class NodeEditTool extends ToolBase {
         super();
         this.svgCanvas = svgCanvas;
         this.elementoAlvo = null;
-        this.grupoOverlay = null;
 
         // Estado do arraste
         this.isDraggingNode = false;
         this.activeNodeId = null;
         this.allowedShapes = {
-            'rect': new RetanguloShape(),
-            'ellipse': new ElipseShape(),
-            'image': new RetanguloShape(), // Image possui as mesmas propriedades de retangulos
+            'rect': new RetanguloShape(svgCanvas),
+            'ellipse': new ElipseShape(svgCanvas),
+            'image': new RetanguloShape(svgCanvas), // Image possui as mesmas propriedades de retangulos
         }
     }
 
@@ -30,9 +29,10 @@ export class NodeEditTool extends ToolBase {
     onMouseDown(evento) {
         const pt = obterCoordenadaSVG(evento, this.svgCanvas);
         const target = evento.target;
+        let shape = this.elementoAlvo ? this.allowedShapes[this.elementoAlvo.tagName] : null;
 
         // Verifica se o clique foi em um handle de nó
-        if (this.grupoOverlay && this.grupoOverlay.contains(target)) {
+        if (shape && shape.grupoOverlay && shape.grupoOverlay.contains(target)) {
             this.isDraggingNode = true;
             this.activeNodeId = target.getAttribute('data-node-id');
             
@@ -40,8 +40,10 @@ export class NodeEditTool extends ToolBase {
             evento.stopPropagation();
             return;
         }
+
         this.limparSelecao();
         const tag = target.tagName ? target.tagName.toLowerCase() : '';
+        let newShape = this.allowedShapes[tag];
 
         // Se o clique não foi no canvas vazio e for um elemento permitido
         if (
@@ -54,8 +56,8 @@ export class NodeEditTool extends ToolBase {
         }
         
         if (this.elementoAlvo) {
-            this.inicializarOverlay();
-            this.allowedShapes[tag].renderizarTodosHandles(this.elementoAlvo, this.grupoOverlay);
+            newShape.inicializarOverlay();
+            newShape.renderizarTodosHandles(this.elementoAlvo);
         } 
     }
 
@@ -67,8 +69,9 @@ export class NodeEditTool extends ToolBase {
 
         // No onMouseMove de NodeEditTool.js altere para:
         const tag = this.elementoAlvo.tagName.toLowerCase();
-        this.allowedShapes[tag].atualizarPosicaoHandle(coordenadas, this.grupoOverlay);
-        this.allowedShapes[tag].atualizarForma(coordenadas, this.elementoAlvo, this.activeNodeId, this.grupoOverlay);
+        const shape = this.allowedShapes[tag];
+        shape.atualizarPosicaoHandle(coordenadas);
+        shape.atualizarForma(coordenadas, this.elementoAlvo, this.activeNodeId);
     }
 
     //Finaliza o arraste
@@ -82,20 +85,9 @@ export class NodeEditTool extends ToolBase {
         this.limparSelecao();
     }
 
-     // Cria um grupo SVG para conter as alças de manipulação (Issue #9).
-    inicializarOverlay() {
-        this.grupoOverlay = criarElementoSVG('g', {
-            'id': 'overlay-nodes',
-            'style': 'pointer-events: all;' 
-        });
-        this.svgCanvas.appendChild(this.grupoOverlay);
-    }
-
     limparSelecao() {
-        if (this.grupoOverlay) {
-            this.grupoOverlay.remove();
-            this.grupoOverlay = null;
-        }
+        const tag = this.elementoAlvo ? this.elementoAlvo.tagName : '';
+        if (tag) this.allowedShapes[tag].removeOverlay();
         this.elementoAlvo = null;
       }
     

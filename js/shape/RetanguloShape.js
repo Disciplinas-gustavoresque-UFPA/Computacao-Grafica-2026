@@ -2,11 +2,11 @@ import { ShapeBase } from "./ShapeBase.js";
 
 export class RetanguloShape extends ShapeBase {
 
-  constructor() {
-    super();
+  constructor(svgCanvas) {
+    super(svgCanvas);
   }
 
-  renderizarTodosHandles(targetElement, grupoOverlay) {
+  renderizarTodosHandles(targetElement) {
     let vertices = [];
 
     const x = parseFloat(targetElement.getAttribute('x'));
@@ -22,10 +22,10 @@ export class RetanguloShape extends ShapeBase {
     ];
 
     // Renderiza cada vértice identificado
-    vertices.forEach(ponto => super.renderizarHandle(ponto, grupoOverlay));
+    vertices.forEach(ponto => super.renderizarHandle(ponto));
   }
 
-  atualizarForma(coords, targetElement, activeNode, grupoOverlay) {
+  atualizarForma(coords, targetElement, activeNode) {
     const x = parseFloat(targetElement.getAttribute('x'));
     const y = parseFloat(targetElement.getAttribute('y'));
     const w = parseFloat(targetElement.getAttribute('width'));
@@ -59,10 +59,10 @@ export class RetanguloShape extends ShapeBase {
     }
 
     // Sincroniza os nodes (vértices)
-    this.sincronizarTodosOsHandles(targetElement, grupoOverlay);
+    this.sincronizarTodosOsHandles(targetElement);
   }
 
-  sincronizarTodosOsHandles(targetElement, grupoOverlay){
+  sincronizarTodosOsHandles(targetElement){
     const x = parseFloat(targetElement.getAttribute('x'));
     const y = parseFloat(targetElement.getAttribute('y'));
     const w = parseFloat(targetElement.getAttribute('width'));
@@ -76,7 +76,7 @@ export class RetanguloShape extends ShapeBase {
     };
 
     for (const [id, pos] of Object.entries(posicoes)) {
-        const handle = grupoOverlay.querySelector(`[data-node-id="${id}"]`);
+        const handle = this.grupoOverlay.querySelector(`[data-node-id="${id}"]`);
         if (handle) {
             handle.setAttribute('x', pos.x - 4);
             handle.setAttribute('y', pos.y - 4);
