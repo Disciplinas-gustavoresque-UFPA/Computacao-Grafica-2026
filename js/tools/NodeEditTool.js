@@ -20,6 +20,7 @@ export class NodeEditTool extends ToolBase {
         this.allowedShapes = {
             'rect': new RetanguloShape(),
             'ellipse': new ElipseShape(),
+            'image': new RetanguloShape(), // Image possui as mesmas propriedades de retangulos
         }
     }
 
