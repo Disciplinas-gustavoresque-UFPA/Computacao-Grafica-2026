@@ -1,6 +1,7 @@
 import { ToolBase } from './ToolBase.js';
 import { obterCoordenadaSVG, criarElementoSVG } from '../utils/svgHelpers.js';
 import { RetanguloShape } from '../shape/RetanguloShape.js';
+import { ElipseShape } from '../shape/ElipseShape.js';
 
 /**
  * NodeEditTool
@@ -18,6 +19,7 @@ export class NodeEditTool extends ToolBase {
         this.activeNodeId = null;
         this.allowedShapes = {
             'rect': new RetanguloShape(),
+            'ellipse': new ElipseShape(),
         }
     }
 
@@ -62,11 +64,10 @@ export class NodeEditTool extends ToolBase {
 
         const coordenadas = obterCoordenadaSVG(evento, this.svgCanvas);
 
-        // Por enquanto, apenas movemos visualmente a alça no overlay
-        // No próximo passo (Passo 4), conectaremos isso à forma real
-        this.allowedShapes[this.elementoAlvo.tagName].atualizarPosicaoHandle(coordenadas, this.grupoOverlay);
-        // Atualiza a geometria da forma real
-        this.allowedShapes[this.elementoAlvo.tagName].atualizarForma(coordenadas, this.elementoAlvo, this.activeNodeId, this.grupoOverlay);
+        // No onMouseMove de NodeEditTool.js altere para:
+        const tag = this.elementoAlvo.tagName.toLowerCase();
+        this.allowedShapes[tag].atualizarPosicaoHandle(coordenadas, this.grupoOverlay);
+        this.allowedShapes[tag].atualizarForma(coordenadas, this.elementoAlvo, this.activeNodeId, this.grupoOverlay);
     }
 
     //Finaliza o arraste
