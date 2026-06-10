@@ -23,39 +23,27 @@ export function inicializarImportadorImagem(svgCanvas, inputImagem) {
     reader.onload = function(e) {
       const dataUrl = e.target.result; // Imagem em Base64
 
-      // Cria um objeto de imagem HTML em memória para descobrir as dimensões reais
-      const imagemOriginal = new Image();
-
-      imagemOriginal.onload = function() {
-        // Obtém as dimensões originais do arquivo de imagem
-        const larguraOriginal = imagemOriginal.naturalWidth;
-        const alturaOriginal = imagemOriginal.naturalHeight;
-
-        // Cria o elemento <image> nativo do SVG
-        const svgImage = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-        
-        // Define os atributos necessários
-        svgImage.setAttribute('href', dataUrl);
-        svgImage.setAttribute('x', '50');
-        svgImage.setAttribute('y', '50');
-        svgImage.setAttribute('width', larguraOriginal.toString());
-        svgImage.setAttribute('height', alturaOriginal.toString());
-        
-        // O atributo permite a edição estrutural de imagens de forma mais fluida
-        svgImage.setAttribute('preserveAspectRatio', 'none');
+      // Cria o elemento <image> nativo do SVG
+      const svgImage = document.createElementNS('http://www.w3.org/2000/svg', 'image');
       
-        // Classe para que a SelecaoTool reconheça o elemento
-        svgImage.classList.add('elemento-desenho'); 
+      // Define os atributos necessários
+      svgImage.setAttribute('href', dataUrl);
+      svgImage.setAttribute('x', '50');
+      svgImage.setAttribute('y', '50');
+      svgImage.setAttribute('width', '300');
+      svgImage.setAttribute('height', '300');
 
-        // Adiciona a imagem ao canvas
-        svgCanvas.appendChild(svgImage);
+      // O atributo permite a edição estrutural de imagens de forma mais fluida
+      svgImage.setAttribute('preserveAspectRatio', 'none');
+      
+      // Classe para que a SelecaoTool reconheça o elemento
+      svgImage.classList.add('elemento-desenho'); 
 
-        // Limpa o input para permitir importar a mesma imagem novamente
-        inputImagem.value = '';
-      }
+      // Adiciona a imagem ao canvas
+      svgCanvas.appendChild(svgImage);
 
-      // Define o src para disparar o evento onload da imagem em memória
-      imagemOriginal.src = dataUrl;
+      // Limpa o input para permitir importar a mesma imagem novamente
+      inputImagem.value = '';
     };
 
     // Inicia a leitura do arquivo como Data URL
