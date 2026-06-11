@@ -123,64 +123,24 @@ botoesFerramenta.forEach((btn) => {
   });
 });
 
-// --- Controles de Cor ---
-/**
- * Atualiza o estado visual dos botões da barra lateral,
- * destacando apenas o botão da ferramenta ativa.
- *
- * @param {string} nomeDaFerramenta - Identificador da ferramenta ativa.
- */
-function atualizarBotaoAtivo(nomeDaFerramenta) {
-  botoesFerramenta.forEach((btn) => {
-    if (btn.getAttribute('data-ferramenta') === nomeDaFerramenta) {
-      btn.classList.add('ativo');
-    } else {
-      btn.classList.remove('ativo');
-    }
-  });
-  nomeFerramenta.textContent = nomeDaFerramenta || 'Nenhuma';
-}
-
-// --- Registro dos Event Listeners ---
-
-// Seleciona a ferramenta ao clicar nos botões da barra lateral
-botoesFerramenta.forEach((btn) => {
-  btn.addEventListener('click', () => {
-    const ferramentaId = btn.getAttribute('data-ferramenta');
-
-    // Obtém a instância da ferramenta atual correspondente (se implementada)
-    const ferramentaInstancia = instanciasFerramentas[ferramentaId] || null;
-
-    definirFerramenta(ferramentaInstancia);
-    atualizarBotaoAtivo(ferramentaId);
-  });
-});
-
-
-// Ouvir mudanças no input de preenchimento da Sidebar
+// Ouvir mudanças no input de cor de preenchimento da sidebar
 inputCorPreenchimento.addEventListener('input', () => {
   const novaCor = inputCorPreenchimento.value;
-  
-  // Atualiza o estado global para as próximas formas que forem desenhadas
   definirCorPreenchimento(novaCor);
-
-  // Se houver um objeto selecionado na tela, aplica a cor nele em tempo real
-  if (estado.elementoSelecionado) {
-    estado.elementoSelecionado.setAttribute('fill', novaCor);
-  }
+  // Preenche cada elemento selecionado com a cor desejada
+  estado.elementosSelecionados.forEach(el => {
+    el.setAttribute('fill', novaCor);
+  });
 });
 
-// Ouvir mudanças no input de borda da Sidebar
+// Ouvir mudanças no input de cor de borda da sidebar
 inputCorBorda.addEventListener('input', () => {
   const novaCor = inputCorBorda.value;
-  
-  // Atualiza o estado global para as próximas formas que forem desenhadas
   definirCorBorda(novaCor);
-
-  // Se houver um objeto selecionado na tela, aplica a cor da borda nele em tempo real
-  if (estado.elementoSelecionado) {
-    estado.elementoSelecionado.setAttribute('stroke', novaCor);
-  }
+  // Colore a borda de cada elemento selecionado com a cor desejada
+  estado.elementosSelecionados.forEach(el => {
+    el.setAttribute('stroke', novaCor);
+  });
 });
 
 // Atualizar os inputs da barra lateral quando o usuário selecionar um objeto
@@ -205,7 +165,6 @@ svgCanvas.addEventListener('mouseup', (evento) => {
     definirCorBorda(corBordaAtual);
   }
 });
-// --- Fim Controles de cor
 
 // Event listeners globais do SVG (delegados para a ferramenta ativa)
 svgCanvas.addEventListener('mousedown', (evento) => {
@@ -217,12 +176,6 @@ svgCanvas.addEventListener('mousedown', (evento) => {
 svgCanvas.addEventListener('mousemove', (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseMove(evento);
-  }
-});
-
-svgCanvas.addEventListener('mouseup', (evento) => {
-  if (estado.ferramentaAtual) {
-    estado.ferramentaAtual.onMouseUp(evento);
   }
 });
 
