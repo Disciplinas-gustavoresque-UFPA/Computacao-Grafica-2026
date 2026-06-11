@@ -41,16 +41,28 @@ export function criarElementoSVG(tag, atributos = {}) {
  * @returns {{ x: number, y: number }} Coordenadas no espaço do SVG.
  */
 export function obterCoordenadaSVG(evento, svgElement) {
+  return converterCoordenadaClienteParaSVG(evento.clientX, evento.clientY, svgElement);
+}
+
+/**
+ * Converte coordenadas de tela (viewport) para coordenadas locais do SVG.
+ *
+ * @param {number} x - Coordenada X no viewport.
+ * @param {number} y - Coordenada Y no viewport.
+ * @param {SVGSVGElement} svgElement - O elemento SVG de referência.
+ * @returns {{ x: number, y: number }} Coordenadas no espaço do SVG.
+ */
+export function converterCoordenadaClienteParaSVG(x, y, svgElement) {
   const ponto = svgElement.createSVGPoint();
-  ponto.x = evento.clientX;
-  ponto.y = evento.clientY;
+  ponto.x = x;
+  ponto.y = y;
 
   const matrizCTM = svgElement.getScreenCTM();
 
   if (!matrizCTM) {
     // Fallback para coordenadas do cliente caso a matriz não esteja disponível
     const rect = svgElement.getBoundingClientRect();
-    return { x: evento.clientX - rect.left, y: evento.clientY - rect.top };
+    return { x: x - rect.left, y: y - rect.top };
   }
 
   const matrizInversa = matrizCTM.inverse();

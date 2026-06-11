@@ -1,16 +1,42 @@
 <!doctype html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Editor Vetorial — Computação Gráfica 2026</title>
-    <link rel="stylesheet" href="css/style.css" />
-</head>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Editor Vetorial — Computação Gráfica 2026</title>
+        <link rel="stylesheet" href="css/style.css" />
+    </head>
 
-<body>
-    <div id="app">
-        <header id="painel-propriedades">
-            <span id="ferramenta-atual-label">Ferramenta: <strong id="nome-ferramenta">Nenhuma</strong></span>
+    <body>
+        <div id="tela-inicial">
+            <h1>Editor Vetorial 2026</h1>
+            <nav class="menu-opcoes">
+                <button id="btn-novo-doc" class="btn-menu">Criar novo documento</button>
+
+                <div class="grupo-opcao">
+                    <label for+"select-tamanho" class"propriedade-label">Tamanho da página:</label>
+                    <div class="select-wrapper">
+                        <select id="select-tamanho" class="select-format">
+                            <option value="livre" selected>Livre</option>
+                            <option value="a4">A4 (800x1131)</option>
+                            <option value="a3">A3 (1131x1600)</option>
+                        </select>
+                        <svg class="select-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                            <path d="M7 10l5 5 5-5z" />
+                        </svg>
+                    </div>
+                </div>
+
+                <button id="btn-abrir-arq" class="btn-menu">Abrir arquivo</button>
+                <button id="btn-modelos" class="btn-menu">Modelos (templates)</button>
+                <button id="btn-config" class="btn-menu">Configurações</button>
+            </nav>
+        </div>
+        <div id="app" class="oculto">
+            <!-- Painel Superior: propriedades (cor de preenchimento, cor de borda, etc.) -->
+            <header id="painel-propriedades">
+                <span id="zoom-indicator">Zoom: 100%</span>
+
                 <span id="ferramenta-atual-label"
                     >Ferramenta:
                     <strong id="nome-ferramenta">Nenhuma</strong></span
@@ -136,6 +162,35 @@
                         <path d="M20 20H7L3 16L14 5L21 12L13 20"/>
                         </svg>
                     </button>
+
+                    <button id="btn-zoom-click" class="btn-ferramenta" data-ferramenta="lupa" title="Zoom padrão">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+                          viewBox="0 0 24 24" fill="none"
+                          stroke="currentColor" stroke-width="2"
+                          stroke-linecap="round" stroke-linejoin="round">
+
+                          <!-- lente -->
+                          <circle cx="11" cy="11" r="7"></circle>
+                          <!-- cabo -->
+                          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+
+                        </svg>
+                      </button>
+                      <div id="zoom-options" class="hidden"></div> <!-- Menu de opçoes para a lupa/zoom -->
+                    <button
+                        class="btn-ferramenta"
+                        id="btn-importar-imagem"
+                        title="Importar Imagem (Raster)"
+                    >
+                        🖼️
+                    </button>
+
+                    <input 
+                        type="file" 
+                        id="input-imagem" 
+                        accept="image/png, image/jpeg, image/svg+xml" 
+                        style="display: none;" 
+                    />
                 </aside>
 
                 <!-- Área Central de Desenho -->
