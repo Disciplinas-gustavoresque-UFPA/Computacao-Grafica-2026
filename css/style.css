@@ -87,6 +87,39 @@ body {
 }
 
 /* =========================================================
+   Controles de Camada (Z-Index)
+   ========================================================= */
+.layer-controls {
+  display: flex;
+  gap: 4px;
+  margin-right: auto;
+  margin-left: 16px;
+  border-left: 1px solid var(--cor-borda-ui);
+  padding-left: 16px;
+}
+
+.btn-layer {
+  background: transparent;
+  border: 1px solid var(--cor-borda-ui);
+  color: var(--cor-texto-secundario);
+  border-radius: var(--raio-borda);
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.btn-layer:hover {
+  background-color: rgba(74, 144, 217, 0.2);
+  color: var(--cor-destaque);
+  border-color: var(--cor-destaque);
+}
+
+.btn-layer:active {
+  transform: scale(0.95);
+}
+
+/* =========================================================
    Workspace: Barra Lateral + Área de Desenho
    Usa CSS Flexbox para layout horizontal
    ========================================================= */
@@ -176,6 +209,10 @@ body {
     display: inline-block;
 }
 
+.select-wrapper select {
+  width: 100%;
+}
+
 .select-format {
     appearance: none;
     -webkit-appearance: none;
@@ -201,6 +238,11 @@ body {
 
 .select-format:focus {
     border-color: #000;
+}
+
+.select-format option {
+    background-color: var(--cor-fundo-painel);
+    color: var(--cor-texto);
 }
 
 /* Minimal Chevron */
@@ -236,4 +278,142 @@ body {
   cursor: crosshair;
   width: 100%;
   height: 100%;
+}
+
+/* =====================================================
+   Menu de Opções da Lupa/Zoom e Node
+   ====================================================*/
+.node-handle:hover {
+    fill: #4a90d9; /* Inverte a cor ao passar o mouse */
+    stroke: white;
+}
+
+#zoom-options {
+  position: absolute;
+  background: var(--cor-fundo-barra);
+  border: 1px solid var(--cor-borda-ui);
+  box-shadow: var(--sombra-padrao);
+  padding: 6px;
+  border-radius: var(--raio-borda);
+  flex-direction: column;
+  gap: 4px;
+}
+
+#zoom-options.hidden {
+  display: none;
+}
+
+#zoom-options:not(.hidden) {
+  display: flex;
+}
+
+#zoom-options button {
+  background-color: #4a90d9;
+  width: 36px;
+  height: 36px;
+  border: 1px solid transparent;
+  border-radius: var(--raio-borda);
+}
+
+#zoom-options button:hover {
+  border-color: var(--cor-destaque);
+}
+
+#zoom-options button.ativo {
+  background: rgba(0, 38, 255, 0.35);
+  border-color: var(--cor-destaque);
+}
+
+#zoom-indicator {
+  display: grid;
+  width: 120px;
+  height: 36px;
+  position: relative;
+  top: 8%;
+  right: 0%;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: sans-serif;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* =========================================================
+   Tela Inicial e Menu de Opções
+   ========================================================= */
+
+.oculto {
+  display: none !important;
+}
+
+#tela-inicial {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: var(--cor-fundo-app);
+  color: var(--cor-texto);
+}
+
+#tela-inicial h1 {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  color: var(--cor-texto);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.menu-opcoes {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background-color: var(--cor-fundo-painel);
+  padding: 32px;
+  border-radius: var(--raio-borda);
+  border: 1px solid var(--cor-borda-ui);
+  box-shadow: var(--sombra-padrao);
+  width: 100%;
+  max-width: 400px;
+}
+
+.grupo-opcao {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+/* Reutilizando a estrutura de botão para o menu */
+.btn-menu {
+  background-color: transparent;
+  color: var(--cor-texto);
+  border: 1px solid var(--cor-borda-ui);
+  border-radius: var(--raio-borda);
+  padding: 12px 16px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.btn-menu:hover {
+  border-color: var(--cor-destaque);
+  background-color: rgba(74, 144, 217, 0.1);
+  color: var(--cor-destaque);
+}
+
+/* O botão de criar novo documento merece destaque */
+#btn-novo-doc {
+  background-color: var(--cor-destaque);
+  color: #fff;
+  border-color: var(--cor-destaque);
+  font-weight: bold;
+}
+
+#btn-novo-doc:hover {
+  background-color: #3a7bc2;
+  transform: translateY(-2px);
 }

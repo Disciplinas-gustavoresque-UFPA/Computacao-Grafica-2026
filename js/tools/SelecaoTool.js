@@ -1,16 +1,17 @@
 import { ToolBase } from './ToolBase.js';
 import { obterCoordenadaSVG } from '../utils/svgHelpers.js';
-import { definirElementoSelecionado, atualizarPosicaoSelecaoVisual } from '../core/StateManager.js';
+import { 
+  estado, 
+  definirElementosSelecionados, 
+  adicionarElementoSelecao, 
+  removerElementoSelecao, 
+  atualizarPosicaoSelecaoVisual 
+} from '../core/StateManager.js';
 
-/**
- * Ferramenta de Seleção
- */
 export class SelecaoTool extends ToolBase {
   constructor(svgCanvas) {
     super();
     this.svgCanvas = svgCanvas;
-
-    this.elementoSelecionado = null;
 
     this.isDragging = false;
     this.action = 'none'; // 'move', 'resize', 'rotate'
@@ -18,16 +19,10 @@ export class SelecaoTool extends ToolBase {
     
     this.startX = 0;
     this.startY = 0;
+    this.offsets = []; // Para mover múltiplos elementos
     
-    // For Move
-    this.offsetX = 0;
-    this.offsetY = 0;
-    
-    // For Scale
     this.startScaleX = 1;
     this.startScaleY = 1;
-    
-    // Initial Centroid
     this.cx = 0;
     this.cy = 0;
   }
@@ -35,19 +30,21 @@ export class SelecaoTool extends ToolBase {
   onMouseDown(evento) {
     const pt = obterCoordenadaSVG(evento, this.svgCanvas);
     const target = evento.target;
+    const isShift = evento.shiftKey;
 
-    // Se o clique foi em um handle
+    // Se o clique foi em um handle (apenas visível em single-selection)
     if (target.classList && target.classList.contains('handle')) {
       this.isDragging = true;
       this.startX = pt.x;
       this.startY = pt.y;
       
-      const bbox = this.elementoSelecionado.getBBox();
+      const el = estado.elementosSelecionados[0];
+      const bbox = el.getBBox();
       this.cx = bbox.x + bbox.width / 2;
       this.cy = bbox.y + bbox.height / 2;
       
-      this.startScaleX = parseFloat(this.elementoSelecionado.getAttribute('data-scalex') || 1);
-      this.startScaleY = parseFloat(this.elementoSelecionado.getAttribute('data-scaley') || 1);
+      this.startScaleX = parseFloat(el.getAttribute('data-scalex') || 1);
+      this.startScaleY = parseFloat(el.getAttribute('data-scaley') || 1);
 
       if (target.classList.contains('rotate-handle')) {
         this.action = 'rotate';
@@ -58,84 +55,110 @@ export class SelecaoTool extends ToolBase {
       return; // Mantém a seleção
     }
 
-    // Limpa a seleção anterior
-    this.limparSelecao();
+    const allowedTags = ['rect', 'text', 'image', 'circle', 'ellipse', 'g', 'path', 'line'];
+    const elementoAlvo = this._buscarElementoValido(target, allowedTags);
 
-    const allowedTags = ['rect', 'text', 'image', 'circle', 'ellipse', 'path', 'polygon', 'polyline', 'g'];
-    const tag = target.tagName ? target.tagName.toLowerCase() : '';
-
-    // Se o clique não foi no canvas vazio e for um elemento permitido
-    if (
-      target !== this.svgCanvas &&
-      target.closest('svg') === this.svgCanvas &&
-      allowedTags.includes(tag)
-    ) {
-      this.elementoSelecionado = target;
-      definirElementoSelecionado(target);
-
-      this.isDragging = true;
-      this.action = 'move';
-
-      let elX = 0, elY = 0;
-      if (tag === 'rect' || tag === 'text' || tag === 'image') {
-        elX = parseFloat(target.getAttribute('x') || 0);
-        elY = parseFloat(target.getAttribute('y') || 0);
-      } else if (tag === 'circle' || tag === 'ellipse') {
-        elX = parseFloat(target.getAttribute('cx') || 0);
-        elY = parseFloat(target.getAttribute('cy') || 0);
+    if (elementoAlvo) {
+      if (isShift) {
+        if (estado.elementosSelecionados.includes(elementoAlvo)) {
+          removerElementoSelecao(elementoAlvo);
+        } else {
+          adicionarElementoSelecao(elementoAlvo);
+        }
+      } else {
+        if (!estado.elementosSelecionados.includes(elementoAlvo)) {
+          definirElementosSelecionados([elementoAlvo]);
+        }
       }
 
-      this.offsetX = pt.x - elX;
-      this.offsetY = pt.y - elY;
+      if (estado.elementosSelecionados.length > 0) {
+        this.isDragging = true;
+        this.action = 'move';
+        this._calcularOffsets(pt);
+      }
+    } else {
+      if (!isShift) {
+        this.limparSelecao();
+      }
     }
   }
 
   onMouseMove(evento) {
-    if (!this.isDragging || !this.elementoSelecionado) return;
+    if (!this.isDragging || estado.elementosSelecionados.length === 0) return;
 
     const pt = obterCoordenadaSVG(evento, this.svgCanvas);
 
     if (this.action === 'move') {
-      const novoX = pt.x - this.offsetX;
-      const novoY = pt.y - this.offsetY;
+      estado.elementosSelecionados.forEach((el, index) => {
+        const offset = this.offsets[index];
+        if (!offset) return;
 
-      const tag = this.elementoSelecionado.tagName.toLowerCase();
+        const novoX = pt.x - offset.x;
+        const novoY = pt.y - offset.y;
 
-      if (tag === 'rect' || tag === 'text' || tag === 'image') {
-        this.elementoSelecionado.setAttribute('x', novoX);
-        this.elementoSelecionado.setAttribute('y', novoY);
-      } else if (tag === 'circle' || tag === 'ellipse') {
-        this.elementoSelecionado.setAttribute('cx', novoX);
-        this.elementoSelecionado.setAttribute('cy', novoY);
-      }
-      
-      this.applyTransform();
+        const tag = el.tagName.toLowerCase();
+
+        if (tag === 'rect' || tag === 'text' || tag === 'image') {
+          el.setAttribute('x', String(novoX));
+          el.setAttribute('y', String(novoY));
+        } else if (tag === 'circle' || tag === 'ellipse') {
+          el.setAttribute('cx', String(novoX));
+          el.setAttribute('cy', String(novoY));
+        } else if (tag === 'line') {
+            const dx = novoX - parseFloat(el.getAttribute('x1') || 0);
+            const dy = novoY - parseFloat(el.getAttribute('y1') || 0);
+            el.setAttribute('x1', String(novoX));
+            el.setAttribute('y1', String(novoY));
+            el.setAttribute('x2', String(parseFloat(el.getAttribute('x2') || 0) + dx));
+            el.setAttribute('y2', String(parseFloat(el.getAttribute('y2') || 0) + dy));
+        }
+        
+        // Reapply transform if any
+        this.applyTransform(el);
+      });
     } 
-    else if (this.action === 'rotate') {
+    else if (this.action === 'rotate' && estado.elementosSelecionados.length === 1) {
+      const el = estado.elementosSelecionados[0];
       const dx = pt.x - this.cx;
       const dy = pt.y - this.cy;
       let angle = Math.atan2(dy, dx) * 180 / Math.PI + 90;
-      this.elementoSelecionado.setAttribute('data-angle', angle);
-      this.applyTransform();
+      el.setAttribute('data-angle', angle);
+      this.applyTransform(el);
     }
-    else if (this.action === 'resize') {
-      // Diferença do mouse a partir do centro
-      const dx = pt.x - this.cx;
-      const dy = pt.y - this.cy;
+    else if (this.action === 'resize' && estado.elementosSelecionados.length === 1) {
+      const el = estado.elementosSelecionados[0];
+      const bbox = el.getBBox();
+      const angle = parseFloat(el.getAttribute('data-angle') || 0);
       
-      const startDx = this.startX - this.cx;
-      const startDy = this.startY - this.cy;
+      const angleRad = -angle * Math.PI / 180;
+      const localX = this.cx + (pt.x - this.cx) * Math.cos(angleRad) - (pt.y - this.cy) * Math.sin(angleRad);
+      const localY = this.cy + (pt.x - this.cx) * Math.sin(angleRad) + (pt.y - this.cy) * Math.cos(angleRad);
+      
+      const halfW = bbox.width / 2;
+      const halfH = bbox.height / 2;
       
       let sx = this.startScaleX;
       let sy = this.startScaleY;
       
-      // Impedir divisão por zero ou muito próximo de zero
-      if (Math.abs(startDx) > 0.1) sx = this.startScaleX * (dx / startDx);
-      if (Math.abs(startDy) > 0.1) sy = this.startScaleY * (dy / startDy);
+      if (halfW > 0.1 && halfH > 0.1) {
+          if (this.resizeDir === 'se') {
+              sx = (localX - this.cx) / halfW;
+              sy = (localY - this.cy) / halfH;
+          } else if (this.resizeDir === 'nw') {
+              sx = (this.cx - localX) / halfW;
+              sy = (this.cy - localY) / halfH;
+          } else if (this.resizeDir === 'ne') {
+              sx = (localX - this.cx) / halfW;
+              sy = (this.cy - localY) / halfH;
+          } else if (this.resizeDir === 'sw') {
+              sx = (this.cx - localX) / halfW;
+              sy = (localY - this.cy) / halfH;
+          }
+      }
       
-      this.elementoSelecionado.setAttribute('data-scalex', sx);
-      this.elementoSelecionado.setAttribute('data-scaley', sy);
-      this.applyTransform();
+      el.setAttribute('data-scalex', sx);
+      el.setAttribute('data-scaley', sy);
+      this.applyTransform(el);
     }
 
     atualizarPosicaoSelecaoVisual();
@@ -144,7 +167,6 @@ export class SelecaoTool extends ToolBase {
   onMouseUp(evento) {
     this.isDragging = false;
     this.action = 'none';
-    // TODO: Adicionar ao HistoryManager
   }
 
   onDesativar() {
@@ -152,32 +174,63 @@ export class SelecaoTool extends ToolBase {
   }
 
   limparSelecao() {
-    this.elementoSelecionado = null;
     this.isDragging = false;
     this.action = 'none';
-    definirElementoSelecionado(null);
+    this.offsets = [];
+    definirElementosSelecionados([]);
+  }
+
+  _buscarElementoValido(target, allowedTags) {
+    if (target === this.svgCanvas) return null;
+
+    let atual = target;
+    while (atual && atual !== this.svgCanvas) {
+      const tag = atual.tagName.toLowerCase();
+      if (allowedTags.includes(tag)) {
+        return atual;
+      }
+      atual = atual.parentNode;
+    }
+    return null;
+  }
+
+  _calcularOffsets(pontoMouse) {
+    this.offsets = estado.elementosSelecionados.map(el => {
+      const tag = el.tagName.toLowerCase();
+      let elX = 0, elY = 0;
+
+      if (tag === 'rect' || tag === 'text' || tag === 'image') {
+        elX = parseFloat(el.getAttribute('x') || 0);
+        elY = parseFloat(el.getAttribute('y') || 0);
+      } else if (tag === 'circle' || tag === 'ellipse') {
+        elX = parseFloat(el.getAttribute('cx') || 0);
+        elY = parseFloat(el.getAttribute('cy') || 0);
+      } else if (tag === 'line') {
+        elX = parseFloat(el.getAttribute('x1') || 0);
+        elY = parseFloat(el.getAttribute('y1') || 0);
+      }
+
+      return { x: pontoMouse.x - elX, y: pontoMouse.y - elY };
+    });
   }
   
-  applyTransform() {
-    if (!this.elementoSelecionado) return;
+  applyTransform(el) {
+    if (!el) return;
     
-    const angle = parseFloat(this.elementoSelecionado.getAttribute('data-angle') || 0);
-    const sx = parseFloat(this.elementoSelecionado.getAttribute('data-scalex') || 1);
-    const sy = parseFloat(this.elementoSelecionado.getAttribute('data-scaley') || 1);
+    const angle = parseFloat(el.getAttribute('data-angle') || 0);
+    const sx = parseFloat(el.getAttribute('data-scalex') || 1);
+    const sy = parseFloat(el.getAttribute('data-scaley') || 1);
     
-    // Precisamos do centroide exato atual (após o movimento)
-    const bbox = this.elementoSelecionado.getBBox();
+    const bbox = el.getBBox();
     const cx = bbox.x + bbox.width / 2;
     const cy = bbox.y + bbox.height / 2;
     
-    // Se não há transformação ativa, pode remover o atributo
     if (angle === 0 && sx === 1 && sy === 1) {
-        this.elementoSelecionado.removeAttribute('transform');
+        el.removeAttribute('transform');
         return;
     }
     
-    // Combina as transformações em torno do centro (cx, cy)
     const transformStr = `translate(${cx}, ${cy}) rotate(${angle}) scale(${sx}, ${sy}) translate(${-cx}, ${-cy})`;
-    this.elementoSelecionado.setAttribute('transform', transformStr);
+    el.setAttribute('transform', transformStr);
   }
 }
