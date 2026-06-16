@@ -88,4 +88,15 @@ export class PoligonoPolilinhaTool extends ToolBase {
         this.polygonElement = null;
         this.vertices = [];
     }
+
+    /**
+    * Limpa o estado atual e remove o elemento inacabado do SVG.
+    */
+    resetarDesenho() {
+        if (this.polygonElement) {
+        this.svgCanvas.removeChild(this.polygonElement);
+        }
+        this.polygonElement = null;
+        this.vertices = [];
+    }
 }
