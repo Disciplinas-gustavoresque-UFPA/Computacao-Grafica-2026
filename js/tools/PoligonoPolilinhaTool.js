@@ -58,4 +58,13 @@ export class PoligonoPolilinhaTool extends ToolBase {
         const pontosComMouse = this.formatarPoints() + ` ${pt.x},${pt.y}`;
         this.polygonElement.setAttribute('points', pontosComMouse);
     }
+
+    /**
+    * Captura o hotswapping de teclas (Enter para fechar o polígono).
+    */
+    onKeyDown(evento) {
+        if (evento.key === 'Enter') {
+        this.finalizarPoligono();
+        }
+    }
 }
