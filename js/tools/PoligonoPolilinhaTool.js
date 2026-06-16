@@ -67,4 +67,25 @@ export class PoligonoPolilinhaTool extends ToolBase {
         this.finalizarPoligono();
         }
     }
+
+    /**
+    * Finaliza a construção se os critérios de validação forem aceitos.
+    */
+    finalizarPoligono() {
+        // Validação: Um polígono precisa de pelo menos 3 vértices
+        if (this.vertices.length < 3) {
+        console.warn('Um polígono precisa de pelo menos 3 vértices.');
+        this.resetarDesenho();
+        return;
+        }
+
+        // Aplica a cor de preenchimento definitiva do estado, se houver
+        if (estado.corPreenchimento) {
+        this.polygonElement.setAttribute('fill', estado.corPreenchimento);
+        }
+
+        // O elemento é mantido no SVG, apenas limpamos a referência da Tool
+        this.polygonElement = null;
+        this.vertices = [];
+    }
 }
