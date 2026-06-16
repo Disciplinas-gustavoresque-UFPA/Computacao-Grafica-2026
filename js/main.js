@@ -15,6 +15,7 @@ import {
   definirGerenciadorSelecao 
 } from './core/StateManager.js';
 import { ColorPickerTool } from './tools/ColorPickerTool.js';
+import { Lapis } from './tools/LapisTool.js';
 import { RetanguloTool } from './tools/RetanguloTool.js';
 import { TextoTool } from './tools/TextoTool.js';
 import { exportarDesenho } from './utils/exportHelpers.js';
@@ -95,6 +96,7 @@ const instanciasFerramentas = {
   lupa: new LupaTool(svgCanvas, overlayCanvas),
   texto: new TextoTool(svgCanvas),
   borracha: new BorrachaTool(svgCanvas),
+  lapis: new Lapis(svgCanvas),
 };
 
 /**
