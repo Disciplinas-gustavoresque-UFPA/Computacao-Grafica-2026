@@ -27,6 +27,7 @@ import { ElipseTool } from './tools/ElipseTool.js';
 import { LupaTool } from './tools/LupaTool.js';
 import { inicializarImportadorImagem } from './tools/ImageImporter.js';
 import { inicializarMenuInicial } from './core/UIManager.js';
+import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
 
 const svgCanvas = document.getElementById('canvas');
 
@@ -88,6 +89,7 @@ const instanciasFerramentas = {
   edicaoVertices: new NodeEditTool(svgCanvas),
   retangulo: new RetanguloTool(svgCanvas),
   linha: new LinhaTool(svgCanvas),    
+  poligono: new PoligonoPolilinhaTool(svgCanvas),
   elipse: new ElipseTool(svgCanvas),  
   "Conta-gotas": new ColorPickerTool(svgCanvas),
   lupa: new LupaTool(svgCanvas, overlayCanvas),
@@ -219,6 +221,7 @@ window.addEventListener("keydown", (e) => {
     "r" : "retangulo",
     "e" : "elipse",
     "l" : "linha",
+    "p" : "poligono",
     "t" : "texto",
     "i" : "conta-gotas"
   }
