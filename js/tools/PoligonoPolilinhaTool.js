@@ -99,4 +99,12 @@ export class PoligonoPolilinhaTool extends ToolBase {
         this.polygonElement = null;
         this.vertices = [];
     }
+
+    /**
+    * Transforma o array de vértices na string formatada exigida pelo atributo 'points' do SVG.
+    * Exemplo: "x1,y1 x2,y2 x3,y3"
+    */
+    formatarPoints() {
+        return this.vertices.map(pt => `${pt.x},${pt.y}`).join(' ');
+    }
 }
