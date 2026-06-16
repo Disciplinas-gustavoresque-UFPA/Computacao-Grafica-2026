@@ -132,6 +132,20 @@ overlayCanvas.style.left = '0';
 overlayCanvas.style.pointerEvents = 'none'; // Coordenado com o principal
 canvasContainer.appendChild(overlayCanvas);
 
+const observer = new MutationObserver((mutations) => {
+  mutations.forEach((mutation) => {
+    if (mutation.attributeName === 'viewBox') {
+      const vb = svgCanvas.getAttribute('viewBox');
+      if (vb) {
+        overlayCanvas.setAttribute('viewBox', vb);
+      } else {
+        overlayCanvas.removeAttribute('viewBox');
+      }
+    }
+  });
+});
+observer.observe(svgCanvas, { attributes: true, attributeFilter: ['viewBox'] });
+
 // Inicializar a classe de seleção visual
 const selecaoVisual = new Selecao(overlayCanvas);
 definirGerenciadorSelecao(selecaoVisual);
