@@ -27,8 +27,14 @@ import { LinhaTool } from './tools/LinhaTool.js';
 import { ElipseTool } from './tools/ElipseTool.js';
 import { LupaTool } from './tools/LupaTool.js';
 import { inicializarImportadorImagem } from './tools/ImageImporter.js';
+import { inicializarMenuInicial } from './core/UIManager.js';
+import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
 
 const svgCanvas = document.getElementById('canvas');
+
+// Inicializar a tela de menu inicial
+inicializarMenuInicial(svgCanvas);
+
 const areaDesenho = document.getElementById('area-desenho');
 const botoesFerramenta = document.querySelectorAll('.btn-ferramenta');
 const btnImportarImagem = document.getElementById('btn-importar-imagem');
@@ -60,16 +66,31 @@ overlayCanvas.style.left = '0';
 overlayCanvas.style.pointerEvents = 'none'; // Coordenado com o principal
 canvasContainer.appendChild(overlayCanvas);
 
+const observer = new MutationObserver((mutations) => {
+  mutations.forEach((mutation) => {
+    if (mutation.attributeName === 'viewBox') {
+      const vb = svgCanvas.getAttribute('viewBox');
+      if (vb) {
+        overlayCanvas.setAttribute('viewBox', vb);
+      } else {
+        overlayCanvas.removeAttribute('viewBox');
+      }
+    }
+  });
+});
+observer.observe(svgCanvas, { attributes: true, attributeFilter: ['viewBox'] });
+
 // Inicializar a classe de seleção visual
 const selecaoVisual = new Selecao(overlayCanvas);
 definirGerenciadorSelecao(selecaoVisual);
 
-// Instâncias das ferramentas disponíveis
+// Instâncias das ferramentas disponíveis com todas as implementações da main
 const instanciasFerramentas = {
   selecao: new SelecaoTool(svgCanvas),
   edicaoVertices: new NodeEditTool(svgCanvas),
   retangulo: new RetanguloTool(svgCanvas),
   linha: new LinhaTool(svgCanvas),    
+  poligono: new PoligonoPolilinhaTool(svgCanvas),
   elipse: new ElipseTool(svgCanvas),  
   "Conta-gotas": new ColorPickerTool(svgCanvas),
   lupa: new LupaTool(svgCanvas, overlayCanvas),
@@ -77,9 +98,6 @@ const instanciasFerramentas = {
   borracha: new BorrachaTool(svgCanvas),
   lapis: new Lapis(svgCanvas),
 };
-
-
-
 
 /**
  * Atualiza o estado visual dos botões da barra lateral,
@@ -137,7 +155,7 @@ svgCanvas.addEventListener('mouseup', (evento) => {
   }
 });
 
-// Previne o menu de opções do botao direito no canvas
+// Previne o menu de opções do botão direito no canvas
 svgCanvas.addEventListener('contextmenu', (e) => {
   if (e.target.closest('#canvas')) {
     e.preventDefault();
@@ -185,8 +203,6 @@ function moverCamada(acao) {
       pai.appendChild(el);
       break;
   }
-  
-  // TODO: Registrar ação no HistoryManager (Issue #10)
 }
 
 btnSendToBack.addEventListener('click', () => moverCamada('fundo'));
@@ -196,22 +212,18 @@ btnBringToFront.addEventListener('click', () => moverCamada('frente'));
 
 // Atalhos de Teclado (Tool Selection)
 window.addEventListener("keydown", (e) => {
-  // Prevenção de conflitos
-  // Verifica se o usuário está focado em um campo de texto ou input de cor.
   const elementoAtivo = document.activeElement;
   const tagAtiva = elementoAtivo.tagName.toLocaleLowerCase();
 
-  // Se o foco estiver em um input, textArea, select ou contentEditable, ignora o atalho.
   if (["input", "textarea", "select"].includes(tagAtiva) || elementoAtivo.isContentEditable)
     return;
   
-  // Mapeamento das teclas 
-  // Conforme novas ferramentas forem surgindo, só adicionar o atalho e o nome da ferramenta aqui
   const mapaTeclas = {
     "s" : "selecao",
     "r" : "retangulo",
     "e" : "elipse",
     "l" : "linha",
+    "p" : "poligono",
     "t" : "texto",
     "i" : "conta-gotas"
   }
@@ -219,24 +231,16 @@ window.addEventListener("keydown", (e) => {
   const teclaPressionada = e.key.toLowerCase();
   const ferramentaAlvo = mapaTeclas[teclaPressionada];
   
-  // Adicionar e feedback visual
   if (ferramentaAlvo) {
     e.preventDefault();
-
-    // Buscar o botão na barra lateral
     const botao = document.querySelector(`.btn-ferramenta[data-ferramenta="${ferramentaAlvo}"]`);
-
     if (botao) {
-      // Simular click para utilizar o eventListener que chama `atualizarBotaoAtivo()`
-      // e aplica a classe CSS '.ativo' de forma automática.
       botao.click();
     }
   }
-}
-)
+});
 
-// Import de imagens
-
+// Importação de imagens
 btnImportarImagem.addEventListener('click', () => {
   inputImagem.click();
 });
