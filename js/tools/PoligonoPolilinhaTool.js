@@ -8,39 +8,56 @@ export class PoligonoPolilinhaTool extends ToolBase {
         this.svgCanvas = svgCanvas;
         this.vertices = []; // Armazena objetos {x, y}
         this.polylineElement = null; // Elemento aberto usado DURANTE o desenho
-        this.onKeyDownBound = this.onKeyDown.bind(this); // Bind necessário para remover o listener corretamente depois
+        
+        // Binds necessários para gerenciar/remover os listeners corretamente
+        this.onKeyDownBound = this.onKeyDown.bind(this);
+        this.onDoubleClickBound = this.onDoubleClick.bind(this);
+        
+        // Raio de tolerância (em pixels) para detectar o clique no primeiro vértice
+        this.raioCliqueVerticeInicial = 10; 
     }
 
     /**
-    * Ativa a ferramenta e começa a escutar o teclado para o "Enter".
+    * Ativa a ferramenta e registra os escutadores de teclado e clique duplo.
     */
     onAtivar() {
         window.addEventListener('keydown', this.onKeyDownBound);
+        this.svgCanvas.addEventListener('dblclick', this.onDoubleClickBound);
     }
 
     /**
-    * Desativa a ferramenta, limpa listeners e cancela desenhos inacabados.
+    * Desativa a ferramenta e remove todos os listeners para evitar vazamento de memória.
     */
     onDesativar() {
         window.removeEventListener('keydown', this.onKeyDownBound);
+        this.svgCanvas.removeEventListener('dblclick', this.onDoubleClickBound);
         this.resetarDesenho();
     }
 
     /**
-    * Cada clique adiciona um novo vértice de forma aberta (polyline).
+    * Cada clique adiciona um novo vértice ou fecha se clicado no ponto inicial.
     */
     onMouseDown(evento) {
-        // Captura a coordenada do clique adaptada ao SVG
+        // Ignora cliques que fazem parte de um clique duplo para evitar pontos extras indesejados
+        if (evento.detail > 1) return;
+
         const pt = obterCoordenadaSVG(evento, this.svgCanvas);
+
+        // SUGESTÃO DO P.O: Fechar ao clicar no vértice inicial
+        if (this.vertices.length >= 3 && this.verificarProximidadePontoInicial(pt)) {
+            this.finalizarPoligono();
+            return;
+        }
+
         this.vertices.push(pt);
 
         if (!this.polylineElement) {
-            // Cria o elemento polilinha no primeiro clique (não fecha automaticamente)
+            // Cria o elemento polilinha aberto no primeiro clique
             this.polylineElement = criarElementoSVG('polyline', {
                 points: this.formatarPoints(),
                 stroke: estado.corBorda,
                 'stroke-width': 2,
-                fill: 'transparent' // Mantém transparente enquanto desenha
+                fill: 'transparent'
             });
             this.svgCanvas.appendChild(this.polylineElement);
         } else {
@@ -56,13 +73,26 @@ export class PoligonoPolilinhaTool extends ToolBase {
         if (!this.polylineElement || this.vertices.length === 0) return;
 
         const pt = obterCoordenadaSVG(evento, this.svgCanvas);
-        // Cria uma string temporária incluindo a posição atual do mouse sem fechar a forma
         const pontosComMouse = this.formatarPoints() + ` ${pt.x},${pt.y}`;
         this.polylineElement.setAttribute('points', pontosComMouse);
     }
 
     /**
-    * Captura o hotswapping de teclas (Enter para fechar o polígono).
+    * SUGESTÃO DO P.O: Captura o clique duplo para fechar o polígono.
+    */
+    onDoubleClick(evento) {
+        evento.preventDefault(); // Previne comportamentos padrões de seleção do navegador
+        
+        // O clique duplo insere um vértice fantasma residual pelo mousedown, removemos ele antes de fechar
+        if (this.vertices.length > 0) {
+            this.vertices.pop();
+        }
+
+        this.finalizarPoligono();
+    }
+
+    /**
+    * Captura o Enter para fechar o polígono (mantendo o requisito original).
     */
     onKeyDown(evento) {
         if (evento.key === 'Enter') {
@@ -71,7 +101,20 @@ export class PoligonoPolilinhaTool extends ToolBase {
     }
 
     /**
-    * Finaliza a construção se os critérios de validação forem aceitos e converte para polygon.
+    * Valida a distância matemática entre o clique atual e o primeiro ponto criado.
+    */
+    verificarProximidadePontoInicial(pontoAtual) {
+        const primeiroPonto = this.vertices[0];
+        // Teorema de Pitágoras para calcular a distância entre dois pontos (dx e dy)
+        const dx = pontoAtual.x - primeiroPonto.x;
+        const dy = pontoAtual.y - primeiroPonto.y;
+        const distancia = Math.sqrt(dx * dx + dy * dy);
+        
+        return distancia <= this.raioCliqueVerticeInicial;
+    }
+
+    /**
+    * Converte o rascunho temporário (polyline) em um polígono fechado definitivo.
     */
     finalizarPoligono() {
         // Validação: Um polígono precisa de pelo menos 3 vértices
@@ -81,12 +124,12 @@ export class PoligonoPolilinhaTool extends ToolBase {
             return;
         }
 
-        // Remove a polilinha temporária de rascunho do ecrã
+        // Remove o rascunho do ecrã
         if (this.polylineElement) {
             this.svgCanvas.removeChild(this.polylineElement);
         }
 
-        // Cria o elemento 'polygon' definitivo (une automaticamente o último ponto ao primeiro)
+        // Cria o elemento 'polygon' definitivo
         const poligonoFinal = criarElementoSVG('polygon', {
             points: this.formatarPoints(),
             stroke: estado.corBorda,
@@ -94,7 +137,6 @@ export class PoligonoPolilinhaTool extends ToolBase {
             fill: estado.corPreenchimento || 'transparent'
         });
 
-        // Adiciona o polígono finalizado de forma permanente ao SVG
         this.svgCanvas.appendChild(poligonoFinal);
 
         // Limpa o estado interno para o próximo desenho
@@ -114,8 +156,7 @@ export class PoligonoPolilinhaTool extends ToolBase {
     }
 
     /**
-    * Transforma o array de vértices na string formatada exigida pelo atributo 'points' do SVG.
-    * Exemplo: "x1,y1 x2,y2 x3,y3"
+    * Transforma o array de vértices na string formatada para o SVG.
     */
     formatarPoints() {
         return this.vertices.map(pt => `${pt.x},${pt.y}`).join(' ');
