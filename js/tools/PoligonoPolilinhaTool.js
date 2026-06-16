@@ -7,7 +7,7 @@ export class PoligonoPolilinhaTool extends ToolBase {
         super();
         this.svgCanvas = svgCanvas;
         this.vertices = []; // Armazena objetos {x, y}
-        this.polygonElement = null;
+        this.polylineElement = null; // Elemento aberto usado DURANTE o desenho
         this.onKeyDownBound = this.onKeyDown.bind(this); // Bind necessário para remover o listener corretamente depois
     }
 
@@ -27,25 +27,25 @@ export class PoligonoPolilinhaTool extends ToolBase {
     }
 
     /**
-    * Cada clique adiciona um novo vértice ao polígono.
+    * Cada clique adiciona um novo vértice de forma aberta (polyline).
     */
     onMouseDown(evento) {
         // Captura a coordenada do clique adaptada ao SVG
         const pt = obterCoordenadaSVG(evento, this.svgCanvas);
         this.vertices.push(pt);
 
-        if (!this.polygonElement) {
-        // Cria o elemento polígono no primeiro clique
-        this.polygonElement = criarElementoSVG('polygon', {
-            points: this.formatarPoints(),
-            stroke: estado.corBorda,
-            'stroke-width': 2,
-            fill: 'transparent' // Permite ver através enquanto desenha
-        });
-        this.svgCanvas.appendChild(this.polygonElement);
+        if (!this.polylineElement) {
+            // Cria o elemento polilinha no primeiro clique (não fecha automaticamente)
+            this.polylineElement = criarElementoSVG('polyline', {
+                points: this.formatarPoints(),
+                stroke: estado.corBorda,
+                'stroke-width': 2,
+                fill: 'transparent' // Mantém transparente enquanto desenha
+            });
+            this.svgCanvas.appendChild(this.polylineElement);
         } else {
-        // Atualiza os pontos com o novo vértice inserido
-        this.polygonElement.setAttribute('points', this.formatarPoints());
+            // Atualiza os pontos com o novo vértice inserido
+            this.polylineElement.setAttribute('points', this.formatarPoints());
         }
     }
 
@@ -53,12 +53,12 @@ export class PoligonoPolilinhaTool extends ToolBase {
     * Mostra uma prévia da linha seguindo o mouse até o próximo clique.
     */
     onMouseMove(evento) {
-        if (!this.polygonElement || this.vertices.length === 0) return;
+        if (!this.polylineElement || this.vertices.length === 0) return;
 
         const pt = obterCoordenadaSVG(evento, this.svgCanvas);
-        // Cria uma string temporária incluindo a posição atual do mouse
+        // Cria uma string temporária incluindo a posição atual do mouse sem fechar a forma
         const pontosComMouse = this.formatarPoints() + ` ${pt.x},${pt.y}`;
-        this.polygonElement.setAttribute('points', pontosComMouse);
+        this.polylineElement.setAttribute('points', pontosComMouse);
     }
 
     /**
@@ -66,28 +66,39 @@ export class PoligonoPolilinhaTool extends ToolBase {
     */
     onKeyDown(evento) {
         if (evento.key === 'Enter') {
-        this.finalizarPoligono();
+            this.finalizarPoligono();
         }
     }
 
     /**
-    * Finaliza a construção se os critérios de validação forem aceitos.
+    * Finaliza a construção se os critérios de validação forem aceitos e converte para polygon.
     */
     finalizarPoligono() {
         // Validação: Um polígono precisa de pelo menos 3 vértices
         if (this.vertices.length < 3) {
-        console.warn('Um polígono precisa de pelo menos 3 vértices.');
-        this.resetarDesenho();
-        return;
+            console.warn('Um polígono precisa de pelo menos 3 vértices.');
+            this.resetarDesenho();
+            return;
         }
 
-        // Aplica a cor de preenchimento definitiva do estado, se houver
-        if (estado.corPreenchimento) {
-        this.polygonElement.setAttribute('fill', estado.corPreenchimento);
+        // Remove a polilinha temporária de rascunho do ecrã
+        if (this.polylineElement) {
+            this.svgCanvas.removeChild(this.polylineElement);
         }
 
-        // O elemento é mantido no SVG, apenas limpamos a referência da Tool
-        this.polygonElement = null;
+        // Cria o elemento 'polygon' definitivo (une automaticamente o último ponto ao primeiro)
+        const poligonoFinal = criarElementoSVG('polygon', {
+            points: this.formatarPoints(),
+            stroke: estado.corBorda,
+            'stroke-width': 2,
+            fill: estado.corPreenchimento || 'transparent'
+        });
+
+        // Adiciona o polígono finalizado de forma permanente ao SVG
+        this.svgCanvas.appendChild(poligonoFinal);
+
+        // Limpa o estado interno para o próximo desenho
+        this.polylineElement = null;
         this.vertices = [];
     }
 
@@ -95,10 +106,10 @@ export class PoligonoPolilinhaTool extends ToolBase {
     * Limpa o estado atual e remove o elemento inacabado do SVG.
     */
     resetarDesenho() {
-        if (this.polygonElement) {
-        this.svgCanvas.removeChild(this.polygonElement);
+        if (this.polylineElement) {
+            this.svgCanvas.removeChild(this.polylineElement);
         }
-        this.polygonElement = null;
+        this.polylineElement = null;
         this.vertices = [];
     }
 
