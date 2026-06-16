@@ -3,6 +3,10 @@ import { ToolBase } from "./ToolBase";
 export class PoligonoPolilinhaTool extends ToolBase {
     constructor(svgCanvas) {
         super();
+        this.svgCanvas = svgCanvas;
+        this.vertices = []; // Armazena objetos {x, y}
+        this.polygonElement = null;
+        this.onKeyDownBound = this.onKeyDown.bind(this); // Bind necessário para remover o listener corretamente depois
     }
 
     /**
@@ -41,5 +45,17 @@ export class PoligonoPolilinhaTool extends ToolBase {
         // Atualiza os pontos com o novo vértice inserido
         this.polygonElement.setAttribute('points', this.formatarPoints());
         }
+    }
+
+    /**
+    * Mostra uma prévia da linha seguindo o mouse até o próximo clique.
+    */
+    onMouseMove(evento) {
+        if (!this.polygonElement || this.vertices.length === 0) return;
+
+        const pt = obterCoordenadaSVG(evento, this.svgCanvas);
+        // Cria uma string temporária incluindo a posição atual do mouse
+        const pontosComMouse = this.formatarPoints() + ` ${pt.x},${pt.y}`;
+        this.polygonElement.setAttribute('points', pontosComMouse);
     }
 }
