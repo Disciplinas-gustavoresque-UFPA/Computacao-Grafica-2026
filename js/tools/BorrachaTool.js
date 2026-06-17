@@ -3,7 +3,8 @@ import { ToolBase } from './ToolBase.js';
 /**
  * Ferramenta Borracha
  *
- * Remove elementos do canvas SVG ao clicar ou arrastar.
+ * Remove elementos do canvas SVG utilizando a trajetória
+ * percorrida pelo cursor ou ao clicar.
  */
 export class BorrachaTool extends ToolBase {
   constructor(svgCanvas) {
