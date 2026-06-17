@@ -94,7 +94,31 @@ export class BorrachaTool extends ToolBase {
     }
   }
 
+  /**
+   * Apaga elementos diretamente sob o cursor
+   */
+  apagarNaPosicao(point) {
+    const elementos = Array.from(this.svgCanvas.children);
 
+    for (const elemento of elementos) {
+      const tag = elemento.tagName?.toLowerCase();
+
+      if (!this.allowedTags.includes(tag)) {
+        continue;
+      }
+
+      const bbox = elemento.getBBox();
+
+      if (
+        point.x >= bbox.x &&
+        point.x <= bbox.x + bbox.width &&
+        point.y >= bbox.y &&
+        point.y <= bbox.y + bbox.height
+      ) {
+        elemento.remove();
+      }
+    }
+  }
 
   /**
    * Verifica se um segmento intercepta o bounding box do elemento
