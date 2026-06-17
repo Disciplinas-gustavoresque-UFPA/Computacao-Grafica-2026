@@ -37,7 +37,13 @@ export class BorrachaTool extends ToolBase {
 
   onMouseMove(evento) {
     if (!this.isErasing) return;
-    this.apagarElemento(evento);
+
+    const currentPoint = this.getSvgPoint(evento);
+    const lastPoint = this.pathPoints[this.pathPoints.length - 1];
+
+    this.pathPoints.push(currentPoint);
+
+    this.apagarSegmento(lastPoint, currentPoint);
   }
 
   onMouseUp() {
