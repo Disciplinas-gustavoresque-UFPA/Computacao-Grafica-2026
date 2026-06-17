@@ -122,6 +122,14 @@ export class BorrachaTool extends ToolBase {
     );
   }
 
+  pontoDentroBBox(point, bbox) {
+    return (
+      point.x >= bbox.x &&
+      point.x <= bbox.x + bbox.width &&
+      point.y >= bbox.y &&
+      point.y <= bbox.y + bbox.height
+    );
+  }
 
   segmentosIntersectam(p1, p2, p3, p4) {
     const det =
