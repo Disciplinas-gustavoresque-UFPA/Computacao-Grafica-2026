@@ -74,4 +74,51 @@ export class BorrachaTool extends ToolBase {
       y: transformed.y
     };
   }
+
+  /**
+   * Apaga elementos atingidos por um segmento da trajetória
+   */
+  apagarSegmento(p1, p2) {
+    const elementos = Array.from(this.svgCanvas.children);
+
+    for (const elemento of elementos) {
+      const tag = elemento.tagName?.toLowerCase();
+
+      if (!this.allowedTags.includes(tag)) {
+        continue;
+      }
+
+      if (this.segmentoInterceptaElemento(p1, p2, elemento)) {
+        elemento.remove();
+      }
+    }
+  }
+
+
+
+  /**
+   * Verifica se um segmento intercepta o bounding box do elemento
+   */
+  segmentoInterceptaElemento(p1, p2, elemento) {
+    const bbox = elemento.getBBox();
+
+    const x1 = bbox.x;
+    const y1 = bbox.y;
+    const x2 = bbox.x + bbox.width;
+    const y2 = bbox.y + bbox.height;
+
+    if (this.pontoDentroBBox(p1, bbox)) return true;
+    if (this.pontoDentroBBox(p2, bbox)) return true;
+
+    const edges = [
+      [{ x: x1, y: y1 }, { x: x2, y: y1 }],
+      [{ x: x2, y: y1 }, { x: x2, y: y2 }],
+      [{ x: x2, y: y2 }, { x: x1, y: y2 }],
+      [{ x: x1, y: y2 }, { x: x1, y: y1 }]
+    ];
+
+    return edges.some(([a, b]) =>
+      this.segmentosIntersectam(p1, p2, a, b)
+    );
+  }
 }
