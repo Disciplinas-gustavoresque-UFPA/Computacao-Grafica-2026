@@ -47,5 +47,25 @@ export class BorrachaTool extends ToolBase {
 
   onDesativar() {
     this.isErasing = false;
+    this.pathPoints = [];
+  }
+
+  /**
+   * Converte coordenadas da tela para coordenadas SVG
+   */
+  getSvgPoint(evento) {
+    const pt = this.svgCanvas.createSVGPoint();
+
+    pt.x = evento.clientX;
+    pt.y = evento.clientY;
+
+    const transformed = pt.matrixTransform(
+      this.svgCanvas.getScreenCTM().inverse()
+    );
+
+    return {
+      x: transformed.x,
+      y: transformed.y
+    };
   }
 }
