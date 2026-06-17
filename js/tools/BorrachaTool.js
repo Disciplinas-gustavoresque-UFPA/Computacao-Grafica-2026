@@ -121,4 +121,32 @@ export class BorrachaTool extends ToolBase {
       this.segmentosIntersectam(p1, p2, a, b)
     );
   }
+
+
+  segmentosIntersectam(p1, p2, p3, p4) {
+    const det =
+      (p2.x - p1.x) * (p4.y - p3.y) -
+      (p2.y - p1.y) * (p4.x - p3.x);
+
+    if (det === 0) {
+      return false;
+    }
+
+    const lambda =
+      ((p4.y - p3.y) * (p4.x - p1.x) +
+        (p3.x - p4.x) * (p4.y - p1.y)) /
+      det;
+
+    const gamma =
+      ((p1.y - p2.y) * (p4.x - p1.x) +
+        (p2.x - p1.x) * (p4.y - p1.y)) /
+      det;
+
+    return (
+      lambda >= 0 &&
+      lambda <= 1 &&
+      gamma >= 0 &&
+      gamma <= 1
+    );
+  }
 }
