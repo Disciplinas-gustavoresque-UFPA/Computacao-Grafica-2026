@@ -10,11 +10,29 @@ export class BorrachaTool extends ToolBase {
     super();
     this.svgCanvas = svgCanvas;
     this.isErasing = false;
+    this.pathPoints = [];
+
+    this.allowedTags = [
+      'rect',
+      'text',
+      'image',
+      'circle',
+      'ellipse',
+      'line',
+      'path',
+      'polygon',
+      'polyline'
+    ];
   }
 
   onMouseDown(evento) {
     this.isErasing = true;
-    this.apagarElemento(evento);
+
+    this.pathPoints = [
+      this.getSvgPoint(evento)
+    ];
+
+    this.apagarNaPosicao(this.pathPoints[0]);
   }
 
   onMouseMove(evento) {
@@ -22,7 +40,7 @@ export class BorrachaTool extends ToolBase {
     this.apagarElemento(evento);
   }
 
-  onMouseUp(evento) {
+  onMouseUp() {
     this.isErasing = false;
   }
 
