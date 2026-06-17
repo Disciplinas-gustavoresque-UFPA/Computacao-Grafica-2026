@@ -42,21 +42,7 @@ export class BorrachaTool extends ToolBase {
 
   onMouseUp() {
     this.isErasing = false;
-  }
-
-  apagarElemento(evento) {
-    const target = evento.target;
-
-    const allowedTags = ['rect', 'text', 'image', 'circle', 'ellipse', 'line', 'path', 'polygon', 'polyline'];
-    const tag = target.tagName ? target.tagName.toLowerCase() : '';
-
-    if (
-      target !== this.svgCanvas &&
-      target.parentNode === this.svgCanvas &&
-      allowedTags.includes(tag)
-    ) {
-      target.remove();
-    }
+    this.pathPoints = [];
   }
 
   onDesativar() {
