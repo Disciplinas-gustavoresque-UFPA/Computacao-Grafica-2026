@@ -29,6 +29,7 @@ import { LupaTool } from './tools/LupaTool.js';
 import { inicializarImportadorImagem } from './tools/ImageImporter.js';
 import { inicializarMenuInicial } from './core/UIManager.js';
 import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
+import { inicializarMenuContexto } from './utils/contextMenu.js';
 
 const svgCanvas = document.getElementById('canvas');
 
@@ -83,6 +84,9 @@ observer.observe(svgCanvas, { attributes: true, attributeFilter: ['viewBox'] });
 // Inicializar a classe de seleção visual
 const selecaoVisual = new Selecao(overlayCanvas);
 definirGerenciadorSelecao(selecaoVisual);
+
+// Menu de contexto simples em utilitário
+inicializarMenuContexto(svgCanvas);
 
 // Instâncias das ferramentas disponíveis com todas as implementações da main
 const instanciasFerramentas = {
@@ -152,13 +156,6 @@ svgCanvas.addEventListener('mousemove', (evento) => {
 svgCanvas.addEventListener('mouseup', (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseUp(evento);
-  }
-});
-
-// Previne o menu de opções do botão direito no canvas
-svgCanvas.addEventListener('contextmenu', (e) => {
-  if (e.target.closest('#canvas')) {
-    e.preventDefault();
   }
 });
 
