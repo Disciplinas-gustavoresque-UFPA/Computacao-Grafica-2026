@@ -1,0 +1,48 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# IDEs - VS Code
+.vscode/
+
+# IDEs - JetBrains
+.idea/
+
+# IDEs - Vim
+.*.swp
+.*.swo
+*~
+
+# IDEs - Emacs
+\#*\#
+.#*
+
+# IDEs - Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# IDEs - Eclipse
+.project
+.classpath
+.settings/
+
+# Node/npm (future-proof)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Environment
+.env
+.env.*
+
+# Build artifacts
+dist/
+build/
+*.min.js
+*.min.css
+
+# Logs
+*.log
+npm-debug.log*
