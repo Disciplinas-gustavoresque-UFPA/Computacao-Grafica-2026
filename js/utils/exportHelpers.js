@@ -66,20 +66,45 @@ function mostrarMensagem(texto, duracao = 2500) {
  *
  * @param {SVGSVGElement} svgElement - O elemento SVG raiz (seu canvas).
  * @param {string} formato - O formato escolhido ('svg', 'png' ou 'jpg').
+ * @param {Object} [opcoes={}] - Opções de exportação.
+ * @param {boolean} [opcoes.incluirExternos=false] - Se true, inclui objetos fora da página.
+ * @param {{ x: number, y: number, width: number, height: number }|null} [opcoes.areaPagina=null] - Área da página para filtragem.
  */
-export function exportarDesenho(svgElement, formato) {
-  // 1. Pega as dimensões exatas em pixels do SVG visível na tela
-  const rect = svgElement.getBoundingClientRect();
-  const largura = rect.width;
-  const altura = rect.height;
+export function exportarDesenho(svgElement, formato, opcoes = {}) {
+  const { incluirExternos = false, areaPagina = null } = opcoes;
+  const deveFiltrar = areaPagina && !incluirExternos;
+  // 1. Pega as dimensões da página (ou do canvas se não houver página)
+  let largura, altura;
+  let svgClone;
 
-  // 2. Cria uma cópia (clone) do SVG para não alterar o original da tela
-  const svgClone = svgElement.cloneNode(true);
+  if (deveFiltrar) {
+    largura = areaPagina.width;
+    altura = areaPagina.height;
 
-  // 3. Substitui os "100%" pelas dimensões fixas em pixels.
-  // Isso é o que resolve o problema do "fundo em branco"!
-  svgClone.setAttribute("width", largura);
-  svgClone.setAttribute("height", altura);
+    svgClone = svgElement.cloneNode(true);
+    svgClone.setAttribute("width", largura);
+    svgClone.setAttribute("height", altura);
+    svgClone.setAttribute("viewBox", `${areaPagina.x} ${areaPagina.y} ${largura} ${altura}`);
+
+    const filhosParaRemover = [];
+    Array.from(svgClone.children).forEach(el => {
+      const tag = el.tagName ? el.tagName.toLowerCase() : '';
+      if (!['rect', 'ellipse', 'circle', 'line', 'path', 'text', 'image',
+            'g', 'polygon', 'polyline'].includes(tag)) return;
+
+      if (!_verificarDentro(el, areaPagina)) {
+        filhosParaRemover.push(el);
+      }
+    });
+    filhosParaRemover.forEach(el => el.parentNode.removeChild(el));
+  } else {
+    const rect = svgElement.getBoundingClientRect();
+    largura = rect.width;
+    altura = rect.height;
+    svgClone = svgElement.cloneNode(true);
+    svgClone.setAttribute("width", largura);
+    svgClone.setAttribute("height", altura);
+  }
 
   // 4. Extrai todo o código XML do clone como texto
   const serializer = new XMLSerializer();
@@ -140,4 +165,22 @@ export function exportarDesenho(svgElement, formato) {
 
   // Dispara o carregamento da imagem
   img.src = urlBlob;
+}
+
+/**
+ * Verifica se um elemento SVG clone está totalmente dentro da área da página.
+ * @private
+ */
+function _verificarDentro(el, areaPagina) {
+  try {
+    const bbox = el.getBBox();
+    return (
+      bbox.x >= areaPagina.x &&
+      bbox.y >= areaPagina.y &&
+      bbox.x + bbox.width <= areaPagina.x + areaPagina.width &&
+      bbox.y + bbox.height <= areaPagina.y + areaPagina.height
+    );
+  } catch {
+    return true;
+  }
 }

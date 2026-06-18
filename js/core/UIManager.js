@@ -1,4 +1,4 @@
-import { definirInterface } from './StateManager.js';
+import { definirInterface, definirAreaPagina } from './StateManager.js';
 
 /**
  * Inicializa os ouvintes de evento para a Tela Inicial
@@ -17,26 +17,24 @@ export function inicializarMenuInicial(svgCanvas) {
         telaInicial.classList.add('oculto');
         telaEditor.classList.remove('oculto');
         definirInterface('editor');
+        svgCanvas.dispatchEvent(new CustomEvent('canvas-cleared'));
     }
 
     // 1. Lógica: Criar Novo Documento
     btnNovoDoc.addEventListener('click', () => {
         const tamanho = selectTamanho.value;
         
-        // Aplica o tamanho selecionado alterando a ViewBox do SVG
         if (tamanho === 'a4') {
             svgCanvas.setAttribute('viewBox', '0 0 800 1131');
-            svgCanvas.style.backgroundColor = '#ffffff'; // Imita papel
+            definirAreaPagina({ x: 0, y: 0, width: 800, height: 1131 });
         } else if (tamanho === 'a3') {
             svgCanvas.setAttribute('viewBox', '0 0 1131 1600');
-            svgCanvas.style.backgroundColor = '#ffffff';
+            definirAreaPagina({ x: 0, y: 0, width: 1131, height: 1600 });
         } else {
-            // Documento Livre
             svgCanvas.removeAttribute('viewBox');
-            svgCanvas.style.backgroundColor = 'var(--cor-fundo-canvas)';
+            definirAreaPagina({ x: 0, y: 0, width: 800, height: 1131 });
         }
         
-        // Garante que começamos com um canvas limpo
         svgCanvas.innerHTML = '';
         irParaEditor();
     });

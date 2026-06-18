@@ -117,4 +117,32 @@ export class CameraSVG {
     this.applyViewBox();
   }
 
+  /**
+   * Ajusta o viewBox para encaixar a área da página na tela,
+   * ignorando objetos externos para os cálculos de zoom.
+   *
+   * @param {{ x: number, y: number, width: number, height: number }} areaPagina
+   * @param {number} [margem=40] - Margem interna em pixels ao redor da página.
+   */
+  fitToPage(areaPagina, margem = 40) {
+    const svg = this.svgs[0];
+    const containerWidth = svg.clientWidth || svg.parentElement.clientWidth || 800;
+    const containerHeight = svg.clientHeight || svg.parentElement.clientHeight || 600;
+
+    const scaleX = (containerWidth - margem * 2) / areaPagina.width;
+    const scaleY = (containerHeight - margem * 2) / areaPagina.height;
+    const scale = Math.min(scaleX, scaleY);
+
+    const newWidth = areaPagina.width * scale;
+    const newHeight = areaPagina.height * scale;
+
+    this.viewBox = {
+      x: areaPagina.x - (containerWidth - newWidth) / (2 * scale),
+      y: areaPagina.y - (containerHeight - newHeight) / (2 * scale),
+      width: containerWidth / scale,
+      height: containerHeight / scale,
+    };
+    this.applyViewBox();
+  }
+
 }

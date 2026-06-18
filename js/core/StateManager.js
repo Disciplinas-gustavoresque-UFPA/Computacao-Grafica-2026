@@ -12,13 +12,14 @@
  * - interfaceAtual {string}         - Flag para sabermos a tela onde o usuário está.
  */
 
-/** @type {{ ferramentaAtual: import('../tools/ToolBase.js').ToolBase|null, corPreenchimento: string, corBorda: string, elementosSelecionados: SVGElement[], interfaceAtual: string }} */
+/** @type {{ ferramentaAtual: import('../tools/ToolBase.js').ToolBase|null, corPreenchimento: string, corBorda: string, elementosSelecionados: SVGElement[], interfaceAtual: string, areaPagina: {x: number, y: number, width: number, height: number} }} */
 export const estado = {
   ferramentaAtual: null,
   corPreenchimento: '#4a90d9',
   corBorda: '#1a1a2e',
-  interfaceAtual: 'inicio', // Nova flag para sabermos onde o usuário está
+  interfaceAtual: 'inicio',
   elementosSelecionados: [],
+  areaPagina: { x: 0, y: 0, width: 800, height: 1131 },
 };
 
 let gerenciadorSelecaoVisual = null;
@@ -130,4 +131,35 @@ export function removerElementoSelecao(elemento) {
 
 export function definirInterface(novaInterface) {
   estado.interfaceAtual = novaInterface;
+}
+
+let callbackRecalculo = null;
+
+/**
+ * Define a área da página (região imprimível/exportável).
+ * Dispara recálculo de status de todos os elementos.
+ *
+ * @param {{ x: number, y: number, width: number, height: number }} area
+ */
+export function definirAreaPagina(area) {
+  estado.areaPagina = { ...area };
+  if (typeof callbackRecalculo === 'function') {
+    callbackRecalculo();
+  }
+}
+
+/**
+ * Retorna a área atual da página.
+ * @returns {{ x: number, y: number, width: number, height: number }}
+ */
+export function obterAreaPagina() {
+  return { ...estado.areaPagina };
+}
+
+/**
+ * Registra uma função de callback chamada quando a área da página muda.
+ * @param {Function} cb
+ */
+export function onAreaPaginaMudou(cb) {
+  callbackRecalculo = cb;
 }

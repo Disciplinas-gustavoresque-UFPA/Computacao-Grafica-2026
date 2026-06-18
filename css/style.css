@@ -272,7 +272,7 @@ body {
 
 #canvas {
   display: block;
-  background-color: var(--cor-fundo-canvas);
+  background-color: #2a2a3e;
   border-radius: var(--raio-borda);
   box-shadow: var(--sombra-padrao);
   cursor: crosshair;
@@ -416,4 +416,45 @@ body {
 #btn-novo-doc:hover {
   background-color: #3a7bc2;
   transform: translateY(-2px);
+}
+
+/* =========================================================
+   Controles de Área da Página
+   ========================================================= */
+.checkbox-externo {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.checkbox-externo input[type="checkbox"] {
+  accent-color: var(--cor-destaque);
+  cursor: pointer;
+}
+
+.page-size-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  border-left: 1px solid var(--cor-borda-ui);
+  padding-left: 12px;
+}
+
+.input-page-size {
+  width: 60px;
+  padding: 4px 6px;
+  border: 1px solid var(--cor-borda-ui);
+  border-radius: var(--raio-borda);
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--cor-texto);
+  font-size: 12px;
+  text-align: center;
+}
+
+.input-page-size:focus {
+  outline: none;
+  border-color: var(--cor-destaque);
 }

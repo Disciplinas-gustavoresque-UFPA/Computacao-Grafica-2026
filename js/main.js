@@ -12,7 +12,9 @@ import {
   definirFerramenta, 
   definirCorPreenchimento, 
   definirCorBorda, 
-  definirGerenciadorSelecao 
+  definirGerenciadorSelecao,
+  definirAreaPagina,
+  obterAreaPagina,
 } from './core/StateManager.js';
 import { ColorPickerTool } from './tools/ColorPickerTool.js';
 import { Lapis } from './tools/LapisTool.js';
@@ -29,6 +31,9 @@ import { LupaTool } from './tools/LupaTool.js';
 import { inicializarImportadorImagem } from './tools/ImageImporter.js';
 import { inicializarMenuInicial } from './core/UIManager.js';
 import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
+import { PageManager } from './core/PageManager.js';
+import { PageRenderer } from './core/PageRenderer.js';
+import { abrirPreviewImpressao, imprimir } from './utils/printHelpers.js';
 
 const svgCanvas = document.getElementById('canvas');
 
@@ -72,8 +77,14 @@ const observer = new MutationObserver((mutations) => {
       const vb = svgCanvas.getAttribute('viewBox');
       if (vb) {
         overlayCanvas.setAttribute('viewBox', vb);
+        if (pageManager && pageManager.interactionLayer) {
+          pageManager.interactionLayer.setAttribute('viewBox', vb);
+        }
       } else {
         overlayCanvas.removeAttribute('viewBox');
+        if (pageManager && pageManager.interactionLayer) {
+          pageManager.interactionLayer.removeAttribute('viewBox');
+        }
       }
     }
   });
@@ -83,6 +94,25 @@ observer.observe(svgCanvas, { attributes: true, attributeFilter: ['viewBox'] });
 // Inicializar a classe de seleção visual
 const selecaoVisual = new Selecao(overlayCanvas);
 definirGerenciadorSelecao(selecaoVisual);
+
+// Inicializar o gerenciador e renderizador da área da página
+const pageRenderer = new PageRenderer(svgCanvas, overlayCanvas);
+const pageManager = new PageManager(overlayCanvas, obterAreaPagina());
+
+pageManager.onMudou = (novaArea) => {
+  definirAreaPagina(novaArea);
+  pageRenderer.atualizar(novaArea);
+  syncPageInputs(novaArea);
+};
+
+pageRenderer.atualizar(obterAreaPagina());
+
+svgCanvas.addEventListener('canvas-cleared', () => {
+  const area = obterAreaPagina();
+  pageManager.setAreaPagina(area);
+  pageRenderer.atualizar(area);
+  syncPageInputs(area);
+});
 
 // Instâncias das ferramentas disponíveis com todas as implementações da main
 const instanciasFerramentas = {
@@ -98,6 +128,9 @@ const instanciasFerramentas = {
   borracha: new BorrachaTool(svgCanvas),
   lapis: new Lapis(svgCanvas),
 };
+
+// Expor a instância da câmera para uso em botões globais (fit-to-page)
+window.cameraInstancia = instanciasFerramentas.lupa.camera;
 
 /**
  * Atualiza o estado visual dos botões da barra lateral,
@@ -169,7 +202,62 @@ inputCorBorda.value = estado.corBorda;
 // Exportar / Salvar desenho
 btnExportar.addEventListener('click', () => {
   const formato = exportFormat.value || 'png';
-  exportarDesenho(svgCanvas, formato);
+  const incluirExternos = document.getElementById('incluir-externos').checked;
+  exportarDesenho(svgCanvas, formato, {
+    incluirExternos,
+    areaPagina: obterAreaPagina(),
+  });
+});
+
+// Imprimir
+const btnImprimir = document.getElementById('btn-imprimir');
+btnImprimir.addEventListener('click', () => {
+  abrirPreviewImpressao(svgCanvas, obterAreaPagina());
+});
+
+// Ajustar zoom à página
+const btnFitPage = document.getElementById('btn-fit-page');
+btnFitPage.addEventListener('click', () => {
+  if (window.cameraInstancia) {
+    window.cameraInstancia.fitToPage(obterAreaPagina());
+    atualizarIndicadorZoom();
+  }
+});
+
+function atualizarIndicadorZoom() {
+  if (window.cameraInstancia) {
+    const el = document.getElementById('zoom-indicator');
+    if (el) el.textContent = `Zoom: ${window.cameraInstancia.getZoomLevel()}%`;
+  }
+}
+
+// Controles de tamanho da página
+const inputPageWidth = document.getElementById('page-width');
+const inputPageHeight = document.getElementById('page-height');
+
+function syncPageInputs(area) {
+  inputPageWidth.value = Math.round(area.width);
+  inputPageHeight.value = Math.round(area.height);
+}
+
+inputPageWidth.addEventListener('change', () => {
+  const w = Math.max(50, parseInt(inputPageWidth.value) || 800);
+  inputPageWidth.value = w;
+  const area = obterAreaPagina();
+  const novaArea = { ...area, width: w };
+  definirAreaPagina(novaArea);
+  pageManager.setAreaPagina(novaArea);
+  pageRenderer.atualizar(novaArea);
+});
+
+inputPageHeight.addEventListener('change', () => {
+  const h = Math.max(50, parseInt(inputPageHeight.value) || 1131);
+  inputPageHeight.value = h;
+  const area = obterAreaPagina();
+  const novaArea = { ...area, height: h };
+  definirAreaPagina(novaArea);
+  pageManager.setAreaPagina(novaArea);
+  pageRenderer.atualizar(novaArea);
 });
 
 // --- Controle de Camadas (Z-Index) ---
@@ -217,6 +305,13 @@ window.addEventListener("keydown", (e) => {
 
   if (["input", "textarea", "select"].includes(tagAtiva) || elementoAtivo.isContentEditable)
     return;
+
+  // Ctrl+Shift+P: Imprimir
+  if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'p') {
+    e.preventDefault();
+    abrirPreviewImpressao(svgCanvas, obterAreaPagina());
+    return;
+  }
   
   const mapaTeclas = {
     "s" : "selecao",

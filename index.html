@@ -94,8 +94,23 @@
                     id="btn-exportar"
                     title="Salvar/Exportar desenho"
                 >
-                    Baixar 💾
+                    Baixar
                 </button>
+
+                <label class="propriedade-label checkbox-externo">
+                    <input type="checkbox" id="incluir-externos" title="Incluir objetos fora da página na exportação" />
+                    Externos
+                </label>
+
+                <button id="btn-imprimir" class="btn-layer" title="Imprimir (Ctrl+Shift+P)">Imprimir</button>
+                <button id="btn-fit-page" class="btn-layer" title="Ajustar zoom à página">Ajustar à Página</button>
+
+                <div class="page-size-controls">
+                    <span class="propriedade-label">Pág:</span>
+                    <input type="number" id="page-width" class="input-page-size" value="800" min="50" title="Largura da página" />
+                    <span class="propriedade-label">x</span>
+                    <input type="number" id="page-height" class="input-page-size" value="1131" min="50" title="Altura da página" />
+                </div>
             </header>
 
             <div id="workspace">
