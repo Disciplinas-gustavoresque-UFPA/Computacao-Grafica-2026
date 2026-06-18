@@ -106,14 +106,16 @@ const instanciasFerramentas = {
  * @param {string} nomeDaFerramenta - Identificador da ferramenta ativa.
  */
 function atualizarBotaoAtivo(nomeDaFerramenta) {
+  let nomeExibivel = 'Nenhuma selecionada';
   botoesFerramenta.forEach((btn) => {
     if (btn.getAttribute('data-ferramenta') === nomeDaFerramenta) {
       btn.classList.add('ativo');
+      nomeExibivel = btn.dataset.nome ?? btn.title ?? nomeDaFerramenta;
     } else {
       btn.classList.remove('ativo');
     }
   });
-  nomeFerramenta.textContent = nomeDaFerramenta || 'Nenhuma';
+  nomeFerramenta.textContent = nomeExibivel;
 }
 
 // --- Barra de Ferramentas & Modos ---

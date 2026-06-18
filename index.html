@@ -54,7 +54,7 @@
 
                 <span id="ferramenta-atual-label"
                     >Ferramenta:
-                    <strong id="nome-ferramenta">Nenhuma</strong></span
+                    <strong id="nome-ferramenta">Nenhuma selecionada</strong></span
                 >
 
                 <!-- Controle de Camadas -->
@@ -104,6 +104,7 @@
                     <button
                         class="btn-ferramenta"
                         data-ferramenta="selecao"
+                        data-nome="Seleção"
                         title="Seleção (S)"
                     >
                         &#9654;
@@ -111,6 +112,7 @@
                     <button
                         class="btn-ferramenta"
                         data-ferramenta="edicaoVertices"
+                        data-nome="Edição de Vértices"
                         title="Edição por Vértices (E-V)"
                     >
                         &#9688;
@@ -118,6 +120,7 @@
                     <button
                         class="btn-ferramenta"
                         data-ferramenta="retangulo"
+                        data-nome="Retângulo"
                         title="Retângulo (R)"
                     >
                         &#9645;
@@ -125,6 +128,7 @@
                     <button
                         class="btn-ferramenta"
                         data-ferramenta="elipse"
+                        data-nome="Elipse"
                         title="Elipse (E)"
                     >
                         &#9711;
@@ -132,6 +136,7 @@
                     <button
                         class="btn-ferramenta"
                         data-ferramenta="linha"
+                        data-nome="Linha"
                         title="Linha (L)"
                     >
                         &#9135;
@@ -139,6 +144,7 @@
                     <button
                         class="btn-ferramenta"
                         data-ferramenta="poligono"
+                        data-nome="Polígono / Polilinha"
                         title="Polígono Polilinha (P)"
                     >
                         &bowtie;
@@ -146,6 +152,7 @@
                     <button
                         class="btn-ferramenta"
                         data-ferramenta="texto"
+                        data-nome="Texto"
                         title="Texto (T)"
                     >
                         T
@@ -153,6 +160,7 @@
                     <button
                         class="btn-ferramenta"
                         data-ferramenta="Conta-gotas"
+                        data-nome="Conta-gotas"
                         title="Conta-gotas"
                     >
                         <svg
@@ -176,7 +184,12 @@
                             <path d="m2 22 .414-.414" />
                         </svg>
                     </button>
-                    <button class="btn-ferramenta" data-ferramenta="borracha" title="Borracha (B)">
+                    <button 
+                        class="btn-ferramenta" 
+                        data-ferramenta="borracha" 
+                        data-nome="Borracha" 
+                        title="Borracha (B)"
+                    >
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                         viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2"
@@ -185,11 +198,22 @@
                         </svg>
                     </button>
 
-                    <button class="btn-ferramenta" data-ferramenta="lapis" title="Lápis (P)">
+                    <button 
+                        class="btn-ferramenta" 
+                        data-ferramenta="lapis" 
+                        data-nome="Lápis" 
+                        title="Lápis (P)"
+                    >
                         &#128393;
                     </button>
 
-                    <button id="btn-zoom-click" class="btn-ferramenta" data-ferramenta="lupa" title="Zoom padrão">
+                    <button 
+                        id="btn-zoom-click" 
+                        class="btn-ferramenta" 
+                        data-ferramenta="lupa" 
+                        data-nome="Zoom"
+                        title="Zoom"
+                    >
                         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
                           viewBox="0 0 24 24" fill="none"
                           stroke="currentColor" stroke-width="2"
@@ -203,7 +227,8 @@
                         </svg>
                       </button>
                       <div id="zoom-options" class="hidden"></div> <!-- Menu de opçoes para a lupa/zoom -->
-                    <button
+                    
+                      <button
                         class="btn-ferramenta"
                         id="btn-importar-imagem"
                         title="Importar Imagem (Raster)"
