@@ -45,7 +45,6 @@ const inputCorPreenchimento = document.getElementById('cor-preenchimento');
 const inputCorBorda = document.getElementById('cor-borda');
 const nomeFerramenta = document.getElementById('nome-ferramenta');
 const btnExportar = document.getElementById('btn-exportar');
-const btnDuplicar = document.getElementById('btn-duplicar');
 const exportFormat = document.getElementById('export-format');
 
 // Wrapper para sincronizar perfeitamente as coordenadas do #canvas com o #overlay-canvas
@@ -267,8 +266,6 @@ function moverCamada(acao) {
     }
   }
 
-  if (btnDuplicar) btnDuplicar.addEventListener('click', handlerDuplicar);
-
   document.addEventListener('keydown', (evento) => {
     if ((evento.ctrlKey || evento.metaKey) && evento.key.toLowerCase() === 'd') {
       evento.preventDefault();
@@ -282,11 +279,3 @@ function moverCamada(acao) {
   });
 
   inicializarImportadorImagem(svgCanvas, inputImagem);
-=======
-// Importação de imagens
-btnImportarImagem.addEventListener('click', () => {
-  inputImagem.click();
-});
-
-inicializarImportadorImagem(svgCanvas, inputImagem);
->>>>>>> main
