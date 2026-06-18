@@ -49,6 +49,10 @@ export class LupaTool extends ToolBase {
     const btnDrag = document.getElementById('btn-drag');
     if (!btnDrag) return;
     btnDrag.classList.toggle('ativo', this.modo === 'drag');
+
+    const nomeEl = document.getElementById('nome-ferramenta');
+    if (nomeEl) 
+      nomeEl.textContent = this.modo === 'drag' ? 'Zoom por Seleção' : 'Zoom';
   }
 
 
