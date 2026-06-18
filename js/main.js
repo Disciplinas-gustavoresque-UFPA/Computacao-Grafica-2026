@@ -112,6 +112,10 @@ svgCanvas.addEventListener('canvas-cleared', () => {
   pageManager.setAreaPagina(area);
   pageRenderer.atualizar(area);
   syncPageInputs(area);
+  if (window.cameraInstancia) {
+    window.cameraInstancia.fitToPage(area);
+    atualizarIndicadorZoom();
+  }
 });
 
 // Instâncias das ferramentas disponíveis com todas as implementações da main
