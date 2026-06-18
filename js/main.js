@@ -7,15 +7,16 @@
  * - Conectar os botões da barra de ferramentas ao StateManager
  */
 
-import { 
-  estado, 
-  definirFerramenta, 
-  definirCorPreenchimento, 
-  definirCorBorda, 
+import {
+  estado,
+  definirFerramenta,
+  definirCorPreenchimento,
+  definirCorBorda,
   definirGerenciadorSelecao,
   definirElementosSelecionados
 } from './core/StateManager.js';
 import { ColorPickerTool } from './tools/ColorPickerTool.js';
+import { Lapis } from './tools/LapisTool.js';
 import { RetanguloTool } from './tools/RetanguloTool.js';
 import { TextoTool } from './tools/TextoTool.js';
 import { exportarDesenho } from './utils/exportHelpers.js';
@@ -29,6 +30,7 @@ import { LupaTool } from './tools/LupaTool.js';
 import { inicializarImportadorImagem } from './tools/ImageImporter.js';
 import { inicializarMenuInicial } from './core/UIManager.js';
 import { duplicarElemento } from './utils/duplicateHelpers.js';
+import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
 
 const svgCanvas = document.getElementById('canvas');
 
@@ -67,7 +69,6 @@ overlayCanvas.style.left = '0';
 overlayCanvas.style.pointerEvents = 'none'; // Coordenado com o principal
 canvasContainer.appendChild(overlayCanvas);
 
-// Sincronizar viewBox entre canvas principal e overlay quando necessário
 const observer = new MutationObserver((mutations) => {
   mutations.forEach((mutation) => {
     if (mutation.attributeName === 'viewBox') {
@@ -86,17 +87,19 @@ observer.observe(svgCanvas, { attributes: true, attributeFilter: ['viewBox'] });
 const selecaoVisual = new Selecao(overlayCanvas);
 definirGerenciadorSelecao(selecaoVisual);
 
-// Instâncias das ferramentas disponíveis
+// Instâncias das ferramentas disponíveis com todas as implementações da main
 const instanciasFerramentas = {
   selecao: new SelecaoTool(svgCanvas),
   edicaoVertices: new NodeEditTool(svgCanvas),
   retangulo: new RetanguloTool(svgCanvas),
-  linha: new LinhaTool(svgCanvas),    
-  elipse: new ElipseTool(svgCanvas),  
+  linha: new LinhaTool(svgCanvas),
+  poligono: new PoligonoPolilinhaTool(svgCanvas),
+  elipse: new ElipseTool(svgCanvas),
   "Conta-gotas": new ColorPickerTool(svgCanvas),
   lupa: new LupaTool(svgCanvas, overlayCanvas),
   texto: new TextoTool(svgCanvas),
   borracha: new BorrachaTool(svgCanvas),
+  lapis: new Lapis(svgCanvas),
 };
 
 /**
@@ -179,103 +182,111 @@ const btnStepForward = document.getElementById('btn-step-forward');
 const btnBringToFront = document.getElementById('btn-bring-to-front');
 
 function moverCamada(acao) {
-  const el = estado.elementosSelecionados[0];
+  const el = estado.elementoSelecionado;
   if (!el) return;
 
   const pai = el.parentNode;
   if (!pai) return;
 
   switch (acao) {
-    case 'fundo':
-      pai.prepend(el);
-      break;
-    case 'recuar':
-      if (el.previousElementSibling) {
-        el.previousElementSibling.before(el);
-      }
-      break;
-    case 'avancar':
-      if (el.nextElementSibling) {
-        el.nextElementSibling.after(el);
-      }
-      break;
-    case 'frente':
-      pai.appendChild(el);
-      break;
-  }
-  
-  // TODO: Registrar ação no HistoryManager (Issue #10)
-}
+      case 'fundo':
+        pai.prepend(el);
+        break;
+      case 'recuar':
+        if (el.previousElementSibling) {
+          el.previousElementSibling.before(el);
+        }
+        break;
+      case 'avancar':
+        if (el.nextElementSibling) {
+          el.nextElementSibling.after(el);
+        }
+        break;
+      case 'frente':
+        pai.appendChild(el);
+        break;
+    }
 
-if (btnSendToBack) btnSendToBack.addEventListener('click', () => moverCamada('fundo'));
-if (btnStepBackward) btnStepBackward.addEventListener('click', () => moverCamada('recuar'));
-if (btnStepForward) btnStepForward.addEventListener('click', () => moverCamada('avancar'));
-if (btnBringToFront) btnBringToFront.addEventListener('click', () => moverCamada('frente'));
-
-// Atalhos de Teclado (Tool Selection)
-window.addEventListener("keydown", (e) => {
-  // Prevenção de conflitos
-  // Verifica se o usuário está focado em um campo de texto ou input de cor.
-  const elementoAtivo = document.activeElement;
-  const tagAtiva = elementoAtivo.tagName.toLocaleLowerCase();
-
-  // Se o foco estiver em um input, textArea, select ou contentEditable, ignora o atalho.
-  if (["input", "textarea", "select"].includes(tagAtiva) || elementoAtivo.isContentEditable)
-    return;
-  
-  // Mapeamento das teclas
-  // Observação: o nome do data-ferramenta para o conta-gotas no HTML é "Conta-gotas"
-  const mapaTeclas = {
-    "s" : "selecao",
-    "r" : "retangulo",
-    "e" : "elipse",
-    "l" : "linha",
-    "t" : "texto",
-    "i" : "Conta-gotas"
+    // TODO: Registrar ação no HistoryManager (Issue #10)
   }
 
-  const teclaPressionada = e.key.toLowerCase();
-  const ferramentaAlvo = mapaTeclas[teclaPressionada];
-  
-  // Adicionar e feedback visual
-  if (ferramentaAlvo) {
-    e.preventDefault();
+  if (btnSendToBack) btnSendToBack.addEventListener('click', () => moverCamada('fundo'));
+  if (btnStepBackward) btnStepBackward.addEventListener('click', () => moverCamada('recuar'));
+  if (btnStepForward) btnStepForward.addEventListener('click', () => moverCamada('avancar'));
+  if (btnBringToFront) btnBringToFront.addEventListener('click', () => moverCamada('frente'));
 
-    // Buscar o botão na barra lateral
-    const botao = document.querySelector(`.btn-ferramenta[data-ferramenta="${ferramentaAlvo}"]`);
+  // Atalhos de Teclado (Tool Selection)
+  window.addEventListener("keydown", (e) => {
+    // Prevenção de conflitos
+    // Verifica se o usuário está focado em um campo de texto ou input de cor.
+    const elementoAtivo = document.activeElement;
+    const tagAtiva = elementoAtivo.tagName.toLocaleLowerCase();
 
-    if (botao) {
-      // Simular click para utilizar o eventListener que chama `atualizarBotaoAtivo()`
-      // e aplica a classe CSS '.ativo' de forma automática.
-      botao.click();
+    // Se o foco estiver em um input, textArea, select ou contentEditable, ignora o atalho.
+    if (["input", "textarea", "select"].includes(tagAtiva) || elementoAtivo.isContentEditable)
+      return;
+
+    // Mapeamento das teclas
+    // Observação: o nome do data-ferramenta para o conta-gotas no HTML é "Conta-gotas"
+    const mapaTeclas = {
+      "s" : "selecao",
+      "r" : "retangulo",
+      "e" : "elipse",
+      "l" : "linha",
+      "p" : "poligono",
+      "t" : "texto",
+      "i" : "conta-gotas"
+    }
+
+    const teclaPressionada = e.key.toLowerCase();
+    const ferramentaAlvo = mapaTeclas[teclaPressionada];
+
+    // Adicionar e feedback visual
+    if (ferramentaAlvo) {
+      e.preventDefault();
+
+      // Buscar o botão na barra lateral
+      const botao = document.querySelector(`.btn-ferramenta[data-ferramenta="${ferramentaAlvo}"]`);
+
+      if (botao) {
+        // Simular click para utilizar o eventListener que chama `atualizarBotaoAtivo()`
+        // e aplica a classe CSS '.ativo' de forma automática.
+        botao.click();
+      }
+    }
+  });
+
+  // --- Duplicar elemento ---
+  function handlerDuplicar() {
+    const el = estado.elementosSelecionados[0];
+    if (el) {
+      const clone = duplicarElemento(el, svgCanvas);
+      if (clone) {
+        definirElementosSelecionados(clone);
+      }
     }
   }
-});
 
-// --- Duplicar elemento ---
-function handlerDuplicar() {
-  const el = estado.elementosSelecionados[0];
-  if (el) {
-    const clone = duplicarElemento(el, svgCanvas);
-    if (clone) {
-      definirElementosSelecionados(clone);
+  if (btnDuplicar) btnDuplicar.addEventListener('click', handlerDuplicar);
+
+  document.addEventListener('keydown', (evento) => {
+    if ((evento.ctrlKey || evento.metaKey) && evento.key.toLowerCase() === 'd') {
+      evento.preventDefault();
+      handlerDuplicar();
     }
-  }
-}
+  });
 
-if (btnDuplicar) btnDuplicar.addEventListener('click', handlerDuplicar);
+  // Importação de imagens
+  btnImportarImagem.addEventListener('click', () => {
+    inputImagem.click();
+  });
 
-document.addEventListener('keydown', (evento) => {
-  if ((evento.ctrlKey || evento.metaKey) && evento.key.toLowerCase() === 'd') {
-    evento.preventDefault();
-    handlerDuplicar();
-  }
-});
-
-// Import de imagens
-if (btnImportarImagem) btnImportarImagem.addEventListener('click', () => {
+  inicializarImportadorImagem(svgCanvas, inputImagem);
+=======
+// Importação de imagens
+btnImportarImagem.addEventListener('click', () => {
   inputImagem.click();
 });
 
-// Inicializar o importador de imagens (configura listeners no input)
 inicializarImportadorImagem(svgCanvas, inputImagem);
+>>>>>>> main
