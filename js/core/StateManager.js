@@ -15,13 +15,15 @@
 /** @type {{ ferramentaAtual: import('../tools/ToolBase.js').ToolBase|null, corPreenchimento: string, corBorda: string, elementosSelecionados: SVGElement[], interfaceAtual: string }} */
 export const estado = {
   ferramentaAtual: null,
-  corPreenchimento: '#4a90d9',
-  corBorda: '#1a1a2e',
-  interfaceAtual: 'inicio', // Nova flag para sabermos onde o usuário está
+  corPreenchimento: "#4a90d9",
+  corBorda: "#1a1a2e",
+  interfaceAtual: "inicio", // Nova flag para sabermos onde o usuário está
   elementosSelecionados: [],
 };
 
 let gerenciadorSelecaoVisual = null;
+let gerenciadorHistorico = null;
+let observadorHistorico = null;
 
 export function definirGerenciadorSelecao(selecao) {
   gerenciadorSelecaoVisual = selecao;
@@ -31,6 +33,95 @@ export function atualizarPosicaoSelecaoVisual() {
   if (gerenciadorSelecaoVisual && estado.elementosSelecionados.length > 0) {
     gerenciadorSelecaoVisual.atualizarPosicao(estado.elementosSelecionados);
   }
+}
+
+export function definirGerenciadorHistorico(historico) {
+  gerenciadorHistorico = historico;
+}
+
+export function definirObservadorHistorico(observador) {
+  observadorHistorico = observador;
+}
+
+export function pausarObservadorHistorico() {
+  if (observadorHistorico && typeof observadorHistorico.pause === 'function') {
+    observadorHistorico.pause();
+  }
+}
+
+export function retomarObservadorHistorico() {
+  if (observadorHistorico && typeof observadorHistorico.resume === 'function') {
+    observadorHistorico.resume();
+  }
+}
+
+export function inicializarHistorico() {
+  if (gerenciadorHistorico) {
+    gerenciadorHistorico.inicializar();
+  }
+}
+
+export function salvarMemento() {
+  if (gerenciadorHistorico) {
+    return gerenciadorHistorico.salvar();
+  }
+
+  return false;
+}
+
+export function desfazerMemento() {
+  if (gerenciadorHistorico) {
+    pausarObservadorHistorico();
+    let alterou = false;
+
+    try {
+      alterou = gerenciadorHistorico.desfazer();
+    } finally {
+      retomarObservadorHistorico();
+    }
+
+    if (alterou) {
+      definirElementosSelecionados([]);
+
+      if (
+        estado.ferramentaAtual &&
+        typeof estado.ferramentaAtual.onDesativar === "function"
+      ) {
+        estado.ferramentaAtual.onDesativar();
+      }
+    }
+
+    return alterou;
+  }
+
+  return false;
+}
+
+export function refazerMemento() {
+  if (gerenciadorHistorico) {
+    pausarObservadorHistorico();
+    let alterou = false;
+
+    try {
+      alterou = gerenciadorHistorico.refazer();
+    } finally {
+      retomarObservadorHistorico();
+    }
+
+    if (alterou) {
+      definirElementosSelecionados([]);
+      if (
+        estado.ferramentaAtual &&
+        typeof estado.ferramentaAtual.onDesativar === "function"
+      ) {
+        estado.ferramentaAtual.onDesativar();
+      }
+    }
+    
+    return alterou;
+  }
+
+  return false;
 }
 
 /**
@@ -45,14 +136,14 @@ export function definirFerramenta(ferramenta) {
   const anterior = estado.ferramentaAtual;
 
   // Notifica a ferramenta anterior antes de trocar
-  if (anterior && typeof anterior.onDesativar === 'function') {
+  if (anterior && typeof anterior.onDesativar === "function") {
     anterior.onDesativar();
   }
 
   estado.ferramentaAtual = ferramenta;
 
   // Notifica a nova ferramenta após a troca
-  if (ferramenta && typeof ferramenta.onAtivar === 'function') {
+  if (ferramenta && typeof ferramenta.onAtivar === "function") {
     ferramenta.onAtivar();
   }
 }
@@ -122,7 +213,9 @@ export function adicionarElementoSelecao(elemento) {
  * @param {SVGElement} elemento
  */
 export function removerElementoSelecao(elemento) {
-  estado.elementosSelecionados = estado.elementosSelecionados.filter(el => el !== elemento);
+  estado.elementosSelecionados = estado.elementosSelecionados.filter(
+    (el) => el !== elemento,
+  );
   if (gerenciadorSelecaoVisual) {
     gerenciadorSelecaoVisual.desenhar(estado.elementosSelecionados);
   }

@@ -12,7 +12,13 @@ import {
   definirFerramenta, 
   definirCorPreenchimento, 
   definirCorBorda, 
-  definirGerenciadorSelecao 
+  definirGerenciadorSelecao,
+  definirGerenciadorHistorico,
+  definirObservadorHistorico,
+  inicializarHistorico,
+  salvarMemento,
+  desfazerMemento,
+  refazerMemento,
 } from './core/StateManager.js';
 import { ColorPickerTool } from './tools/ColorPickerTool.js';
 import { RetanguloTool } from './tools/RetanguloTool.js';
@@ -27,6 +33,9 @@ import { ElipseTool } from './tools/ElipseTool.js';
 import { LupaTool } from './tools/LupaTool.js';
 import { inicializarImportadorImagem } from './tools/ImageImporter.js';
 import { inicializarMenuInicial } from './core/UIManager.js';
+import { CanvasOriginator } from './core/memento/CanvasOriginator.js';
+import { HistoryCaretaker } from './core/memento/HistoryCaretaker.js';
+import { SvgHistoryObserver } from './core/memento/SvgHistoryObserver.js';
 
 const svgCanvas = document.getElementById('canvas');
 
@@ -67,6 +76,19 @@ canvasContainer.appendChild(overlayCanvas);
 // Inicializar a classe de seleção visual
 const selecaoVisual = new Selecao(overlayCanvas);
 definirGerenciadorSelecao(selecaoVisual);
+
+// Inicializar o sistema de histórico usando o padrão Memento
+
+const originatorCanvas = new CanvasOriginator(svgCanvas);
+const historicoCanvas = new HistoryCaretaker(originatorCanvas, 50);
+definirGerenciadorHistorico(historicoCanvas);
+inicializarHistorico();
+
+const observadorHistoricoCanvas = new SvgHistoryObserver(svgCanvas, salvarMemento, {
+  debounceMs: 150,
+});
+definirObservadorHistorico(observadorHistoricoCanvas);
+observadorHistoricoCanvas.start();
 
 // Instâncias das ferramentas disponíveis com todas as implementações da main
 const instanciasFerramentas = {
@@ -169,20 +191,28 @@ function moverCamada(acao) {
 
   switch (acao) {
     case 'fundo':
-      pai.prepend(el);
+      if (el.previousElementSibling) {
+        pai.prepend(el);
+        salvarMemento();
+      }
       break;
     case 'recuar':
       if (el.previousElementSibling) {
         el.previousElementSibling.before(el);
+        salvarMemento();
       }
       break;
     case 'avancar':
       if (el.nextElementSibling) {
         el.nextElementSibling.after(el);
+        salvarMemento();
       }
       break;
     case 'frente':
-      pai.appendChild(el);
+      if (el.nextElementSibling) {
+        pai.appendChild(el);
+        salvarMemento();
+      }
       break;
   }
 }
@@ -195,10 +225,25 @@ btnBringToFront.addEventListener('click', () => moverCamada('frente'));
 // Atalhos de Teclado (Tool Selection)
 window.addEventListener("keydown", (e) => {
   const elementoAtivo = document.activeElement;
-  const tagAtiva = elementoAtivo.tagName.toLocaleLowerCase();
+  const tagAtiva = elementoAtivo ? elementoAtivo.tagName.toLocaleLowerCase() : '';
 
-  if (["input", "textarea", "select"].includes(tagAtiva) || elementoAtivo.isContentEditable)
+  if (["input", "textarea", "select"].includes(tagAtiva) || (elementoAtivo && elementoAtivo.isContentEditable))
     return;
+
+  const ctrlOuMeta = e.ctrlKey || e.metaKey;
+  const tecla = e.key.toLowerCase();
+
+  if (ctrlOuMeta && tecla === 'z' && !e.shiftKey) {
+    e.preventDefault();
+    desfazerMemento();
+    return;
+  }
+
+  if (ctrlOuMeta && (tecla === 'y' || (tecla === 'z' && e.shiftKey))) {
+    e.preventDefault();
+    refazerMemento();
+    return;
+  }
   
   const mapaTeclas = {
     "s" : "selecao",
