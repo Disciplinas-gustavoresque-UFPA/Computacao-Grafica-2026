@@ -36,81 +36,16 @@
             <!-- Painel Superior: propriedades (cor de preenchimento, cor de borda, etc.) -->
             <header id="painel-propriedades">
                 <span class="propriedade-label">Preenchimento:</span>
-                <input
-                    type="color"
-                    id="cor-preenchimento"
-                    value="#4a90d9"
-                    title="Cor de preenchimento"
-                />
+                <input type="color" id="cor-preenchimento" value="#4a90d9" title="Cor de preenchimento" />
 
                 <span class="propriedade-label">Borda:</span>
-                <input
-                    type="color"
-                    id="cor-borda"
-                    value="#1a1a2e"
-                    title="Cor da borda"
-                />
+                <input type="color" id="cor-borda" value="#1a1a2e" title="Cor da borda" />
+
                 <span id="zoom-indicator">Zoom: 100%</span>
 
-                <span id="ferramenta-atual-label"
-                    >Ferramenta:
-                    <strong id="nome-ferramenta">Nenhuma</strong></span
-                >
-
-                <!-- Controle de Camadas -->
-                <div class="layer-controls">
-                    <button id="btn-send-to-back" title="Enviar para o Fundo" class="btn-layer">⏮</button>
-                    <button id="btn-step-backward" title="Recuar" class="btn-layer">⏪</button>
-                    <button id="btn-step-forward" title="Avançar" class="btn-layer">⏩</button>
-                    <button id="btn-bring-to-front" title="Trazer para a Frente" class="btn-layer">⏭</button>
-                </div>
-
-                <!-- Botão de exportar/descarregar desenho -->
-                <label for="export-format" class="propriedade-label"
-                    >Exportar:</label
-                >
-                <div class="select-wrapper">
-                    <select
-                        class="select-format"
-                        id="export-format"
-                        title="Formato de exportação"
-                    >
-                        <option value="png" selected>PNG</option>
-                        <option value="jpg">JPG</option>
-                        <option value="svg">SVG</option>
-                    </select>
-
-                    <svg
-                        class="select-arrow"
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                        focusable="false"
-                    >
-                        <path d="M7 10l5 5 5-5z" />
-                    </svg>
-                </div>
-                <button
-                    class="btn-exportar"
-                    id="btn-exportar"
-                    title="Salvar/Exportar desenho"
-                >
-                    Baixar
-                </button>
-
-                <label class="propriedade-label checkbox-externo">
-                    <input type="checkbox" id="incluir-externos" title="Incluir objetos fora da página na exportação" />
-                    Externos
-                </label>
-
-                <button id="btn-imprimir" class="btn-layer" title="Imprimir (Ctrl+Shift+P)">Imprimir</button>
-                <button id="btn-fit-page" class="btn-layer" title="Ajustar zoom à página">Ajustar à Página</button>
-
-                <div class="page-size-controls">
-                    <span class="propriedade-label">Pág:</span>
-                    <input type="number" id="page-width" class="input-page-size" value="800" min="50" title="Largura da página" />
-                    <span class="propriedade-label">x</span>
-                    <input type="number" id="page-height" class="input-page-size" value="1131" min="50" title="Altura da página" />
-                </div>
+                <span id="ferramenta-atual-label">
+                    Ferramenta: <strong id="nome-ferramenta">Nenhuma</strong>
+                </span>
             </header>
 
             <div id="workspace">
@@ -246,11 +181,144 @@
                         <!-- Os elementos SVG criados pelo usuário serão inseridos aqui -->
                     </svg>
                 </main>
+
+                <!-- Painel Lateral Direito: opções extras -->
+                <aside id="painel-direito">
+                    <button
+                        id="btn-toggle-direito"
+                        class="painel-direito-handle"
+                        title="Fechar painel (])"
+                        type="button"
+                        aria-label="Fechar painel de propriedades"
+                    >
+                        <span class="painel-direito-handle-icon" aria-hidden="true">▶</span>
+                    </button>
+                    <div class="painel-direito-corpo">
+                        <div class="painel-direito-header">
+                            <span class="painel-direito-titulo">Propriedades</span>
+                        </div>
+                        <div class="painel-direito-conteudo">
+                            <div class="painel-direito-section">
+                                <div class="painel-direito-section-header">
+                                    <svg class="painel-direito-section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                                        <polyline points="2 17 12 22 22 17"></polyline>
+                                        <polyline points="2 12 12 17 22 12"></polyline>
+                                    </svg>
+                                    <span class="painel-direito-section-titulo">Camadas</span>
+                                </div>
+                                <div class="layer-controls">
+                                    <button id="btn-send-to-back" title="Enviar para o Fundo" class="btn-layer">⏮</button>
+                                    <button id="btn-step-backward" title="Recuar" class="btn-layer">⏪</button>
+                                    <button id="btn-step-forward" title="Avançar" class="btn-layer">⏩</button>
+                                    <button id="btn-bring-to-front" title="Trazer para a Frente" class="btn-layer">⏭</button>
+                                </div>
+                            </div>
+
+                            <div class="painel-direito-section">
+                                <div class="painel-direito-section-header">
+                                    <svg class="painel-direito-section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="7 10 12 15 17 10"></polyline>
+                                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                                    </svg>
+                                    <span class="painel-direito-section-titulo">Exportar</span>
+                                </div>
+                                <div class="select-wrapper sidebar-full">
+                                    <select class="select-format" id="export-format" title="Formato de exportação">
+                                        <option value="png" selected>PNG</option>
+                                        <option value="jpg">JPG</option>
+                                        <option value="svg">SVG</option>
+                                    </select>
+                                    <svg class="select-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                        <path d="M7 10l5 5 5-5z" />
+                                    </svg>
+                                </div>
+                                <button class="btn-exportar sidebar-full" id="btn-exportar" title="Salvar/Exportar desenho">Baixar</button>
+                                <label class="propriedade-label checkbox-externo">
+                                    <input type="checkbox" id="incluir-externos" title="Incluir objetos fora da página na exportação" />
+                                    Externos
+                                </label>
+                            </div>
+
+                            <div class="painel-direito-section">
+                                <div class="painel-direito-section-header">
+                                    <svg class="painel-direito-section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                        <line x1="9" y1="13" x2="15" y2="13"></line>
+                                        <line x1="9" y1="17" x2="15" y2="17"></line>
+                                    </svg>
+                                    <span class="painel-direito-section-titulo">Página</span>
+                                </div>
+                                <button id="btn-imprimir" class="btn-layer" title="Imprimir (Ctrl+Shift+P)">Imprimir</button>
+                                <button id="btn-fit-page" class="btn-layer" title="Ajustar zoom à página">Ajustar à Página</button>
+                                <div class="page-size-controls">
+                                    <label class="page-size-field">
+                                        <span class="page-size-label">L</span>
+                                        <input type="number" id="page-width" class="input-page-size" value="800" min="50" title="Largura da página" />
+                                    </label>
+                                    <span class="page-size-sep" aria-hidden="true">×</span>
+                                    <label class="page-size-field">
+                                        <span class="page-size-label">A</span>
+                                        <input type="number" id="page-height" class="input-page-size" value="1131" min="50" title="Altura da página" />
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
             </div><!-- /#workspace -->
         </div><!-- /#app -->
 
 
   <!-- Ponto de entrada da aplicação: ES6 Module -->
+  <script>
+    (function() {
+      var STORAGE_KEY = 'painel-direito-collapsed';
+      function init() {
+        var btn = document.getElementById('btn-toggle-direito');
+        var panel = document.getElementById('painel-direito');
+        if (!btn || !panel) return;
+        var icon = btn.querySelector('.painel-direito-handle-icon');
+
+        function applyState(collapsed) {
+          panel.classList.toggle('collapsed', collapsed);
+          if (icon) icon.textContent = collapsed ? '◀' : '▶';
+          btn.title = (collapsed ? 'Abrir painel' : 'Fechar painel') + ' (])';
+          btn.setAttribute('aria-label', btn.title);
+        }
+
+        function toggle() {
+          var collapsed = !panel.classList.contains('collapsed');
+          applyState(collapsed);
+          try { localStorage.setItem(STORAGE_KEY, collapsed ? '1' : '0'); } catch (e) {}
+        }
+
+        try {
+          if (localStorage.getItem(STORAGE_KEY) === '1') applyState(true);
+        } catch (e) {}
+
+        btn.addEventListener('click', toggle);
+
+        document.addEventListener('keydown', function(e) {
+          if (e.key !== ']' || e.ctrlKey || e.metaKey || e.altKey) return;
+          var t = document.activeElement && document.activeElement.tagName;
+          if (t === 'INPUT' || t === 'TEXTAREA' || t === 'SELECT') return;
+          if (document.activeElement && document.activeElement.isContentEditable) return;
+          e.preventDefault();
+          toggle();
+        });
+
+        window.togglePainelDireito = toggle;
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+    })();
+  </script>
   <script type="module" src="js/main.js"></script>
 </body>
 
