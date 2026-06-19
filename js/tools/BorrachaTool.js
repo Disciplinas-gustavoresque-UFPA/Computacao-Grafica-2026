@@ -122,64 +122,37 @@ export class BorrachaTool extends ToolBase {
   }
 
   /**
-   * Verifica se um segmento intercepta o bounding box do elemento
+   * Verifica se um segmento intercepta o elemento
    */
   segmentoInterceptaElemento(p1, p2, elemento) {
-    const bbox = elemento.getBBox();
-
-    const x1 = bbox.x;
-    const y1 = bbox.y;
-    const x2 = bbox.x + bbox.width;
-    const y2 = bbox.y + bbox.height;
-
-    if (this.pontoDentroBBox(p1, bbox)) return true;
-    if (this.pontoDentroBBox(p2, bbox)) return true;
-
-    const edges = [
-      [{ x: x1, y: y1 }, { x: x2, y: y1 }],
-      [{ x: x2, y: y1 }, { x: x2, y: y2 }],
-      [{ x: x2, y: y2 }, { x: x1, y: y2 }],
-      [{ x: x1, y: y2 }, { x: x1, y: y1 }]
-    ];
-
-    return edges.some(([a, b]) =>
-      this.segmentosIntersectam(p1, p2, a, b)
+    const distancia = Math.hypot(
+      p2.x - p1.x,
+      p2.y - p1.y
     );
-  }
-
-  pontoDentroBBox(point, bbox) {
-    return (
-      point.x >= bbox.x &&
-      point.x <= bbox.x + bbox.width &&
-      point.y >= bbox.y &&
-      point.y <= bbox.y + bbox.height
-    );
-  }
-
-  segmentosIntersectam(p1, p2, p3, p4) {
-    const det =
-      (p2.x - p1.x) * (p4.y - p3.y) -
-      (p2.y - p1.y) * (p4.x - p3.x);
-
-    if (det === 0) {
-      return false;
+  
+    const passos = Math.max(1, Math.ceil(distancia / 2));
+  
+    for (let i = 0; i <= passos; i++) {
+      const t = i / passos;
+    
+      const pontoSvg = this.svgCanvas.createSVGPoint();
+      pontoSvg.x = p1.x + (p2.x - p1.x) * t;
+      pontoSvg.y = p1.y + (p2.y - p1.y) * t;
+    
+      const pontoTela = pontoSvg.matrixTransform(
+        this.svgCanvas.getScreenCTM()
+      );
+    
+      const target = document.elementFromPoint(
+        pontoTela.x,
+        pontoTela.y
+      );
+    
+      if (target === elemento) {
+        return true;
+      }
     }
-
-    const lambda =
-      ((p4.y - p3.y) * (p4.x - p1.x) +
-        (p3.x - p4.x) * (p4.y - p1.y)) /
-      det;
-
-    const gamma =
-      ((p1.y - p2.y) * (p4.x - p1.x) +
-        (p2.x - p1.x) * (p4.y - p1.y)) /
-      det;
-
-    return (
-      lambda >= 0 &&
-      lambda <= 1 &&
-      gamma >= 0 &&
-      gamma <= 1
-    );
+  
+    return false;
   }
 }
