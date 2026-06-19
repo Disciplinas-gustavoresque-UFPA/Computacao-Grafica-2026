@@ -21,6 +21,7 @@ import {
   refazerMemento,
 } from './core/StateManager.js';
 import { ColorPickerTool } from './tools/ColorPickerTool.js';
+import { Lapis } from './tools/LapisTool.js';
 import { RetanguloTool } from './tools/RetanguloTool.js';
 import { TextoTool } from './tools/TextoTool.js';
 import { exportarDesenho } from './utils/exportHelpers.js';
@@ -36,6 +37,7 @@ import { inicializarMenuInicial } from './core/UIManager.js';
 import { CanvasOriginator } from './core/memento/CanvasOriginator.js';
 import { HistoryCaretaker } from './core/memento/HistoryCaretaker.js';
 import { SvgHistoryObserver } from './core/memento/SvgHistoryObserver.js';
+import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
 
 const svgCanvas = document.getElementById('canvas');
 
@@ -73,6 +75,20 @@ overlayCanvas.style.left = '0';
 overlayCanvas.style.pointerEvents = 'none'; // Coordenado com o principal
 canvasContainer.appendChild(overlayCanvas);
 
+const observer = new MutationObserver((mutations) => {
+  mutations.forEach((mutation) => {
+    if (mutation.attributeName === 'viewBox') {
+      const vb = svgCanvas.getAttribute('viewBox');
+      if (vb) {
+        overlayCanvas.setAttribute('viewBox', vb);
+      } else {
+        overlayCanvas.removeAttribute('viewBox');
+      }
+    }
+  });
+});
+observer.observe(svgCanvas, { attributes: true, attributeFilter: ['viewBox'] });
+
 // Inicializar a classe de seleção visual
 const selecaoVisual = new Selecao(overlayCanvas);
 definirGerenciadorSelecao(selecaoVisual);
@@ -96,11 +112,13 @@ const instanciasFerramentas = {
   edicaoVertices: new NodeEditTool(svgCanvas),
   retangulo: new RetanguloTool(svgCanvas),
   linha: new LinhaTool(svgCanvas),    
+  poligono: new PoligonoPolilinhaTool(svgCanvas),
   elipse: new ElipseTool(svgCanvas),  
   "Conta-gotas": new ColorPickerTool(svgCanvas),
   lupa: new LupaTool(svgCanvas, overlayCanvas),
   texto: new TextoTool(svgCanvas),
   borracha: new BorrachaTool(svgCanvas),
+  lapis: new Lapis(svgCanvas),
 };
 
 /**
@@ -250,6 +268,7 @@ window.addEventListener("keydown", (e) => {
     "r" : "retangulo",
     "e" : "elipse",
     "l" : "linha",
+    "p" : "poligono",
     "t" : "texto",
     "i" : "conta-gotas"
   }
