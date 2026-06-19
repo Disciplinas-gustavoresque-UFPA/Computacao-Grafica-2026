@@ -29,7 +29,7 @@ import { LupaTool } from './tools/LupaTool.js';
 import { inicializarImportadorImagem } from './tools/ImageImporter.js';
 import { inicializarMenuInicial } from './core/UIManager.js';
 import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
-import { inicializarMenuContexto } from './utils/contextMenu.js';
+import { inicializarMenuContexto } from './contextMenu/index.js';
 
 const svgCanvas = document.getElementById('canvas');
 
