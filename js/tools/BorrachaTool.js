@@ -99,25 +99,29 @@ export class BorrachaTool extends ToolBase {
    * Apaga elementos diretamente sob o cursor
    */
   apagarNaPosicao(point) {
-    const elementos = Array.from(this.svgCanvas.children);
-
-    for (const elemento of elementos) {
-      const tag = elemento.tagName?.toLowerCase();
-
-      if (!this.allowedTags.includes(tag)) {
-        continue;
-      }
-
-      const bbox = elemento.getBBox();
-
-      if (
-        point.x >= bbox.x &&
-        point.x <= bbox.x + bbox.width &&
-        point.y >= bbox.y &&
-        point.y <= bbox.y + bbox.height
-      ) {
-        elemento.remove();
-      }
+    const svgPoint = this.svgCanvas.createSVGPoint();
+  
+    svgPoint.x = point.x;
+    svgPoint.y = point.y;
+  
+    const screenPoint = svgPoint.matrixTransform(
+      this.svgCanvas.getScreenCTM()
+    );
+  
+    const elemento = document.elementFromPoint(
+      screenPoint.x,
+      screenPoint.y
+    );
+  
+    const tag = elemento?.tagName?.toLowerCase();
+  
+    if (
+      elemento &&
+      elemento !== this.svgCanvas &&
+      elemento.parentNode === this.svgCanvas &&
+      this.allowedTags.includes(tag)
+    ) {
+      elemento.remove();
     }
   }
 
