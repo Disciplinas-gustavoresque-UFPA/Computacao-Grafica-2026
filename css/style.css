@@ -417,3 +417,14 @@ body {
   background-color: #3a7bc2;
   transform: translateY(-2px);
 }
+
+.dimensoes {
+  /*
+  width: 20px;
+  */
+}
+
+.dimensoes-input {
+  width: 100%;
+  max-width: 80px;
+}

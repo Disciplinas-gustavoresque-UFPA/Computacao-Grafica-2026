@@ -29,6 +29,7 @@ import { LupaTool } from './tools/LupaTool.js';
 import { inicializarImportadorImagem } from './tools/ImageImporter.js';
 import { inicializarMenuInicial } from './core/UIManager.js';
 import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
+import { DimensoesManager } from './core/DimensoesManager.js';
 
 const svgCanvas = document.getElementById('canvas');
 
@@ -83,6 +84,9 @@ observer.observe(svgCanvas, { attributes: true, attributeFilter: ['viewBox'] });
 // Inicializar a classe de seleção visual
 const selecaoVisual = new Selecao(overlayCanvas);
 definirGerenciadorSelecao(selecaoVisual);
+
+// O dimensoes é instanciado aqui pra poder redesenhar a borda azul depois de redimensionar um elemento
+const dimensoesManager = new DimensoesManager(selecaoVisual);
 
 // Instâncias das ferramentas disponíveis com todas as implementações da main
 const instanciasFerramentas = {
@@ -140,6 +144,10 @@ inputCorBorda.addEventListener('input', () => {
 svgCanvas.addEventListener('mousedown', (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseDown(evento);
+    // Se selecao for a ferramenta ativa, o dimensões vai ser executado
+    if (estado.ferramentaAtual === instanciasFerramentas['selecao']){
+      dimensoesManager.atualizarInputs();
+    } 
   }
 });
 
