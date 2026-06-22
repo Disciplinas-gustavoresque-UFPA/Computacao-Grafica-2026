@@ -29,6 +29,8 @@ import { LupaTool } from './tools/LupaTool.js';
 import { inicializarImportadorImagem } from './tools/ImageImporter.js';
 import { inicializarMenuInicial } from './core/UIManager.js';
 import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
+import { CameraSVG } from './core/CameraSVG.js';
+import { obterCoordenadaSVG } from './utils/svgHelpers.js';
 
 const svgCanvas = document.getElementById('canvas');
 
@@ -84,6 +86,9 @@ observer.observe(svgCanvas, { attributes: true, attributeFilter: ['viewBox'] });
 const selecaoVisual = new Selecao(overlayCanvas);
 definirGerenciadorSelecao(selecaoVisual);
 
+// Câmera compartilhada — usada pela LupaTool e pelo atalho Ctrl+Scroll
+const cameraGlobal = new CameraSVG([svgCanvas, overlayCanvas]);
+
 // Instâncias das ferramentas disponíveis com todas as implementações da main
 const instanciasFerramentas = {
   selecao: new SelecaoTool(svgCanvas),
@@ -93,7 +98,7 @@ const instanciasFerramentas = {
   poligono: new PoligonoPolilinhaTool(svgCanvas),
   elipse: new ElipseTool(svgCanvas),  
   "Conta-gotas": new ColorPickerTool(svgCanvas),
-  lupa: new LupaTool(svgCanvas, overlayCanvas),
+  lupa: new LupaTool(svgCanvas, overlayCanvas, cameraGlobal),
   texto: new TextoTool(svgCanvas),
   borracha: new BorrachaTool(svgCanvas),
   lapis: new Lapis(svgCanvas),
@@ -244,5 +249,23 @@ window.addEventListener("keydown", (e) => {
 btnImportarImagem.addEventListener('click', () => {
   inputImagem.click();
 });
+
+// Ctrl + Scroll — Zoom global (funciona com qualquer ferramenta ativa)
+svgCanvas.addEventListener('wheel', (e) => {
+  if (!e.ctrlKey) return;
+  e.preventDefault();
+
+  const coords = obterCoordenadaSVG(e, svgCanvas);
+  const fator = 0.1;
+  const escala = e.deltaY > 0
+    ? 1 + fator   // scroll para baixo = zoom out
+    : 1 - fator;  // scroll para cima  = zoom in
+
+  cameraGlobal.zoom(escala, coords.x, coords.y);
+
+  // Atualiza o indicador de zoom se estiver visível
+  const indicador = document.getElementById('zoom-indicator');
+  if (indicador) indicador.textContent = `Zoom: ${cameraGlobal.getZoomLevel()}%`;
+}, { passive: false });
 
 inicializarImportadorImagem(svgCanvas, inputImagem);
