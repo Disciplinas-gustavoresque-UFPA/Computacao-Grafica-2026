@@ -54,7 +54,7 @@
 
                 <span id="ferramenta-atual-label"
                     >Ferramenta:
-                    <strong id="nome-ferramenta">Nenhuma</strong></span
+                    <strong id="nome-ferramenta">Nenhuma selecionada</strong></span
                 >
 
                 <!-- Botões de Desfazer/Refazer -->
@@ -120,56 +120,64 @@
                     <button
                         class="btn-ferramenta"
                         data-ferramenta="selecao"
-                        title="Seleção (S)"
+                        data-nome="Seleção"
+                        data-tooltip="Seleção (S)"
                     >
                         &#9654;
                     </button>
                     <button
                         class="btn-ferramenta"
                         data-ferramenta="edicaoVertices"
-                        title="Edição por Vértices (E-V)"
+                        data-nome="Edição de Vértices"
+                        data-tooltip="Edição de Vértices (V)"
                     >
                         &#9688;
                     </button>
                     <button
                         class="btn-ferramenta"
                         data-ferramenta="retangulo"
-                        title="Retângulo (R)"
+                        data-nome="Retângulo"
+                        data-tooltip="Retângulo (R)"
                     >
                         &#9645;
                     </button>
                     <button
                         class="btn-ferramenta"
                         data-ferramenta="elipse"
-                        title="Elipse (E)"
+                        data-nome="Elipse"
+                        data-tooltip="Elipse (E)"
                     >
                         &#9711;
                     </button>
                     <button
                         class="btn-ferramenta"
                         data-ferramenta="linha"
-                        title="Linha (L)"
+                        data-nome="Linha"
+                        data-tooltip="Linha (L)"
                     >
                         &#9135;
                     </button>
                     <button
                         class="btn-ferramenta"
                         data-ferramenta="poligono"
-                        title="Polígono Polilinha (P)"
+                        data-nome="Polígono / Polilinha"
+                        data-tooltip="Polígono / Polilinha (G)"
                     >
                         &bowtie;
                     </button>
                     <button
                         class="btn-ferramenta"
                         data-ferramenta="texto"
-                        title="Texto (T)"
+                        data-nome="Texto"
+                        data-tooltip="Texto (T)"
                     >
                         T
                     </button>
                     <button
                         class="btn-ferramenta"
                         data-ferramenta="Conta-gotas"
-                        title="Conta-gotas"
+                        data-nome="Conta-gotas"
+                        data-tooltip="Conta-gotas (I)"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -192,7 +200,12 @@
                             <path d="m2 22 .414-.414" />
                         </svg>
                     </button>
-                    <button class="btn-ferramenta" data-ferramenta="borracha" title="Borracha (B)">
+                    <button 
+                        class="btn-ferramenta" 
+                        data-ferramenta="borracha" 
+                        data-nome="Borracha"
+                        data-tooltip="Borracha (B)"
+                    >
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                         viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2"
@@ -201,11 +214,22 @@
                         </svg>
                     </button>
 
-                    <button class="btn-ferramenta" data-ferramenta="lapis" title="Lápis (P)">
+                    <button 
+                        class="btn-ferramenta" 
+                        data-ferramenta="lapis" 
+                        data-nome="Lápis"
+                        data-tooltip="Lápis (P)"
+                    >
                         &#128393;
                     </button>
 
-                    <button id="btn-zoom-click" class="btn-ferramenta" data-ferramenta="lupa" title="Zoom padrão">
+                    <button 
+                        id="btn-zoom-click" 
+                        class="btn-ferramenta" 
+                        data-ferramenta="lupa" 
+                        data-nome="Zoom"
+                        data-tooltip="Zoom (Z)"
+                    >
                         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
                           viewBox="0 0 24 24" fill="none"
                           stroke="currentColor" stroke-width="2"
@@ -219,10 +243,12 @@
                         </svg>
                       </button>
                       <div id="zoom-options" class="hidden"></div> <!-- Menu de opçoes para a lupa/zoom -->
-                    <button
+                    
+                      <button
                         class="btn-ferramenta"
                         id="btn-importar-imagem"
-                        title="Importar Imagem (Raster)"
+                        data-nome="Importar Imagem"
+                        data-tooltip="Importar Imagem (Shift+I)"
                     >
                         🖼️
                     </button>
