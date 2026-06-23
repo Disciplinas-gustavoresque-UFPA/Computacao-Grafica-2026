@@ -1,17 +1,19 @@
 <!doctype html>
 <html lang="pt-BR">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Editor Vetorial — Computação Gráfica 2026</title>
-        <link rel="stylesheet" href="css/style.css" />
-    </head>
 
-    <body>
-        <div id="tela-inicial">
-            <h1>Editor Vetorial 2026</h1>
-            <nav class="menu-opcoes">
-                <button id="btn-novo-doc" class="btn-menu">Criar novo documento</button>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Editor Vetorial — Computação Gráfica 2026</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js/dist/driver.css">
+</head>
+
+<body>
+    <div id="tela-inicial">
+        <h1>Editor Vetorial 2026</h1>
+        <nav class="menu-opcoes">
+            <button id="btn-novo-doc" class="btn-menu">Criar novo documento</button>
 
                 <div class="grupo-opcao">
                     <label for="select-tamanho" class="propriedade-label">Tamanho da página:</label>
@@ -27,35 +29,23 @@
                     </div>
                 </div>
 
-                <button id="btn-abrir-arq" class="btn-menu">Abrir arquivo</button>
-                <button id="btn-modelos" class="btn-menu">Modelos (templates)</button>
-                <button id="btn-config" class="btn-menu">Configurações</button>
-            </nav>
-        </div>
-        <div id="app" class="oculto">
-            <!-- Painel Superior: propriedades (cor de preenchimento, cor de borda, etc.) -->
-            <header id="painel-propriedades">
-                <span class="propriedade-label">Preenchimento:</span>
-                <input
-                    type="color"
-                    id="cor-preenchimento"
-                    value="#4a90d9"
-                    title="Cor de preenchimento"
-                />
+            <button id="btn-abrir-arq" class="btn-menu">Abrir arquivo</button>
+            <button id="btn-modelos" class="btn-menu">Modelos (templates)</button>
+            <button id="btn-config" class="btn-menu">Configurações</button>
+        </nav>
+    </div>
+    <div id="app" class="oculto">
+        <!-- Painel Superior: propriedades (cor de preenchimento, cor de borda, etc.) -->
+        <header id="painel-propriedades">
+            <span class="propriedade-label">Preenchimento:</span>
+            <input type="color" id="cor-preenchimento" value="#4a90d9" title="Cor de preenchimento" />
 
-                <span class="propriedade-label">Borda:</span>
-                <input
-                    type="color"
-                    id="cor-borda"
-                    value="#1a1a2e"
-                    title="Cor da borda"
-                />
-                <span id="zoom-indicator">Zoom: 100%</span>
+            <span class="propriedade-label">Borda:</span>
+            <input type="color" id="cor-borda" value="#1a1a2e" title="Cor da borda" />
+            <span id="zoom-indicator">Zoom: 100%</span>
 
-                <span id="ferramenta-atual-label"
-                    >Ferramenta:
-                    <strong id="nome-ferramenta">Nenhuma selecionada</strong></span
-                >
+            <span id="ferramenta-atual-label">Ferramenta:
+                <strong id="nome-ferramenta">Nenhuma selecionada</strong></span>
 
                 <!-- Botões de Desfazer/Refazer -->
                 <div class="history-controls">
@@ -73,46 +63,43 @@
                     </button>
                 </div>
 
-                <!-- Controle de Camadas -->
-                <div class="layer-controls">
-                    <button id="btn-send-to-back" title="Enviar para o Fundo" class="btn-layer">⏮</button>
-                    <button id="btn-step-backward" title="Recuar" class="btn-layer">⏪</button>
-                    <button id="btn-step-forward" title="Avançar" class="btn-layer">⏩</button>
-                    <button id="btn-bring-to-front" title="Trazer para a Frente" class="btn-layer">⏭</button>
-                </div>
+            <!-- Controle de Camadas -->
+            <div class="layer-controls">
+                <button id="btn-send-to-back" title="Enviar para o Fundo" class="btn-layer">⏮</button>
+                <button id="btn-step-backward" title="Recuar" class="btn-layer">⏪</button>
+                <button id="btn-step-forward" title="Avançar" class="btn-layer">⏩</button>
+                <button id="btn-bring-to-front" title="Trazer para a Frente" class="btn-layer">⏭</button>
+            </div>
 
-                <!-- Botão de exportar/descarregar desenho -->
-                <label for="export-format" class="propriedade-label"
-                    >Exportar:</label
-                >
-                <div class="select-wrapper">
-                    <select
-                        class="select-format"
-                        id="export-format"
-                        title="Formato de exportação"
-                    >
-                        <option value="png" selected>PNG</option>
-                        <option value="jpg">JPG</option>
-                        <option value="svg">SVG</option>
-                    </select>
+            <!-- Botão de exportar/descarregar desenho -->
+            <button id="btn-primeiros-passos" class="btn-ajuda">
+                <i class="btn-primeiros-passos-i" data-lucide="info"></i>
+                Primeiros Passos
+            </button>
 
-                    <svg
-                        class="select-arrow"
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                        focusable="false"
-                    >
-                        <path d="M7 10l5 5 5-5z" />
-                    </svg>
-                </div>
-                <button
-                    class="btn-exportar"
-                    id="btn-exportar"
-                    title="Salvar/Exportar desenho"
-                >
-                    Baixar 💾
-                </button>
-            </header>
+            <label for="export-format" class="propriedade-label">Exportar:</label>
+            <div class="select-wrapper">
+                <select class="select-format" id="export-format" title="Formato de exportação">
+                    <option value="png" selected>PNG</option>
+                    <option value="jpg">JPG</option>
+                    <option value="svg">SVG</option>
+                </select>
+
+                <svg class="select-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M7 10l5 5 5-5z" />
+                </svg>
+            </div>
+            <button class="cssbuttons-io-button" class="btn-exportar" id="btn-exportar" title="Salvar/Exportar desenho">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                    <path fill="none" d="M0 0h24v24H0z"></path>
+                    <path fill="white"
+                        d="M1 14.5a6.496 6.496 0 0 1 3.064-5.519 8.001 8.001 0 0 1 15.872 0 6.5 6.5 0 0 1-2.936 12L7 21c-3.356-.274-6-3.078-6-6.5zm15.848 4.487a4.5 4.5 0 0 0 2.03-8.309l-.807-.503-.12-.942a6.001 6.001 0 0 0-11.903 0l-.12.942-.805.503a4.5 4.5 0 0 0 2.029 8.309l.173.013h9.35l.173-.013zM13 12h3l-4 5-4-5h3V8h2v4z">
+                    </path>
+                </svg>
+                <span style="color: white;">Baixar</span>
+            </button>
+
+        </header>
 
             <div id="workspace">
                 <!-- Barra Lateral: botões das ferramentas de desenho -->
@@ -222,6 +209,47 @@
                     >
                         &#128393;
                     </button>
+        <div id="workspace">
+            <!-- Barra Lateral: botões das ferramentas de desenho -->
+            <aside id="barra-ferramentas">
+                <!-- FAVOR NAO APAGAR NENHUM ID DOS BOTOES!!! -->
+                <button id="btn-selecionar" class="btn-ferramenta" data-ferramenta="selecao" title="Seleção (S)">
+                    <i data-lucide="mouse-pointer-2"></i>
+                </button>
+
+                <button id="btn-edicao-vertices" class="btn-ferramenta" data-ferramenta="edicaoVertices" title="Edição por Vértices (E-V)">
+                    <i data-lucide="waypoints"></i>
+                </button>
+
+                <button id="btn-criar-retangulo" class="btn-ferramenta" data-ferramenta="retangulo" title="Retângulo (R)">
+                    <i data-lucide="square"></i>
+                </button>
+
+                <button id="btn-criar-elipse" class="btn-ferramenta" data-ferramenta="elipse" title="Elipse (E)">
+                    <i data-lucide="circle"></i>
+                </button>
+
+                <button id="btn-criar-linha" class="btn-ferramenta" data-ferramenta="linha" title="Linha (L)">
+                    <i data-lucide="minus"></i>
+                </button>
+
+                <button id="btn-criar-texto" class="btn-ferramenta" data-ferramenta="texto" title="Texto (T)">
+                    <i data-lucide="type"></i>
+                </button>
+                <button id="btn-pintar" class="btn-ferramenta" data-ferramenta="Conta-gotas" title="Conta-gotas">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-pipette-icon lucide-pipette">
+                        <path d="m12 9-8.414 8.414A2 2 0 0 0 3 18.828v1.344a2 2 0 0 1-.586 1.414A2 2 0 0 1 3.828 21h1.344a2 2 0 0 0 1.414-.586L15 12" />
+                        <path d="m18 9 .4.4a1 1 0 1 1-3 3l-3.8-3.8a1 1 0 1 1 3-3l.4.4 3.4-3.4a1 1 0 1 1 3 3z" />
+                        <path d="m2 22 .414-.414" />
+                    </svg>
+                </button>
+                <button id="btn-borracha" class="btn-ferramenta" data-ferramenta="borracha" title="Borracha (B)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M20 20H7L3 16L14 5L21 12L13 20" />
+                    </svg>
+                </button>
 
                     <button 
                         id="btn-zoom-click" 
@@ -235,50 +263,43 @@
                           stroke="currentColor" stroke-width="2"
                           stroke-linecap="round" stroke-linejoin="round">
 
-                          <!-- lente -->
-                          <circle cx="11" cy="11" r="7"></circle>
-                          <!-- cabo -->
-                          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        <!-- lente -->
+                        <circle cx="11" cy="11" r="7"></circle>
+                        <!-- cabo -->
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
 
-                        </svg>
-                      </button>
-                      <div id="zoom-options" class="hidden"></div> <!-- Menu de opçoes para a lupa/zoom -->
-                    
-                      <button
-                        class="btn-ferramenta"
-                        id="btn-importar-imagem"
-                        data-nome="Importar Imagem"
-                        data-tooltip="Importar Imagem (Shift+I)"
-                    >
-                        🖼️
-                    </button>
-
-                    <input 
-                        type="file" 
-                        id="input-imagem" 
-                        accept="image/png, image/jpeg, image/svg+xml" 
-                        style="display: none;" 
-                    />
-      </aside>
-
-                <!-- Área Central de Desenho -->
-                <main id="area-desenho">
-                    <svg
-                        id="canvas"
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="100%"
-                        height="100%"
-                        aria-label="Área de desenho vetorial"
-                    >
-                        <!-- Os elementos SVG criados pelo usuário serão inseridos aqui -->
                     </svg>
-                </main>
-            </div><!-- /#workspace -->
-        </div><!-- /#app -->
+                </button>
+                <div id="zoom-options" class="hidden"></div> <!-- Menu de opçoes para a lupa/zoom -->
+                    
+                <button class="btn-ferramenta" id="btn-importar-imagem" data-nome="Importar Imagem"
+                        data-tooltip="Importar Imagem (Shift+I)">
+                    🖼️
+                </button>
+
+                <input type="file" id="input-imagem" accept="image/png, image/jpeg, image/svg+xml" style="display: none;" />
+            </aside>
+
+            <!-- Área Central de Desenho -->
+            <main id="area-desenho">
+                <svg id="canvas" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" aria-label="Área de desenho vetorial">
+                    <!-- Os elementos SVG criados pelo usuário serão inseridos aqui -->
+                </svg>
+            </main>
+        </div><!-- /#workspace -->
+    </div><!-- /#app -->
 
 
-  <!-- Ponto de entrada da aplicação: ES6 Module -->
-  <script type="module" src="js/main.js"></script>
+    <!-- Ponto de entrada da aplicação: ES6 Module -->
+    <script type="module" src="js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/driver.js/dist/driver.js.iife.js"></script>
+    <script src="js/tour.js"></script>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+
 </body>
 
 </html>
