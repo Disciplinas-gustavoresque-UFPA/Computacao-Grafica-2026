@@ -1,6 +1,8 @@
 import { ToolBase } from './ToolBase.js';
 import { criarElementoSVG, obterCoordenadaSVG } from '../utils/svgHelpers.js';
 import { estado } from '../core/StateManager.js';
+import { registrarAcaoHistorico } from '../core/StateManager.js';
+import { definirElementosSelecionados } from '../core/StateManager.js';
 
 export class LinhaTool extends ToolBase {
   constructor(svgCanvas) {
@@ -32,5 +34,8 @@ export class LinhaTool extends ToolBase {
   onMouseUp() {
     this.isDrawing = false;
     this.lineElement = null;
+
+    // Integração com o History Manager
+    registrarAcaoHistorico();
   }
 }

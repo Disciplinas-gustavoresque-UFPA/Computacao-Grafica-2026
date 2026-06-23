@@ -208,6 +208,7 @@ body {
   font-size: 18px;
   cursor: pointer;
   transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  position: relative;
 }
 
 .btn-ferramenta:hover {
@@ -221,6 +222,30 @@ body {
   border-color: var(--cor-destaque);
   color: var(--cor-destaque);
   box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.25);
+}
+
+.btn-ferramenta[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%) translateX(-4px);
+  background-color: var(--cor-fundo-painel);
+  color: var(--cor-texto);
+  border: 1px solid var(--cor-destaque);
+  border-radius: var(--raio-borda);
+  padding: 4px 8px;
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 100;
+}
+
+.btn-ferramenta[data-tooltip]:hover::after {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
 }
 
 
@@ -442,4 +467,52 @@ body {
 #btn-novo-doc:hover {
   background-color: #3a7bc2;
   transform: translateY(-2px);
+}
+
+.history-controls {
+    display: flex;
+    gap: 4px;
+    margin-left: 16px;
+    border-left: 1px solid var(--cor-borda-ui);
+    padding-left: 16px;
+}
+
+.btn-history {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid var(--cor-borda-ui);
+    color: var(--cor-texto-secundario);
+    border-radius: var(--raio-borda);
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-history:hover {
+    background-color: rgba(74, 144, 217, 0.2);
+    color: var(--cor-destaque);
+    border-color: var(--cor-destaque);
+}
+
+.btn-history:active {
+    transform: scale(0.95);
+}
+
+/* Indicador visual de que há ação disponível */
+.btn-history:not(:disabled) {
+    color: var(--cor-texto);
+}
+
+.btn-history:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-history:disabled:hover {
+    background-color: transparent;
+    border-color: var(--cor-borda-ui);
+    color: var(--cor-texto-secundario);
 }
