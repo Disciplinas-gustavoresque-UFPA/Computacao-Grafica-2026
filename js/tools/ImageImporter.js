@@ -32,6 +32,9 @@ export function inicializarImportadorImagem(svgCanvas, inputImagem) {
       svgImage.setAttribute('y', '50');
       svgImage.setAttribute('width', '300');
       svgImage.setAttribute('height', '300');
+
+      // O atributo permite a edição estrutural de imagens de forma mais fluida
+      svgImage.setAttribute('preserveAspectRatio', 'none');
       
       // Classe para que a SelecaoTool reconheça o elemento
       svgImage.classList.add('elemento-desenho'); 
