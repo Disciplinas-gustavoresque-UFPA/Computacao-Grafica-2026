@@ -7,12 +7,13 @@
  * - Conectar os botões da barra de ferramentas ao StateManager
  */
 
-import { 
-  estado, 
-  definirFerramenta, 
-  definirCorPreenchimento, 
-  definirCorBorda, 
-  definirGerenciadorSelecao 
+import {
+  estado,
+  definirFerramenta,
+  definirCorPreenchimento,
+  definirCorBorda,
+  definirGerenciadorSelecao,
+  definirElementosSelecionados
 } from './core/StateManager.js';
 import { ColorPickerTool } from './tools/ColorPickerTool.js';
 import { Lapis } from './tools/LapisTool.js';
@@ -89,9 +90,9 @@ const instanciasFerramentas = {
   selecao: new SelecaoTool(svgCanvas),
   edicaoVertices: new NodeEditTool(svgCanvas),
   retangulo: new RetanguloTool(svgCanvas),
-  linha: new LinhaTool(svgCanvas),    
+  linha: new LinhaTool(svgCanvas),
   poligono: new PoligonoPolilinhaTool(svgCanvas),
-  elipse: new ElipseTool(svgCanvas),  
+  elipse: new ElipseTool(svgCanvas),
   "Conta-gotas": new ColorPickerTool(svgCanvas),
   lupa: new LupaTool(svgCanvas, overlayCanvas),
   texto: new TextoTool(svgCanvas),
@@ -217,20 +218,29 @@ window.addEventListener("keydown", (e) => {
 
   if (["input", "textarea", "select"].includes(tagAtiva) || elementoAtivo.isContentEditable)
     return;
-  
+
   const mapaTeclas = {
-    "s" : "selecao",
-    "r" : "retangulo",
-    "e" : "elipse",
-    "l" : "linha",
-    "p" : "poligono",
-    "t" : "texto",
-    "i" : "conta-gotas"
+    "s": "selecao",
+    "r": "retangulo",
+    "e": "elipse",
+    "l": "linha",
+    "p": "poligono",
+    "t": "texto",
+    "i": "conta-gotas"
+  }
+
+  if (e.key === "Delete" || e.key === "Backspace") {
+    if (estado.elementosSelecionados && estado.elementosSelecionados.length > 0) {
+      estado.elementosSelecionados.forEach(el => el.remove());
+      definirElementosSelecionados(null);
+    } else if (estado.elementoSelecionado) {
+      estado.elementoSelecionado.remove();
+    }
   }
 
   const teclaPressionada = e.key.toLowerCase();
   const ferramentaAlvo = mapaTeclas[teclaPressionada];
-  
+
   if (ferramentaAlvo) {
     e.preventDefault();
     const botao = document.querySelector(`.btn-ferramenta[data-ferramenta="${ferramentaAlvo}"]`);
