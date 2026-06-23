@@ -19,6 +19,7 @@ import {
   registrarAcaoHistorico
 } from './core/StateManager.js';
 import { ColorPickerTool } from './tools/ColorPickerTool.js';
+import { Lapis } from './tools/LapisTool.js';
 import { RetanguloTool } from './tools/RetanguloTool.js';
 import { TextoTool } from './tools/TextoTool.js';
 import { exportarDesenho } from './utils/exportHelpers.js';
@@ -31,6 +32,7 @@ import { ElipseTool } from './tools/ElipseTool.js';
 import { LupaTool } from './tools/LupaTool.js';
 import { inicializarImportadorImagem } from './tools/ImageImporter.js';
 import { inicializarMenuInicial } from './core/UIManager.js';
+import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
 import { HistoryManager } from './core/HistoryManager.js';
 
 const svgCanvas = document.getElementById('canvas');
@@ -156,11 +158,13 @@ const instanciasFerramentas = {
   edicaoVertices: new NodeEditTool(svgCanvas),
   retangulo: new RetanguloTool(svgCanvas),
   linha: new LinhaTool(svgCanvas),    
+  poligono: new PoligonoPolilinhaTool(svgCanvas),
   elipse: new ElipseTool(svgCanvas),  
   "Conta-gotas": new ColorPickerTool(svgCanvas),
   lupa: new LupaTool(svgCanvas, overlayCanvas),
   texto: new TextoTool(svgCanvas),
   borracha: new BorrachaTool(svgCanvas),
+  lapis: new Lapis(svgCanvas),
 };
 
 /**
@@ -314,6 +318,7 @@ window.addEventListener("keydown", (e) => {
     "r" : "retangulo",
     "e" : "elipse",
     "l" : "linha",
+    "p" : "poligono",
     "t" : "texto",
     "i" : "conta-gotas"
   }
