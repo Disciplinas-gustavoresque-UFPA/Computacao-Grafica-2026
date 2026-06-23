@@ -225,9 +225,13 @@ window.addEventListener("keydown", (e) => {
     "r" : "retangulo",
     "e" : "elipse",
     "l" : "linha",
-    "p" : "poligono",
+    "g" : "poligono",
+    "p" : "lapis",
     "t" : "texto",
-    "i" : "conta-gotas"
+    "i" : "Conta-gotas",
+    "b" : "borracha",
+    "v" : "edicaoVertices",
+    "z" : "lupa",
   }
 
   const teclaPressionada = e.key.toLowerCase();
