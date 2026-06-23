@@ -131,3 +131,33 @@ export function removerElementoSelecao(elemento) {
 export function definirInterface(novaInterface) {
   estado.interfaceAtual = novaInterface;
 }
+
+let gerenciadorHistorico = null;
+
+/**
+ * Injeta a instância do HistoryManager no estado global.
+ * Chamado apenas uma vez pelo main.js.
+ */
+export function definirGerenciadorHistorico(manager) {
+  gerenciadorHistorico = manager;
+}
+
+/**
+ * Função global para as ferramentas avisarem que o canvas foi alterado.
+ */
+export function registrarAcaoHistorico() {
+  if (gerenciadorHistorico) {
+    gerenciadorHistorico.salvarEstado();
+  }
+}
+
+/**
+ * Funções para os atalhos de teclado (Ctrl+Z / Ctrl+Y) chamarem.
+ */
+export function desfazerAcao() {
+  if (gerenciadorHistorico) gerenciadorHistorico.desfazer();
+}
+
+export function refazerAcao() {
+  if (gerenciadorHistorico) gerenciadorHistorico.refazer();
+}

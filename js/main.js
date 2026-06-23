@@ -12,7 +12,11 @@ import {
   definirFerramenta, 
   definirCorPreenchimento, 
   definirCorBorda, 
-  definirGerenciadorSelecao 
+  definirGerenciadorSelecao,
+  definirGerenciadorHistorico,
+  desfazerAcao,
+  refazerAcao,
+  registrarAcaoHistorico
 } from './core/StateManager.js';
 import { ColorPickerTool } from './tools/ColorPickerTool.js';
 import { Lapis } from './tools/LapisTool.js';
@@ -29,10 +33,13 @@ import { LupaTool } from './tools/LupaTool.js';
 import { inicializarImportadorImagem } from './tools/ImageImporter.js';
 import { inicializarMenuInicial } from './core/UIManager.js';
 import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
-import { CameraSVG } from './core/CameraSVG.js';
-import { obterCoordenadaSVG } from './utils/svgHelpers.js';
+import { HistoryManager } from './core/HistoryManager.js';
 
 const svgCanvas = document.getElementById('canvas');
+
+// Instancia HistoryManager
+const historyManager = new HistoryManager(svgCanvas);
+definirGerenciadorHistorico(historyManager);
 
 // Inicializar a tela de menu inicial
 inicializarMenuInicial(svgCanvas);
@@ -46,6 +53,65 @@ const inputCorBorda = document.getElementById('cor-borda');
 const nomeFerramenta = document.getElementById('nome-ferramenta');
 const btnExportar = document.getElementById('btn-exportar');
 const exportFormat = document.getElementById('export-format');
+
+// Botões de histórico
+const btnDesfazer = document.getElementById('btn-desfazer');
+const btnRefazer = document.getElementById('btn-refazer');
+
+// Função para atualizar o estado dos botões de histórico
+function atualizarBotoesHistorico() {
+    if (!historyManager) return;
+    
+    const podeDesfazer = historyManager.podeDesfazer();
+    const podeRefazer = historyManager.podeRefazer();
+    
+    if (btnDesfazer) {
+        btnDesfazer.disabled = !podeDesfazer;
+        btnDesfazer.title = podeDesfazer ? 'Desfazer (Ctrl+Z)' : 'Nada para desfazer';
+    }
+    
+    if (btnRefazer) {
+        btnRefazer.disabled = !podeRefazer;
+        btnRefazer.title = podeRefazer ? 'Refazer (Ctrl+Y)' : 'Nada para refazer';
+    }
+}
+
+// Sobrescrever o método salvarEstado do historyManager para atualizar os botões
+const salvarEstadoOriginal = historyManager.salvarEstado.bind(historyManager);
+historyManager.salvarEstado = function() {
+    const resultado = salvarEstadoOriginal();
+    atualizarBotoesHistorico();
+    return resultado;
+};
+
+const desfazerOriginal = historyManager.desfazer.bind(historyManager);
+historyManager.desfazer = function() {
+    const resultado = desfazerOriginal();
+    atualizarBotoesHistorico();
+    return resultado;
+};
+
+const refazerOriginal = historyManager.refazer.bind(historyManager);
+historyManager.refazer = function() {
+    const resultado = refazerOriginal();
+    atualizarBotoesHistorico();
+    return resultado;
+};
+
+// Configurar event listeners dos botões de histórico
+if (btnDesfazer) {
+    btnDesfazer.addEventListener('click', () => {
+        desfazerAcao();
+        atualizarBotoesHistorico();
+    });
+}
+
+if (btnRefazer) {
+    btnRefazer.addEventListener('click', () => {
+        refazerAcao();
+        atualizarBotoesHistorico();
+    });
+}
 
 // Wrapper para sincronizar perfeitamente as coordenadas do #canvas com o #overlay-canvas
 const canvasContainer = document.createElement('div');
@@ -86,9 +152,6 @@ observer.observe(svgCanvas, { attributes: true, attributeFilter: ['viewBox'] });
 const selecaoVisual = new Selecao(overlayCanvas);
 definirGerenciadorSelecao(selecaoVisual);
 
-// Câmera compartilhada — usada pela LupaTool e pelo atalho Ctrl+Scroll
-const cameraGlobal = new CameraSVG([svgCanvas, overlayCanvas]);
-
 // Instâncias das ferramentas disponíveis com todas as implementações da main
 const instanciasFerramentas = {
   selecao: new SelecaoTool(svgCanvas),
@@ -98,7 +161,7 @@ const instanciasFerramentas = {
   poligono: new PoligonoPolilinhaTool(svgCanvas),
   elipse: new ElipseTool(svgCanvas),  
   "Conta-gotas": new ColorPickerTool(svgCanvas),
-  lupa: new LupaTool(svgCanvas, overlayCanvas, cameraGlobal),
+  lupa: new LupaTool(svgCanvas, overlayCanvas),
   texto: new TextoTool(svgCanvas),
   borracha: new BorrachaTool(svgCanvas),
   lapis: new Lapis(svgCanvas),
@@ -111,16 +174,14 @@ const instanciasFerramentas = {
  * @param {string} nomeDaFerramenta - Identificador da ferramenta ativa.
  */
 function atualizarBotaoAtivo(nomeDaFerramenta) {
-  let nomeExibivel = 'Nenhuma selecionada';
   botoesFerramenta.forEach((btn) => {
     if (btn.getAttribute('data-ferramenta') === nomeDaFerramenta) {
       btn.classList.add('ativo');
-      nomeExibivel = btn.dataset.nome ?? btn.title ?? nomeDaFerramenta;
     } else {
       btn.classList.remove('ativo');
     }
   });
-  nomeFerramenta.textContent = nomeExibivel;
+  nomeFerramenta.textContent = nomeDaFerramenta || 'Nenhuma';
 }
 
 // --- Barra de Ferramentas & Modos ---
@@ -186,7 +247,11 @@ const btnStepForward = document.getElementById('btn-step-forward');
 const btnBringToFront = document.getElementById('btn-bring-to-front');
 
 function moverCamada(acao) {
-  const el = estado.elementoSelecionado;
+  const elementos = estado.elementosSelecionados;
+  if (!elementos || elementos.length === 0) return;
+  
+  // Move o primeiro elemento selecionado (para simplicidade)
+  const el = elementos[0];
   if (!el) return;
 
   const pai = el.parentNode;
@@ -210,6 +275,9 @@ function moverCamada(acao) {
       pai.appendChild(el);
       break;
   }
+
+  registrarAcaoHistorico();
+  atualizarBotoesHistorico();
 }
 
 btnSendToBack.addEventListener('click', () => moverCamada('fundo'));
@@ -224,28 +292,25 @@ window.addEventListener("keydown", (e) => {
 
   if (["input", "textarea", "select"].includes(tagAtiva) || elementoAtivo.isContentEditable)
     return;
-
-  const teclaPressionada = e.key.toLowerCase();
-
-  // Atalhos com Shift
-  if (e.shiftKey) {
-    if (teclaPressionada === "z") {
+  
+  // Atalhos de teclado para o histórico
+  if (e.ctrlKey || e.metaKey) { // metaKey é o Cmd do Mac
+    if (e.key.toLowerCase() === 'z') {
       e.preventDefault();
-      const btnDrag = document.getElementById('btn-drag');
-      if (btnDrag) {
-        btnDrag.click();
+      if (e.shiftKey) {
+        refazerAcao();
       } else {
-        const botaoZoom = document.querySelector('.btn-ferramenta[data-ferramenta="lupa"]');
-        if (botaoZoom) {
-          botaoZoom.click();
-          setTimeout(() => document.getElementById('btn-drag')?.click(), 0);
-        }
+        desfazerAcao();
       }
-    } else if (teclaPressionada === "i") {
-      e.preventDefault();
-      btnImportarImagem?.click();
+      atualizarBotoesHistorico();
+      return;
     }
-    return;
+    if (e.key.toLowerCase() === 'y') {
+      e.preventDefault();
+      refazerAcao();
+      atualizarBotoesHistorico();
+      return;
+    }
   }
 
   const mapaTeclas = {
@@ -253,17 +318,14 @@ window.addEventListener("keydown", (e) => {
     "r" : "retangulo",
     "e" : "elipse",
     "l" : "linha",
-    "g" : "poligono",
-    "p" : "lapis",
+    "p" : "poligono",
     "t" : "texto",
-    "i" : "Conta-gotas",
-    "b" : "borracha",
-    "v" : "edicaoVertices",
-    "z" : "lupa",
+    "i" : "conta-gotas"
   }
 
+  const teclaPressionada = e.key.toLowerCase();
   const ferramentaAlvo = mapaTeclas[teclaPressionada];
-
+  
   if (ferramentaAlvo) {
     e.preventDefault();
     const botao = document.querySelector(`.btn-ferramenta[data-ferramenta="${ferramentaAlvo}"]`);
@@ -278,22 +340,7 @@ btnImportarImagem.addEventListener('click', () => {
   inputImagem.click();
 });
 
-// Ctrl + Scroll — Zoom global (funciona com qualquer ferramenta ativa)
-svgCanvas.addEventListener('wheel', (e) => {
-  if (!e.ctrlKey) return;
-  e.preventDefault();
-
-  const coords = obterCoordenadaSVG(e, svgCanvas);
-  const fator = 0.1;
-  const escala = e.deltaY > 0
-    ? 1 + fator   // scroll para baixo = zoom out
-    : 1 - fator;  // scroll para cima  = zoom in
-
-  cameraGlobal.zoom(escala, coords.x, coords.y);
-
-  // Atualiza o indicador de zoom se estiver visível
-  const indicador = document.getElementById('zoom-indicator');
-  if (indicador) indicador.textContent = `Zoom: ${cameraGlobal.getZoomLevel()}%`;
-}, { passive: false });
-
 inicializarImportadorImagem(svgCanvas, inputImagem);
+
+// Inicializar o estado dos botões de histórico
+atualizarBotoesHistorico();
