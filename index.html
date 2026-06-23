@@ -105,6 +105,7 @@
                 <!-- Barra Lateral: botões das ferramentas de desenho -->
                 <aside id="barra-ferramentas">
                     <button
+                        id="btn-selecionar"
                         class="btn-ferramenta"
                         data-ferramenta="selecao"
                         data-nome="Seleção"
@@ -113,6 +114,7 @@
                         &#9654;
                     </button>
                     <button
+                        id="btn-edicao-vertices"
                         class="btn-ferramenta"
                         data-ferramenta="edicaoVertices"
                         data-nome="Edição de Vértices"
@@ -121,6 +123,7 @@
                         &#9688;
                     </button>
                     <button
+                        id="btn-criar-retangulo"
                         class="btn-ferramenta"
                         data-ferramenta="retangulo"
                         data-nome="Retângulo"
@@ -129,6 +132,7 @@
                         &#9645;
                     </button>
                     <button
+                        id="btn-criar-elipse"
                         class="btn-ferramenta"
                         data-ferramenta="elipse"
                         data-nome="Elipse"
@@ -137,6 +141,7 @@
                         &#9711;
                     </button>
                     <button
+                        id="btn-criar-linha"
                         class="btn-ferramenta"
                         data-ferramenta="linha"
                         data-nome="Linha"
@@ -145,6 +150,7 @@
                         &#9135;
                     </button>
                     <button
+                        id="btn-criar-polilinha"
                         class="btn-ferramenta"
                         data-ferramenta="poligono"
                         data-nome="Polígono / Polilinha"
@@ -153,6 +159,7 @@
                         &bowtie;
                     </button>
                     <button
+                        id="btn-criar-texto"
                         class="btn-ferramenta"
                         data-ferramenta="texto"
                         data-nome="Texto"
@@ -161,6 +168,7 @@
                         T
                     </button>
                     <button
+                        id="btn-pintar"
                         class="btn-ferramenta"
                         data-ferramenta="Conta-gotas"
                         data-nome="Conta-gotas"
@@ -188,6 +196,7 @@
                         </svg>
                     </button>
                     <button 
+                        id="btn-borracha"
                         class="btn-ferramenta" 
                         data-ferramenta="borracha" 
                         data-nome="Borracha"
@@ -202,6 +211,7 @@
                     </button>
 
                     <button 
+                        id="btn-lapis"
                         class="btn-ferramenta" 
                         data-ferramenta="lapis" 
                         data-nome="Lápis"
@@ -209,47 +219,6 @@
                     >
                         &#128393;
                     </button>
-        <div id="workspace">
-            <!-- Barra Lateral: botões das ferramentas de desenho -->
-            <aside id="barra-ferramentas">
-                <!-- FAVOR NAO APAGAR NENHUM ID DOS BOTOES!!! -->
-                <button id="btn-selecionar" class="btn-ferramenta" data-ferramenta="selecao" title="Seleção (S)">
-                    <i data-lucide="mouse-pointer-2"></i>
-                </button>
-
-                <button id="btn-edicao-vertices" class="btn-ferramenta" data-ferramenta="edicaoVertices" title="Edição por Vértices (E-V)">
-                    <i data-lucide="waypoints"></i>
-                </button>
-
-                <button id="btn-criar-retangulo" class="btn-ferramenta" data-ferramenta="retangulo" title="Retângulo (R)">
-                    <i data-lucide="square"></i>
-                </button>
-
-                <button id="btn-criar-elipse" class="btn-ferramenta" data-ferramenta="elipse" title="Elipse (E)">
-                    <i data-lucide="circle"></i>
-                </button>
-
-                <button id="btn-criar-linha" class="btn-ferramenta" data-ferramenta="linha" title="Linha (L)">
-                    <i data-lucide="minus"></i>
-                </button>
-
-                <button id="btn-criar-texto" class="btn-ferramenta" data-ferramenta="texto" title="Texto (T)">
-                    <i data-lucide="type"></i>
-                </button>
-                <button id="btn-pintar" class="btn-ferramenta" data-ferramenta="Conta-gotas" title="Conta-gotas">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                        class="lucide lucide-pipette-icon lucide-pipette">
-                        <path d="m12 9-8.414 8.414A2 2 0 0 0 3 18.828v1.344a2 2 0 0 1-.586 1.414A2 2 0 0 1 3.828 21h1.344a2 2 0 0 0 1.414-.586L15 12" />
-                        <path d="m18 9 .4.4a1 1 0 1 1-3 3l-3.8-3.8a1 1 0 1 1 3-3l.4.4 3.4-3.4a1 1 0 1 1 3 3z" />
-                        <path d="m2 22 .414-.414" />
-                    </svg>
-                </button>
-                <button id="btn-borracha" class="btn-ferramenta" data-ferramenta="borracha" title="Borracha (B)">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <path d="M20 20H7L3 16L14 5L21 12L13 20" />
-                    </svg>
-                </button>
 
                     <button 
                         id="btn-zoom-click" 
