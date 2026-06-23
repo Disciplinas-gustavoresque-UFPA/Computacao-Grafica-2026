@@ -7,12 +7,12 @@ import { CameraSVG } from '../core/CameraSVG.js';
                   LupaTool
 ============================================ */
 export class LupaTool extends ToolBase {
-  constructor(svg, overlaySvg) {
+  constructor(svg, overlaySvg, camera = null) {
     super();
 
     this.svg = svg;
     this.overlaySvg = overlaySvg;
-    this.camera = new CameraSVG([svg,overlaySvg]);
+    this.camera = camera || new CameraSVG([svg, overlaySvg]);
 
     this.modo = 'click'; // zoom padrão do inkscape
 
