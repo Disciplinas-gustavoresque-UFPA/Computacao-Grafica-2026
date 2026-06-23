@@ -75,7 +75,8 @@ export class LupaTool extends ToolBase {
     panel.innerHTML = `
       <button
         id="btn-drag"
-        title="Zoom por seleção">
+        class="btn-ferramenta"
+        data-tooltip="Zoom por Seleção (Shift+Z)">
 
         <svg 
           xmlns="http://www.w3.org/2000/svg"
