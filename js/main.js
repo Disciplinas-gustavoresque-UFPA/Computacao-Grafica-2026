@@ -33,6 +33,9 @@ import { LupaTool } from './tools/LupaTool.js';
 import { inicializarImportadorImagem } from './tools/ImageImporter.js';
 import { inicializarMenuInicial } from './core/UIManager.js';
 import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
+import { PincelTool } from './tools/PincelTool.js';
+import { CameraSVG } from './core/CameraSVG.js';
+import { obterCoordenadaSVG } from './utils/svgHelpers.js';
 import { HistoryManager } from './core/HistoryManager.js';
 
 const svgCanvas = document.getElementById('canvas');
@@ -153,6 +156,7 @@ const selecaoVisual = new Selecao(overlayCanvas);
 definirGerenciadorSelecao(selecaoVisual);
 
 // Instâncias das ferramentas disponíveis com todas as implementações da main
+const cameraGlobal = new CameraSVG([svgCanvas, overlayCanvas]);
 const instanciasFerramentas = {
   selecao: new SelecaoTool(svgCanvas),
   edicaoVertices: new NodeEditTool(svgCanvas),
@@ -161,10 +165,11 @@ const instanciasFerramentas = {
   poligono: new PoligonoPolilinhaTool(svgCanvas),
   elipse: new ElipseTool(svgCanvas),  
   "Conta-gotas": new ColorPickerTool(svgCanvas),
-  lupa: new LupaTool(svgCanvas, overlayCanvas),
+  lupa: new LupaTool(svgCanvas, overlayCanvas, cameraGlobal),
   texto: new TextoTool(svgCanvas),
   borracha: new BorrachaTool(svgCanvas),
   lapis: new Lapis(svgCanvas),
+  pincel: new PincelTool(svgCanvas),
 };
 
 /**
@@ -344,3 +349,17 @@ inicializarImportadorImagem(svgCanvas, inputImagem);
 
 // Inicializar o estado dos botões de histórico
 atualizarBotoesHistorico();
+
+// Ctrl + Scroll — Zoom global (funciona com qualquer ferramenta ativa)
+svgCanvas.addEventListener('wheel', (e) => {
+  if (!e.ctrlKey) return;
+  e.preventDefault();
+
+  const coords = obterCoordenadaSVG(e, svgCanvas);
+  const fator = 0.1;
+  const escala = e.deltaY > 0
+    ? 1 + fator   // scroll para baixo = zoom out
+    : 1 - fator;  // scroll para cima  = zoom in
+
+  cameraGlobal.zoom(escala, coords.x, coords.y);
+}, { passive: false });
