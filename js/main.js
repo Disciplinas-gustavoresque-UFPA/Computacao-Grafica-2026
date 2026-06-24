@@ -34,6 +34,7 @@ import { inicializarImportadorImagem } from './tools/ImageImporter.js';
 import { inicializarMenuInicial } from './core/UIManager.js';
 import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
 import { HistoryManager } from './core/HistoryManager.js';
+import { agruparElementos, desagruparElementos } from './core/GroupManager.js';
 
 const svgCanvas = document.getElementById('canvas');
 
@@ -295,6 +296,16 @@ window.addEventListener("keydown", (e) => {
   
   // Atalhos de teclado para o histórico
   if (e.ctrlKey || e.metaKey) { // metaKey é o Cmd do Mac
+    if (e.key.toLowerCase() === 'g') {
+      e.preventDefault(); // Impede o navegador de tentar buscar (find)
+      if (e.shiftKey) {
+        desagruparElementos();
+      } else {
+        agruparElementos();
+      }
+      atualizarBotoesHistorico(); // Sincroniza a interface de histórico
+      return;
+    }
     if (e.key.toLowerCase() === 'z') {
       e.preventDefault();
       if (e.shiftKey) {
