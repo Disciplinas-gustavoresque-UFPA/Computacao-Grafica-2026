@@ -70,11 +70,19 @@ export class CuboTool extends ToolBase {
   _coordenadasSVG(evento) {
     const rect = this.canvas.getBoundingClientRect();
     const vb = this.canvas.viewBox.baseVal;
-    const scaleX = vb.width  ? vb.width  / rect.width  : 1;
-    const scaleY = vb.height ? vb.height / rect.height : 1;
+
+    // Se não há viewBox, usa as dimensões físicas do elemento
+    const width  = vb && vb.width  ? vb.width  : rect.width;
+    const height = vb && vb.height ? vb.height : rect.height;
+    const originX = vb ? vb.x : 0;
+    const originY = vb ? vb.y : 0;
+
+    const scaleX = width  / rect.width;
+    const scaleY = height / rect.height;
+
     return {
-      x: (evento.clientX - rect.left) * scaleX + vb.x,
-      y: (evento.clientY - rect.top)  * scaleY + vb.y,
+        x: (evento.clientX - rect.left) * scaleX + originX,
+        y: (evento.clientY - rect.top)  * scaleY + originY,
     };
   }
 
