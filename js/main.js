@@ -248,27 +248,27 @@ window.addEventListener("keydown", (e) => {
   }
 });
 
-  // --- Duplicar elemento ---
-  function handlerDuplicar() {
-    const el = estado.elementosSelecionados[0];
-    if (el) {
-      const clone = duplicarElemento(el, svgCanvas);
-      if (clone) {
-        definirElementosSelecionados(clone);
-      }
+// --- Duplicar elemento ---
+function handlerDuplicar() {
+  const el = estado.elementosSelecionados[0];
+  if (el) {
+    const clone = duplicarElemento(el, svgCanvas);
+    if (clone) {
+      definirElementosSelecionados(clone);
     }
   }
+}
 
-  document.addEventListener('keydown', (evento) => {
-    if ((evento.ctrlKey || evento.metaKey) && evento.key.toLowerCase() === 'd') {
-      evento.preventDefault();
-      handlerDuplicar();
-    }
-  });
+document.addEventListener('keydown', (evento) => {
+  if ((evento.ctrlKey || evento.metaKey) && evento.key.toLowerCase() === 'd') {
+    evento.preventDefault();
+    handlerDuplicar();
+  }
+});
 
-  // Importação de imagens
-  btnImportarImagem.addEventListener('click', () => {
-    inputImagem.click();
-  });
+// Importação de imagens
+btnImportarImagem.addEventListener('click', () => {
+  inputImagem.click();
+});
 
-  inicializarImportadorImagem(svgCanvas, inputImagem);
+inicializarImportadorImagem(svgCanvas, inputImagem);
