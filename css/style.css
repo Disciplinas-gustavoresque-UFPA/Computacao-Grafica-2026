@@ -12,8 +12,6 @@
   --cor-borda-ui: #2a2a4e;
   --altura-painel-superior: 48px;
   --largura-barra-lateral: 56px;
-  --largura-painel-direito: 200px;
-  --largura-painel-handle: 16px;
   --raio-borda: 6px;
   --sombra-padrao: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
@@ -226,281 +224,6 @@ body {
   box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.25);
 }
 
-/* =========================================================
-   Painel Lateral Direito
-   ========================================================= */
-#painel-direito {
-  display: flex;
-  flex-direction: row;
-  width: calc(var(--largura-painel-direito) + var(--largura-painel-handle));
-  background-color: var(--cor-fundo-barra);
-  border-left: 1px solid var(--cor-borda-ui);
-  box-shadow: var(--sombra-padrao);
-  flex-shrink: 0;
-  z-index: 5;
-  transition: width 0.25s ease;
-  overflow: hidden;
-}
-
-#painel-direito.collapsed {
-  width: var(--largura-painel-handle);
-}
-
-#painel-direito.collapsed .painel-direito-corpo {
-  display: none;
-}
-
-/* Handle: alça vertical sempre visível na borda esquerda do painel */
-.painel-direito-handle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--largura-painel-handle);
-  flex-shrink: 0;
-  background-color: rgba(0, 0, 0, 0.25);
-  border: none;
-  border-right: 1px solid var(--cor-borda-ui);
-  color: var(--cor-texto-secundario);
-  cursor: pointer;
-  padding: 0;
-  transition: background-color 0.2s, color 0.2s;
-}
-
-.painel-direito-handle:hover {
-  background-color: var(--cor-destaque);
-  color: #fff;
-}
-
-.painel-direito-handle-icon {
-  font-size: 10px;
-  line-height: 1;
-  display: inline-block;
-  transition: transform 0.2s ease;
-}
-
-#painel-direito.collapsed .painel-direito-handle-icon {
-  transform: rotate(180deg);
-}
-
-.painel-direito-corpo {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-}
-
-.painel-direito-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--cor-borda-ui);
-  flex-shrink: 0;
-  background-color: rgba(0, 0, 0, 0.18);
-}
-
-.painel-direito-titulo {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: var(--cor-texto);
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.painel-direito-conteudo {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 10px;
-  overflow-y: auto;
-  flex: 1;
-}
-
-.painel-direito-section {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 10px;
-  border-radius: var(--raio-borda);
-  background-color: rgba(0, 0, 0, 0.18);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-}
-
-.painel-direito-section-header {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding-bottom: 4px;
-  border-bottom: 1px solid var(--cor-borda-ui);
-}
-
-.painel-direito-section-icon {
-  width: 14px;
-  height: 14px;
-  color: var(--cor-destaque);
-  flex-shrink: 0;
-}
-
-.painel-direito-section-titulo {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1.4px;
-  color: var(--cor-texto-secundario);
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-#painel-direito .layer-controls {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4px;
-  margin: 0;
-  border: none;
-  padding: 0;
-}
-
-#painel-direito .layer-controls .btn-layer {
-  width: 100%;
-  text-align: center;
-  padding: 8px 4px;
-  font-size: 14px;
-  background-color: rgba(255, 255, 255, 0.03);
-  border-color: rgba(255, 255, 255, 0.06);
-}
-
-#painel-direito .layer-controls .btn-layer:hover {
-  background-color: rgba(74, 144, 217, 0.15);
-  border-color: var(--cor-destaque);
-  transform: translateY(-1px);
-}
-
-#painel-direito .layer-controls .btn-layer:active {
-  transform: translateY(0) scale(0.96);
-}
-
-#painel-direito .checkbox-externo {
-  font-size: 12px;
-  color: var(--cor-texto-secundario);
-  padding: 4px 2px;
-  user-select: none;
-}
-
-#painel-direito .page-size-controls {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: end;
-  gap: 6px;
-  margin: 0;
-  border: none;
-  padding: 0;
-}
-
-.page-size-field {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.page-size-label {
-  font-size: 9px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--cor-texto-secundario);
-  font-weight: 600;
-  padding-left: 2px;
-}
-
-.page-size-sep {
-  color: var(--cor-texto-secundario);
-  font-size: 12px;
-  padding-bottom: 6px;
-  font-weight: 600;
-}
-
-#painel-direito .input-page-size {
-  width: 100%;
-  min-width: 0;
-  padding: 6px 6px;
-  font-size: 12px;
-  text-align: center;
-  background-color: rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--cor-borda-ui);
-  border-radius: var(--raio-borda);
-  color: var(--cor-texto);
-}
-
-#painel-direito .input-page-size:focus {
-  outline: none;
-  border-color: var(--cor-destaque);
-  box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.2);
-}
-
-#painel-direito .btn-layer {
-  width: 100%;
-  text-align: center;
-  padding: 8px 10px;
-  background-color: rgba(255, 255, 255, 0.03);
-  border-color: rgba(255, 255, 255, 0.06);
-}
-
-#painel-direito .btn-layer:hover {
-  background-color: rgba(74, 144, 217, 0.15);
-  border-color: var(--cor-destaque);
-  transform: translateY(-1px);
-}
-
-#painel-direito .btn-layer:active {
-  transform: translateY(0) scale(0.98);
-}
-
-#painel-direito .select-format {
-  font-size: 12px;
-  padding: 8px 28px 8px 10px;
-  background-color: rgba(0, 0, 0, 0.3);
-  border-color: rgba(255, 255, 255, 0.08);
-}
-
-#painel-direito .select-format:hover {
-  border-color: var(--cor-destaque);
-}
-
-#painel-direito .select-format:focus {
-  border-color: var(--cor-destaque);
-  box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.2);
-}
-
-#painel-direito .btn-exportar {
-  padding: 9px 12px;
-  font-size: 12px;
-  font-weight: 600;
-  background-color: var(--cor-destaque);
-  color: #fff;
-  border: 1px solid var(--cor-destaque);
-  border-radius: var(--raio-borda);
-  box-shadow: none;
-  transition: all 0.2s ease;
-}
-
-#painel-direito .btn-exportar:hover {
-  background-color: #5aa0e9;
-  border-color: #5aa0e9;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(74, 144, 217, 0.3);
-}
-
-#painel-direito .btn-exportar:active {
-  transform: translateY(0);
-  background-color: #3a7bc2;
-}
-
-.sidebar-full {
-  width: 100%;
-}
-
-/* Tooltips para botões da barra de ferramentas */
 .btn-ferramenta[data-tooltip]::after {
   content: attr(data-tooltip);
   position: absolute;
@@ -525,6 +248,7 @@ body {
   transform: translateY(-50%) translateX(0);
 }
 
+
 /* =========================================================
    Área Exportação
    ========================================================= */
@@ -540,9 +264,9 @@ body {
 }
 
 .select-format {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
 
   height: 36px;
   padding: 0 36px 0 12px;
@@ -599,7 +323,7 @@ body {
 
 #canvas {
   display: block;
-  background-color: #2a2a3e;
+  background-color: var(--cor-fundo-canvas);
   border-radius: var(--raio-borda);
   box-shadow: var(--sombra-padrao);
   cursor: crosshair;
@@ -745,50 +469,6 @@ body {
   transform: translateY(-2px);
 }
 
-/* =========================================================
-   Controles de Área da Página
-   ========================================================= */
-.checkbox-externo {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.checkbox-externo input[type="checkbox"] {
-  accent-color: var(--cor-destaque);
-  cursor: pointer;
-}
-
-.page-size-controls {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-left: 8px;
-  border-left: 1px solid var(--cor-borda-ui);
-  padding-left: 12px;
-}
-
-.input-page-size {
-  width: 60px;
-  padding: 4px 6px;
-  border: 1px solid var(--cor-borda-ui);
-  border-radius: var(--raio-borda);
-  background: rgba(0, 0, 0, 0.3);
-  color: var(--cor-texto);
-  font-size: 12px;
-  text-align: center;
-}
-
-.input-page-size:focus {
-  outline: none;
-  border-color: var(--cor-destaque);
-}
-
-/* =========================================================
-   Controles de Histórico (Undo/Redo)
-   ========================================================= */
 .history-controls {
     display: flex;
     gap: 4px;
