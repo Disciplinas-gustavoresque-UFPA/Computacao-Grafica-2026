@@ -7,11 +7,11 @@
  * - Conectar os botões da barra de ferramentas ao StateManager
  */
 
-import {
-  estado,
-  definirFerramenta,
-  definirCorPreenchimento,
-  definirCorBorda,
+import { 
+  estado, 
+  definirFerramenta, 
+  definirCorPreenchimento, 
+  definirCorBorda, 
   definirGerenciadorSelecao,
   definirElementosSelecionados
 } from './core/StateManager.js';
@@ -68,6 +68,7 @@ overlayCanvas.style.left = '0';
 overlayCanvas.style.pointerEvents = 'none'; // Coordenado com o principal
 canvasContainer.appendChild(overlayCanvas);
 
+// Sincronizar viewBox entre canvas principal e overlay quando necessário
 const observer = new MutationObserver((mutations) => {
   mutations.forEach((mutation) => {
     if (mutation.attributeName === 'viewBox') {
@@ -188,23 +189,23 @@ function moverCamada(acao) {
   if (!pai) return;
 
   switch (acao) {
-      case 'fundo':
-        pai.prepend(el);
-        break;
-      case 'recuar':
-        if (el.previousElementSibling) {
-          el.previousElementSibling.before(el);
-        }
-        break;
-      case 'avancar':
-        if (el.nextElementSibling) {
-          el.nextElementSibling.after(el);
-        }
-        break;
-      case 'frente':
-        pai.appendChild(el);
-        break;
-    }
+    case 'fundo':
+      pai.prepend(el);
+      break;
+    case 'recuar':
+      if (el.previousElementSibling) {
+        el.previousElementSibling.before(el);
+      }
+      break;
+    case 'avancar':
+      if (el.nextElementSibling) {
+        el.nextElementSibling.after(el);
+      }
+      break;
+    case 'frente':
+      pai.appendChild(el);
+      break;
+  }
 
     // TODO: Registrar ação no HistoryManager (Issue #10)
   }
@@ -237,23 +238,17 @@ function moverCamada(acao) {
       "i" : "conta-gotas"
     }
 
-    const teclaPressionada = e.key.toLowerCase();
-    const ferramentaAlvo = mapaTeclas[teclaPressionada];
-
-    // Adicionar e feedback visual
-    if (ferramentaAlvo) {
-      e.preventDefault();
-
-      // Buscar o botão na barra lateral
-      const botao = document.querySelector(`.btn-ferramenta[data-ferramenta="${ferramentaAlvo}"]`);
-
-      if (botao) {
-        // Simular click para utilizar o eventListener que chama `atualizarBotaoAtivo()`
-        // e aplica a classe CSS '.ativo' de forma automática.
-        botao.click();
-      }
+  const teclaPressionada = e.key.toLowerCase();
+  const ferramentaAlvo = mapaTeclas[teclaPressionada];
+  
+  if (ferramentaAlvo) {
+    e.preventDefault();
+    const botao = document.querySelector(`.btn-ferramenta[data-ferramenta="${ferramentaAlvo}"]`);
+    if (botao) {
+      botao.click();
     }
-  });
+  }
+});
 
   // --- Duplicar elemento ---
   function handlerDuplicar() {
