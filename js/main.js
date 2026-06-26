@@ -34,6 +34,7 @@ import { inicializarImportadorImagem } from './tools/ImageImporter.js';
 import { inicializarMenuInicial } from './core/UIManager.js';
 import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
 import { HistoryManager } from './core/HistoryManager.js';
+import { CuboTool } from './tools/CuboTool.js';
 
 const svgCanvas = document.getElementById('canvas');
 
@@ -165,6 +166,7 @@ const instanciasFerramentas = {
   texto: new TextoTool(svgCanvas),
   borracha: new BorrachaTool(svgCanvas),
   lapis: new Lapis(svgCanvas),
+  cubo: new CuboTool(svgCanvas),
 };
 
 /**
