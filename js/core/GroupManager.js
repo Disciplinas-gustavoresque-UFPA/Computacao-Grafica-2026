@@ -51,7 +51,53 @@ export function agruparElementos() {
 }
 
 /**
- * Desagrupa os elementos, removendo a tag <g> selecionada
+ * Aplica o deslocamento do grupo (dx, dy) diretamente nas coordenadas 
+ * do elemento filho para preservar sua posição visual.
+ */
+function aplicarTranslacaoAoFilho(el, dx, dy) {
+    if (dx === 0 && dy === 0) return;
+
+    const tag = el.tagName.toLowerCase();
+
+    // Repassa o valor diretamente para as propriedades primitivas
+    if (tag === 'rect' || tag === 'text' || tag === 'image') {
+        el.setAttribute('x', String(parseFloat(el.getAttribute('x') || 0) + dx));
+        el.setAttribute('y', String(parseFloat(el.getAttribute('y') || 0) + dy));
+    } else if (tag === 'circle' || tag === 'ellipse') {
+        el.setAttribute('cx', String(parseFloat(el.getAttribute('cx') || 0) + dx));
+        el.setAttribute('cy', String(parseFloat(el.getAttribute('cy') || 0) + dy));
+    } else if (tag === 'line') {
+        el.setAttribute('x1', String(parseFloat(el.getAttribute('x1') || 0) + dx));
+        el.setAttribute('y1', String(parseFloat(el.getAttribute('y1') || 0) + dy));
+        el.setAttribute('x2', String(parseFloat(el.getAttribute('x2') || 0) + dx));
+        el.setAttribute('y2', String(parseFloat(el.getAttribute('y2') || 0) + dy));
+    } else if (tag === 'path' || tag === 'g') {
+        // Para path e subgrupos, usamos a API nativa do SVG (igual na SelecaoTool)
+        const transformList = el.transform.baseVal;
+        let translateItem = null;
+
+        for (let i = 0; i < transformList.numberOfItems; i++) {
+            const item = transformList.getItem(i);
+            if (item.type === SVGTransform.SVG_TRANSFORM_TRANSLATE) {
+                translateItem = item;
+                break;
+            }
+        }
+
+        if (!translateItem) {
+            const svgRef = el.ownerSVGElement;
+            translateItem = svgRef.createSVGTransform();
+            translateItem.setTranslate(dx, dy);
+            transformList.appendItem(translateItem);
+        } else {
+            // Soma a translação existente com a translação do grupo pai
+            translateItem.setTranslate(translateItem.matrix.e + dx, translateItem.matrix.f + dy);
+        }
+    }
+}
+
+/**
+ * Desagrupa os elementos, repassando o deslocamento visual e removendo a tag <g>
  */
 export function desagruparElementos() {
     const elementos = estado.elementosSelecionados;
@@ -61,29 +107,40 @@ export function desagruparElementos() {
     const novaSelecao = [];
 
     elementos.forEach(el => {
-        // Verifica se o elemento selecionado é de fato um grupo
         if (el.tagName.toLowerCase() === 'g') {
             ocorreuDesagrupamento = true;
             const pai = el.parentNode;
             
-            // Pega todos os filhos de dentro do grupo
+            // 1. Descobre qual foi o deslocamento sofrido pelo grupo
+            let grupoDx = 0;
+            let grupoDy = 0;
+            const transformList = el.transform.baseVal;
+            for (let i = 0; i < transformList.numberOfItems; i++) {
+                const item = transformList.getItem(i);
+                if (item.type === SVGTransform.SVG_TRANSFORM_TRANSLATE) {
+                    grupoDx = item.matrix.e;
+                    grupoDy = item.matrix.f;
+                    break;
+                }
+            }
+            
             const filhos = Array.from(el.childNodes);
             
-            // Move os filhos para fora do grupo (para o mesmo nível hierárquico do <g>)
+            // 2. Move os filhos para fora aplicando o deslocamento
             filhos.forEach(filho => {
+                aplicarTranslacaoAoFilho(filho, grupoDx, grupoDy);
+                
                 pai.insertBefore(filho, el);
-                novaSelecao.push(filho); // Adiciona os filhos soltos na nova seleção
+                novaSelecao.push(filho); 
             });
             
-            // Remove a tag <g> que agora ficou vazia
+            // 3. Remove a tag <g>
             pai.removeChild(el);
         } else {
-            // Se o usuário selecionou algo que não é um grupo, apenas mantém na seleção
             novaSelecao.push(el);
         }
     });
 
-    // Se pelo menos um grupo foi desfeito, atualiza o estado e o histórico
     if (ocorreuDesagrupamento) {
         estado.elementosSelecionados = novaSelecao;
         
