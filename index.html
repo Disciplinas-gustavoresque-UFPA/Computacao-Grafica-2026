@@ -242,55 +242,5 @@
                 </main>
             </div><!-- /#workspace -->
         </div><!-- /#app -->
-
-
-        <!-- Script de colapso do painel direito -->
-        <script>
-            (function() {
-                var STORAGE_KEY = 'painel-direito-collapsed';
-                function init() {
-                    var btn = document.getElementById('btn-toggle-direito');
-                    var panel = document.getElementById('painel-direito');
-                    if (!btn || !panel) return;
-                    var icon = btn.querySelector('.painel-direito-handle-icon');
-
-                    function applyState(collapsed) {
-                        panel.classList.toggle('collapsed', collapsed);
-                        if (icon) icon.textContent = collapsed ? '◀' : '▶';
-                        btn.title = (collapsed ? 'Abrir painel' : 'Fechar painel') + ' (])';
-                        btn.setAttribute('aria-label', btn.title);
-                    }
-
-                    function toggle() {
-                        var collapsed = !panel.classList.contains('collapsed');
-                        applyState(collapsed);
-                        try { localStorage.setItem(STORAGE_KEY, collapsed ? '1' : '0'); } catch (e) {}
-                    }
-
-                    try {
-                        if (localStorage.getItem(STORAGE_KEY) === '1') applyState(true);
-                    } catch (e) {}
-
-                    btn.addEventListener('click', toggle);
-
-                    document.addEventListener('keydown', function(e) {
-                        if (e.key !== ']' || e.ctrlKey || e.metaKey || e.altKey) return;
-                        var t = document.activeElement && document.activeElement.tagName;
-                        if (t === 'INPUT' || t === 'TEXTAREA' || t === 'SELECT') return;
-                        if (document.activeElement && document.activeElement.isContentEditable) return;
-                        e.preventDefault();
-                        toggle();
-                    });
-
-                    window.togglePainelDireito = toggle;
-                }
-                if (document.readyState === 'loading') {
-                    document.addEventListener('DOMContentLoaded', init);
-                } else {
-                    init();
-                }
-            })();
-        </script>
-
         <script type="module" src="js/main.js"></script>
         <script src="https://cdn.jsdelivr.net
