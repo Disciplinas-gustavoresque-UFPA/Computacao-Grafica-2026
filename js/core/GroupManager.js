@@ -107,6 +107,7 @@ export function desagruparElementos() {
     const novaSelecao = [];
 
     elementos.forEach(el => {
+        // Verifica se o elemento selecionado é de fato um grupo
         if (el.tagName.toLowerCase() === 'g') {
             ocorreuDesagrupamento = true;
             const pai = el.parentNode;
@@ -124,6 +125,7 @@ export function desagruparElementos() {
                 }
             }
             
+            // Pega todos os filhos de dentro do grupo
             const filhos = Array.from(el.childNodes);
             
             // 2. Move os filhos para fora aplicando o deslocamento
@@ -131,16 +133,17 @@ export function desagruparElementos() {
                 aplicarTranslacaoAoFilho(filho, grupoDx, grupoDy);
                 
                 pai.insertBefore(filho, el);
-                novaSelecao.push(filho); 
+                novaSelecao.push(filho); // Adiciona os filhos soltos na nova seleção
             });
             
             // 3. Remove a tag <g>
             pai.removeChild(el);
         } else {
-            novaSelecao.push(el);
+            novaSelecao.push(el); // Se o usuário selecionou algo que não é um grupo, apenas mantém na seleção
         }
     });
 
+    // Se pelo menos um grupo foi desfeito, atualiza o estado e o histórico
     if (ocorreuDesagrupamento) {
         estado.elementosSelecionados = novaSelecao;
         
