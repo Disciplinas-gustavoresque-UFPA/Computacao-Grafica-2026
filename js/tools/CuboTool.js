@@ -48,4 +48,91 @@ export class CuboTool extends ToolBase {
     this._renderizarCubo(grupo, this._origem, tamanho, 1.0);
     this.canvas.appendChild(grupo);
   }
+
+  // ── Auxiliares ────────────────────────────────────────────
+
+  _coordenadasSVG(evento) {
+    const rect = this.canvas.getBoundingClientRect();
+    const vb = this.canvas.viewBox.baseVal;
+    const scaleX = vb.width  ? vb.width  / rect.width  : 1;
+    const scaleY = vb.height ? vb.height / rect.height : 1;
+    return {
+      x: (evento.clientX - rect.left) * scaleX + vb.x,
+      y: (evento.clientY - rect.top)  * scaleY + vb.y,
+    };
+  }
+
+  _calcularTamanho(a, b) {
+    return Math.max(Math.abs(b.x - a.x), Math.abs(b.y - a.y));
+  }
+
+  _criarGrupo() {
+    const g = document.createElementNS(NS, 'g');
+    g.setAttribute('class', 'cubo-3d');
+    return g;
+  }
+
+  _limparPreview() {
+    if (this._grupoPreview) {
+      this._grupoPreview.remove();
+      this._grupoPreview = null;
+    }
+  }
+
+  _renderizarCubo(grupo, centro, tamanho, opacidade = 1) {
+    // Limpa o grupo antes de redesenhar (para preview em tempo real)
+    while (grupo.firstChild) grupo.removeChild(grupo.firstChild);
+
+    const vertices3D = getCubeVertices(tamanho);
+    const projOpts = { originX: centro.x, originY: centro.y, scale: 1 };
+
+    // Projeta todos os vértices para 2D
+    const vertices2D = vertices3D.map(v =>
+      projectIsometric(v.x, v.y, v.z, projOpts)
+    );
+
+    // Calcula profundidade de cada face (Painter's Algorithm)
+    const facesOrdenadas = CUBE_FACES
+      .map(face => ({
+        ...face,
+        profundidade: computeFaceDepth(face.indices, vertices3D),
+      }))
+      .sort((a, b) => b.profundidade - a.profundidade); // mais fundo primeiro
+
+    const corBase = '#4a90d9';
+    const corBorda = '#1a1a2e';
+
+    for (const face of facesOrdenadas) {
+      const pts2D = face.indices.map(i => vertices2D[i]);
+
+      // Back-face culling: descarta faces voltadas para trás
+      const normalZ = computeFaceNormalZ(pts2D[0], pts2D[1], pts2D[2]);
+      if (normalZ >= 0) continue;
+
+      const pontosStr = pts2D.map(p => `${p.x.toFixed(2)},${p.y.toFixed(2)}`).join(' ');
+      const brilho = FACE_BRIGHTNESS[face.label] ?? 0.8;
+
+      const poly = document.createElementNS(NS, 'polygon');
+      poly.setAttribute('points', pontosStr);
+      poly.setAttribute('fill', this._ajustarBrilho(corBase, brilho));
+      poly.setAttribute('stroke', corBorda);
+      poly.setAttribute('stroke-width', '1');
+      poly.setAttribute('stroke-linejoin', 'round');
+      poly.setAttribute('opacity', String(opacidade));
+      poly.setAttribute('data-face', face.label);
+
+      grupo.appendChild(poly);
+    }
+  }
+
+  /**
+   * Ajusta o brilho de uma cor hex multiplicando cada canal por `fator`.
+   */
+  _ajustarBrilho(hex, fator) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    const clamp = v => Math.min(255, Math.max(0, Math.round(v * fator)));
+    return `rgb(${clamp(r)}, ${clamp(g)}, ${clamp(b)})`;
+  }
 }
