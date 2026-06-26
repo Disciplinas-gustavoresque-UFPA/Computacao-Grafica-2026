@@ -322,7 +322,8 @@ window.addEventListener("keydown", (e) => {
     "l" : "linha",
     "p" : "poligono",
     "t" : "texto",
-    "i" : "conta-gotas"
+    "i" : "conta-gotas",
+    "3": "cubo"
   }
 
   const teclaPressionada = e.key.toLowerCase();
