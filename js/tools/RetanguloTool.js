@@ -1,6 +1,8 @@
 import { ToolBase } from './ToolBase.js';
 import { criarElementoSVG, obterCoordenadaSVG } from '../utils/svgHelpers.js';
 import { estado } from '../core/StateManager.js';
+import { registrarAcaoHistorico } from '../core/StateManager.js';
+import { definirElementosSelecionados } from '../core/StateManager.js';
 
 /**
  * FerramentaRetangulo
@@ -64,7 +66,8 @@ export class RetanguloTool extends ToolBase {
     this.isDrawing = false;
     this.rectElement = null;
     
-    // TODO: Aqui integraríamos com o HistoryManager.adicionar(estadoAtual) na Issue #10
+    // Integração com o History Manager
+    registrarAcaoHistorico();
   }
 
   onDesativar() {

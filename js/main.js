@@ -13,7 +13,12 @@ import {
   definirCorPreenchimento, 
   definirCorBorda, 
   definirGerenciadorSelecao,
-  definirElementosSelecionados
+  definirElementosSelecionados,
+  definirGerenciadorSelecao,
+  definirGerenciadorHistorico,
+  desfazerAcao,
+  refazerAcao,
+  registrarAcaoHistorico
 } from './core/StateManager.js';
 import { ColorPickerTool } from './tools/ColorPickerTool.js';
 import { Lapis } from './tools/LapisTool.js';
@@ -31,8 +36,13 @@ import { inicializarImportadorImagem } from './tools/ImageImporter.js';
 import { inicializarMenuInicial } from './core/UIManager.js';
 import { duplicarElemento } from './utils/duplicateHelpers.js';
 import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
+import { HistoryManager } from './core/HistoryManager.js';
 
 const svgCanvas = document.getElementById('canvas');
+
+// Instancia HistoryManager
+const historyManager = new HistoryManager(svgCanvas);
+definirGerenciadorHistorico(historyManager);
 
 // Inicializar a tela de menu inicial
 inicializarMenuInicial(svgCanvas);
@@ -46,6 +56,65 @@ const inputCorBorda = document.getElementById('cor-borda');
 const nomeFerramenta = document.getElementById('nome-ferramenta');
 const btnExportar = document.getElementById('btn-exportar');
 const exportFormat = document.getElementById('export-format');
+
+// Botões de histórico
+const btnDesfazer = document.getElementById('btn-desfazer');
+const btnRefazer = document.getElementById('btn-refazer');
+
+// Função para atualizar o estado dos botões de histórico
+function atualizarBotoesHistorico() {
+    if (!historyManager) return;
+    
+    const podeDesfazer = historyManager.podeDesfazer();
+    const podeRefazer = historyManager.podeRefazer();
+    
+    if (btnDesfazer) {
+        btnDesfazer.disabled = !podeDesfazer;
+        btnDesfazer.title = podeDesfazer ? 'Desfazer (Ctrl+Z)' : 'Nada para desfazer';
+    }
+    
+    if (btnRefazer) {
+        btnRefazer.disabled = !podeRefazer;
+        btnRefazer.title = podeRefazer ? 'Refazer (Ctrl+Y)' : 'Nada para refazer';
+    }
+}
+
+// Sobrescrever o método salvarEstado do historyManager para atualizar os botões
+const salvarEstadoOriginal = historyManager.salvarEstado.bind(historyManager);
+historyManager.salvarEstado = function() {
+    const resultado = salvarEstadoOriginal();
+    atualizarBotoesHistorico();
+    return resultado;
+};
+
+const desfazerOriginal = historyManager.desfazer.bind(historyManager);
+historyManager.desfazer = function() {
+    const resultado = desfazerOriginal();
+    atualizarBotoesHistorico();
+    return resultado;
+};
+
+const refazerOriginal = historyManager.refazer.bind(historyManager);
+historyManager.refazer = function() {
+    const resultado = refazerOriginal();
+    atualizarBotoesHistorico();
+    return resultado;
+};
+
+// Configurar event listeners dos botões de histórico
+if (btnDesfazer) {
+    btnDesfazer.addEventListener('click', () => {
+        desfazerAcao();
+        atualizarBotoesHistorico();
+    });
+}
+
+if (btnRefazer) {
+    btnRefazer.addEventListener('click', () => {
+        refazerAcao();
+        atualizarBotoesHistorico();
+    });
+}
 
 // Wrapper para sincronizar perfeitamente as coordenadas do #canvas com o #overlay-canvas
 const canvasContainer = document.createElement('div');
@@ -182,7 +251,11 @@ const btnStepForward = document.getElementById('btn-step-forward');
 const btnBringToFront = document.getElementById('btn-bring-to-front');
 
 function moverCamada(acao) {
-  const el = estado.elementoSelecionado;
+  const elementos = estado.elementosSelecionados;
+  if (!elementos || elementos.length === 0) return;
+  
+  // Move o primeiro elemento selecionado (para simplicidade)
+  const el = elementos[0];
   if (!el) return;
 
   const pai = el.parentNode;
@@ -206,6 +279,9 @@ function moverCamada(acao) {
       pai.appendChild(el);
       break;
   }
+
+  registrarAcaoHistorico();
+  atualizarBotoesHistorico();
 }
 
 btnSendToBack.addEventListener('click', () => moverCamada('fundo'));
@@ -223,9 +299,27 @@ window.addEventListener("keydown", (e) => {
   // Se o foco estiver em um input, textArea, select ou contentEditable, ignora o atalho.
   if (["input", "textarea", "select"].includes(tagAtiva) || elementoAtivo.isContentEditable)
     return;
+  
+  // Atalhos de teclado para o histórico
+  if (e.ctrlKey || e.metaKey) { // metaKey é o Cmd do Mac
+    if (e.key.toLowerCase() === 'z') {
+      e.preventDefault();
+      if (e.shiftKey) {
+        refazerAcao();
+      } else {
+        desfazerAcao();
+      }
+      atualizarBotoesHistorico();
+      return;
+    }
+    if (e.key.toLowerCase() === 'y') {
+      e.preventDefault();
+      refazerAcao();
+      atualizarBotoesHistorico();
+      return;
+    }
+  }
 
-  // Mapeamento das teclas
-  // Observação: o nome do data-ferramenta para o conta-gotas no HTML é "Conta-gotas"
   const mapaTeclas = {
     "s" : "selecao",
     "r" : "retangulo",
@@ -272,3 +366,6 @@ btnImportarImagem.addEventListener('click', () => {
 });
 
 inicializarImportadorImagem(svgCanvas, inputImagem);
+
+// Inicializar o estado dos botões de histórico
+atualizarBotoesHistorico();
