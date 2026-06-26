@@ -12,3 +12,19 @@ export function projectIsometric(x, y, z, { originX = 0, originY = 0, scale = 1 
   const screenY = originY + (x + z) * Math.sin(angle) * scale - y * scale;
   return { x: screenX, y: screenY };
 }
+
+/**
+ * Projeta um vértice 3D para coordenadas 2D usando projeção em perspectiva.
+ * @param {number} x
+ * @param {number} y
+ * @param {number} z
+ * @param {{ originX, originY, scale, fov }} opts
+ * @returns {{ x: number, y: number }}
+ */
+export function projectPerspective(x, y, z, { originX = 0, originY = 0, scale = 1, fov = 500 } = {}) {
+  const depth = fov / (fov + z * scale);
+  return {
+    x: originX + x * scale * depth,
+    y: originY - y * scale * depth,
+  };
+}
