@@ -134,6 +134,7 @@ export function definirInterface(novaInterface) {
 }
 
 let callbackRecalculo = null;
+let gerenciadorHistorico = null;
 
 /**
  * Define a área da página (região imprimível/exportável).
@@ -145,6 +146,23 @@ export function definirAreaPagina(area) {
   estado.areaPagina = { ...area };
   if (typeof callbackRecalculo === 'function') {
     callbackRecalculo();
+  }
+}
+
+/**
+ * Injeta a instância do HistoryManager no estado global.
+ * Chamado apenas uma vez pelo main.js.
+ */
+export function definirGerenciadorHistorico(manager) {
+  gerenciadorHistorico = manager;
+}
+
+/**
+ * Função global para as ferramentas avisarem que o canvas foi alterado.
+ */
+export function registrarAcaoHistorico() {
+  if (gerenciadorHistorico) {
+    gerenciadorHistorico.salvarEstado();
   }
 }
 
@@ -162,4 +180,15 @@ export function obterAreaPagina() {
  */
 export function onAreaPaginaMudou(cb) {
   callbackRecalculo = cb;
+}
+
+/**
+ * Funções para os atalhos de teclado (Ctrl+Z / Ctrl+Y) chamarem.
+ */
+export function desfazerAcao() {
+  if (gerenciadorHistorico) gerenciadorHistorico.desfazer();
+}
+
+export function refazerAcao() {
+  if (gerenciadorHistorico) gerenciadorHistorico.refazer();
 }
