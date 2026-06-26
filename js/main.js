@@ -92,9 +92,9 @@ const instanciasFerramentas = {
   selecao: new SelecaoTool(svgCanvas),
   edicaoVertices: new NodeEditTool(svgCanvas),
   retangulo: new RetanguloTool(svgCanvas),
-  linha: new LinhaTool(svgCanvas),
+  linha: new LinhaTool(svgCanvas),    
   poligono: new PoligonoPolilinhaTool(svgCanvas),
-  elipse: new ElipseTool(svgCanvas),
+  elipse: new ElipseTool(svgCanvas),  
   "Conta-gotas": new ColorPickerTool(svgCanvas),
   lupa: new LupaTool(svgCanvas, overlayCanvas),
   texto: new TextoTool(svgCanvas),
@@ -206,37 +206,35 @@ function moverCamada(acao) {
       pai.appendChild(el);
       break;
   }
+}
 
-    // TODO: Registrar ação no HistoryManager (Issue #10)
+btnSendToBack.addEventListener('click', () => moverCamada('fundo'));
+btnStepBackward.addEventListener('click', () => moverCamada('recuar'));
+btnStepForward.addEventListener('click', () => moverCamada('avancar'));
+btnBringToFront.addEventListener('click', () => moverCamada('frente'));
+
+// Atalhos de Teclado (Tool Selection)
+window.addEventListener("keydown", (e) => {
+  // Prevenção de conflitos
+  // Verifica se o usuário está focado em um campo de texto ou input de cor.
+  const elementoAtivo = document.activeElement;
+  const tagAtiva = elementoAtivo.tagName.toLocaleLowerCase();
+
+  // Se o foco estiver em um input, textArea, select ou contentEditable, ignora o atalho.
+  if (["input", "textarea", "select"].includes(tagAtiva) || elementoAtivo.isContentEditable)
+    return;
+
+  // Mapeamento das teclas
+  // Observação: o nome do data-ferramenta para o conta-gotas no HTML é "Conta-gotas"
+  const mapaTeclas = {
+    "s" : "selecao",
+    "r" : "retangulo",
+    "e" : "elipse",
+    "l" : "linha",
+    "p" : "poligono",
+    "t" : "texto",
+    "i" : "conta-gotas"
   }
-
-  if (btnSendToBack) btnSendToBack.addEventListener('click', () => moverCamada('fundo'));
-  if (btnStepBackward) btnStepBackward.addEventListener('click', () => moverCamada('recuar'));
-  if (btnStepForward) btnStepForward.addEventListener('click', () => moverCamada('avancar'));
-  if (btnBringToFront) btnBringToFront.addEventListener('click', () => moverCamada('frente'));
-
-  // Atalhos de Teclado (Tool Selection)
-  window.addEventListener("keydown", (e) => {
-    // Prevenção de conflitos
-    // Verifica se o usuário está focado em um campo de texto ou input de cor.
-    const elementoAtivo = document.activeElement;
-    const tagAtiva = elementoAtivo.tagName.toLocaleLowerCase();
-
-    // Se o foco estiver em um input, textArea, select ou contentEditable, ignora o atalho.
-    if (["input", "textarea", "select"].includes(tagAtiva) || elementoAtivo.isContentEditable)
-      return;
-
-    // Mapeamento das teclas
-    // Observação: o nome do data-ferramenta para o conta-gotas no HTML é "Conta-gotas"
-    const mapaTeclas = {
-      "s" : "selecao",
-      "r" : "retangulo",
-      "e" : "elipse",
-      "l" : "linha",
-      "p" : "poligono",
-      "t" : "texto",
-      "i" : "conta-gotas"
-    }
 
   const teclaPressionada = e.key.toLowerCase();
   const ferramentaAlvo = mapaTeclas[teclaPressionada];
