@@ -28,3 +28,17 @@ export function projectPerspective(x, y, z, { originX = 0, originY = 0, scale = 
     y: originY - y * scale * depth,
   };
 }
+
+/**
+ * Calcula a normal de uma face a partir de 3 vértices projetados (2D).
+ * Retorna o componente Z do produto vetorial — se negativo, a face está voltada para a câmera.
+ * @param {{ x, y }} p0
+ * @param {{ x, y }} p1
+ * @param {{ x, y }} p2
+ * @returns {number}
+ */
+export function computeFaceNormalZ(p0, p1, p2) {
+  const ax = p1.x - p0.x, ay = p1.y - p0.y;
+  const bx = p2.x - p0.x, by = p2.y - p0.y;
+  return ax * by - ay * bx; // Z do produto vetorial
+}
