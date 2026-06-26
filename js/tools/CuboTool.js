@@ -1,3 +1,19 @@
+import { ToolBase } from './ToolBase.js';
+import { getCubeVertices, CUBE_FACES } from '../shape/CuboShape.js';
+import { projectIsometric, computeFaceNormalZ, computeFaceDepth } from '../core/Projection3D.js';
+
+const NS = 'http://www.w3.org/2000/svg';
+
+// Mapa de luminosidade por face — simula iluminação direcional simples
+const FACE_BRIGHTNESS = {
+  frente:    1.00,
+  direita:   0.85,
+  esquerda:  0.70,
+  topo:      0.95,
+  fundo:     0.55,
+  'trás':    0.65,
+};
+
 export class CuboTool extends ToolBase {
   constructor(svgCanvas) {
     super();
