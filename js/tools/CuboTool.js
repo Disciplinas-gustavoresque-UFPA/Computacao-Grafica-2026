@@ -6,4 +6,13 @@ export class CuboTool extends ToolBase {
     this._origem = null;       // ponto onde o mousedown ocorreu
     this._grupoPreview = null; // <g> temporário mostrado durante o drag
   }
+
+  onAtivar() {
+    this.canvas.style.cursor = 'crosshair';
+  }
+
+  onDesativar() {
+    this.canvas.style.cursor = 'default';
+    this._limparPreview();
+  }
 }
