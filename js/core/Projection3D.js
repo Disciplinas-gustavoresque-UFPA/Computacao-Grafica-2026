@@ -42,3 +42,15 @@ export function computeFaceNormalZ(p0, p1, p2) {
   const bx = p2.x - p0.x, by = p2.y - p0.y;
   return ax * by - ay * bx; // Z do produto vetorial
 }
+
+/**
+ * Calcula a profundidade média de uma face no espaço 3D.
+ * Usado pelo Painter's Algorithm para ordenar faces.
+ * @param {number[]} faceIndices - Índices dos vértices da face
+ * @param {{ x,y,z }[]} vertices3D
+ * @returns {number}
+ */
+export function computeFaceDepth(faceIndices, vertices3D) {
+  const sum = faceIndices.reduce((acc, i) => acc + vertices3D[i].z, 0);
+  return sum / faceIndices.length;
+}
