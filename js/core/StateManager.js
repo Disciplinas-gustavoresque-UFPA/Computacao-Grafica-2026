@@ -17,6 +17,7 @@ export const estado = {
   ferramentaAtual: null,
   corPreenchimento: '#4a90d9',
   corBorda: '#1a1a2e',
+  estiloLinha: 'continua',
   interfaceAtual: 'inicio', // Nova flag para sabermos onde o usuário está
   elementosSelecionados: [],
 };
@@ -73,6 +74,10 @@ export function definirCorPreenchimento(cor) {
  */
 export function definirCorBorda(cor) {
   estado.corBorda = cor;
+}
+
+export function definirEstiloLinha(estilo) {
+  estado.estiloLinha = estilo;
 }
 
 /**
