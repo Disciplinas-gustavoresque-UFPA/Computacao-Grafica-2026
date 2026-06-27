@@ -11,9 +11,10 @@ import {
   estado, 
   definirFerramenta, 
   definirCorPreenchimento, 
-  definirCorBorda, 
+  definirCorBorda,
   definirGerenciadorSelecao,
   definirElementosSelecionados,
+  definirEstiloLinha,
   definirGerenciadorHistorico,
   desfazerAcao,
   refazerAcao,
@@ -52,6 +53,7 @@ const btnImportarImagem = document.getElementById('btn-importar-imagem');
 const inputImagem = document.getElementById('input-imagem');
 const inputCorPreenchimento = document.getElementById('cor-preenchimento');
 const inputCorBorda = document.getElementById('cor-borda');
+const botoesEstiloLinha = document.querySelectorAll('.btn-line-style');
 const nomeFerramenta = document.getElementById('nome-ferramenta');
 const btnExportar = document.getElementById('btn-exportar');
 const exportFormat = document.getElementById('export-format');
@@ -207,6 +209,20 @@ inputCorBorda.addEventListener('input', () => {
   definirCorBorda(inputCorBorda.value);
 });
 
+function atualizarBotaoEstiloLinhaAtivo(estiloLinha) {
+  botoesEstiloLinha.forEach((btn) => {
+    btn.classList.toggle('ativo', btn.dataset.estiloLinha === estiloLinha);
+  });
+}
+
+botoesEstiloLinha.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const estiloLinha = btn.dataset.estiloLinha;
+    definirEstiloLinha(estiloLinha);
+    atualizarBotaoEstiloLinhaAtivo(estiloLinha);
+  });
+});
+
 // Event listeners globais do SVG (delegados para a ferramenta ativa)
 svgCanvas.addEventListener('mousedown', (evento) => {
   if (estado.ferramentaAtual) {
@@ -236,6 +252,7 @@ svgCanvas.addEventListener('contextmenu', (e) => {
 // Inicializa os valores dos inputs com os valores padrão do estado
 inputCorPreenchimento.value = estado.corPreenchimento;
 inputCorBorda.value = estado.corBorda;
+atualizarBotaoEstiloLinhaAtivo(estado.estiloLinha);
 
 // Exportar / Salvar desenho
 btnExportar.addEventListener('click', () => {
