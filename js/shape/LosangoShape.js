@@ -48,4 +48,26 @@ export class LosangoShape extends ShapeBase {
             this.sincronizarTodosOsHandles(targetElement);
         }
     }
+
+    sincronizarTodosOsHandles(targetElement){
+        const x = parseFloat(targetElement.getAttribute('x'));
+        const y = parseFloat(targetElement.getAttribute('y'));
+        const w = parseFloat(targetElement.getAttribute('width'));
+        const h = parseFloat(targetElement.getAttribute('height'));
+
+        const posicoes = {
+            'top': { x: x + w/2, y: y },
+            'left': { x: x, y: y + h/2 },
+            'right': { x: x + w, y: y + h/2 },
+            'bottom': { x: x + w/2, y: y + h }
+        };
+
+        for (const [id, pos] of Object.entries(posicoes)) {
+            const handle = this.grupoOverlay.querySelector(`[data-node-id="${id}"]`);
+            if (handle) {
+                handle.setAttribute('x', pos.x - 4);
+                handle.setAttribute('y', pos.y - 4);
+            }
+        }
+    }
 }
