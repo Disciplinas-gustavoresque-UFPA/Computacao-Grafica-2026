@@ -8,11 +8,12 @@
  * - ferramentaAtual {ToolBase|null} - Instância da ferramenta de desenho ativa.
  * - corPreenchimento {string}       - Cor de preenchimento dos elementos (formato hex).
  * - corBorda {string}               - Cor da borda/stroke dos elementos (formato hex).
+ * - estiloLinha {string}            - Estilo visual usado pela ferramenta de linha.
  * - elementosSelecionados {SVGElement[]} - Elementos SVG atualmente selecionados.
  * - interfaceAtual {string}         - Flag para sabermos a tela onde o usuário está.
  */
 
-/** @type {{ ferramentaAtual: import('../tools/ToolBase.js').ToolBase|null, corPreenchimento: string, corBorda: string, elementosSelecionados: SVGElement[], interfaceAtual: string }} */
+/** @type {{ ferramentaAtual: import('../tools/ToolBase.js').ToolBase|null, corPreenchimento: string, corBorda: string, estiloLinha: string, elementosSelecionados: SVGElement[], interfaceAtual: string }} */
 export const estado = {
   ferramentaAtual: null,
   corPreenchimento: '#4a90d9',
