@@ -1,8 +1,17 @@
 import { ToolBase } from './ToolBase.js';
 import { criarElementoSVG, obterCoordenadaSVG } from '../utils/svgHelpers.js';
-import { estado } from '../core/StateManager.js';
-import { registrarAcaoHistorico } from '../core/StateManager.js';
-import { definirElementosSelecionados } from '../core/StateManager.js';
+import { estado, registrarAcaoHistorico } from '../core/StateManager.js';
+
+const ESTILOS_LINHA = {
+  continua: {},
+  tracejada: {
+    'stroke-dasharray': '12 6',
+  },
+  pontilhada: {
+    'stroke-dasharray': '1 6',
+    'stroke-linecap': 'round',
+  },
+};
 
 export class LinhaTool extends ToolBase {
   constructor(svgCanvas) {
@@ -19,7 +28,8 @@ export class LinhaTool extends ToolBase {
       x1: pt.x, y1: pt.y,
       x2: pt.x, y2: pt.y,
       stroke: estado.corBorda,
-      'stroke-width': 2
+      'stroke-width': 2,
+      ...this.obterAtributosEstiloLinha()
     });
     this.svgCanvas.appendChild(this.lineElement);
   }
@@ -37,5 +47,9 @@ export class LinhaTool extends ToolBase {
 
     // Integração com o History Manager
     registrarAcaoHistorico();
+  }
+
+  obterAtributosEstiloLinha() {
+    return ESTILOS_LINHA[estado.estiloLinha] || ESTILOS_LINHA.continua;
   }
 }
