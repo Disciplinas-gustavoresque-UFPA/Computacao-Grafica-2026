@@ -37,6 +37,7 @@ import { inicializarMenuInicial } from './core/UIManager.js';
 import { duplicarElemento } from './utils/duplicateHelpers.js';
 import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
 import { HistoryManager } from './core/HistoryManager.js';
+import { LosangoTool } from './tools/LosangoTool.js';
 
 const svgCanvas = document.getElementById('canvas');
 
@@ -169,6 +170,7 @@ const instanciasFerramentas = {
   texto: new TextoTool(svgCanvas),
   borracha: new BorrachaTool(svgCanvas),
   lapis: new Lapis(svgCanvas),
+  losango: new LosangoTool(svgCanvas),
 };
 
 /**
@@ -327,7 +329,8 @@ window.addEventListener("keydown", (e) => {
     "l" : "linha",
     "p" : "poligono",
     "t" : "texto",
-    "i" : "conta-gotas"
+    "i" : "conta-gotas",
+    "g": "losango",
   }
 
   const teclaPressionada = e.key.toLowerCase();
