@@ -12,7 +12,7 @@ import {
   definirFerramenta, 
   definirCorPreenchimento, 
   definirCorBorda, 
-  definirGerenciadorSelecao,
+  //definirGerenciadorSelecao,
   definirElementosSelecionados,
   definirGerenciadorSelecao,
   definirGerenciadorHistorico,

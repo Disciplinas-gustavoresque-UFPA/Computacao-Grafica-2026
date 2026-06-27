@@ -258,6 +258,21 @@
         </div><!-- /#workspace -->
     </div><!-- /#app -->
 
+    <button id="btn-opcao-borda" class="oculto btn-flutuante" title="Ajustar Borda">
+    ⚙️ Borda
+    </button>
+    
+    <div id="card-edicao-borda" class="oculto painel-flutuante">
+        <div class="card-header">
+            <span class="propriedade-label">Espessura (1% a 10%)</span>
+            <button id="btn-fechar-card-borda" class="btn-fechar">✖</button>
+        </div>
+        <div class="card-body">
+            <input type="range" id="slider-espessura-borda" min="1" max="10" step="0.1" value="1">
+            <span id="valor-espessura-borda">1%</span>
+        </div>
+    </div>
+
 
     <!-- Ponto de entrada da aplicação: ES6 Module -->
     <script type="module" src="js/main.js"></script>
