@@ -12,9 +12,11 @@ import {
   definirFerramenta, 
   definirCorPreenchimento, 
   definirCorBorda, 
-  definirGerenciadorSelecao 
+  definirGerenciadorSelecao,
+  definirElementosSelecionados
 } from './core/StateManager.js';
 import { ColorPickerTool } from './tools/ColorPickerTool.js';
+import { Lapis } from './tools/LapisTool.js';
 import { RetanguloTool } from './tools/RetanguloTool.js';
 import { TextoTool } from './tools/TextoTool.js';
 import { exportarDesenho } from './utils/exportHelpers.js';
@@ -27,11 +29,17 @@ import { ElipseTool } from './tools/ElipseTool.js';
 import { LupaTool } from './tools/LupaTool.js';
 import { inicializarImportadorImagem } from './tools/ImageImporter.js';
 import { inicializarMenuInicial } from './core/UIManager.js';
+import { duplicarElemento } from './utils/duplicateHelpers.js';
+import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
+import { SideBar } from './core/SideBar.js';
 
 const svgCanvas = document.getElementById('canvas');
 
 // Inicializar a tela de menu inicial
 inicializarMenuInicial(svgCanvas);
+
+// Inicializar a sidebar
+const barraLateral = new SideBar();
 
 const areaDesenho = document.getElementById('area-desenho');
 const botoesFerramenta = document.querySelectorAll('.btn-ferramenta');
@@ -64,6 +72,7 @@ overlayCanvas.style.left = '0';
 overlayCanvas.style.pointerEvents = 'none'; // Coordenado com o principal
 canvasContainer.appendChild(overlayCanvas);
 
+// Sincronizar viewBox entre canvas principal e overlay quando necessário
 const observer = new MutationObserver((mutations) => {
   mutations.forEach((mutation) => {
     if (mutation.attributeName === 'viewBox') {
@@ -88,15 +97,17 @@ const instanciasFerramentas = {
   edicaoVertices: new NodeEditTool(svgCanvas),
   retangulo: new RetanguloTool(svgCanvas),
   linha: new LinhaTool(svgCanvas),    
+  poligono: new PoligonoPolilinhaTool(svgCanvas),
   elipse: new ElipseTool(svgCanvas),  
   "Conta-gotas": new ColorPickerTool(svgCanvas),
   lupa: new LupaTool(svgCanvas, overlayCanvas),
   texto: new TextoTool(svgCanvas),
   borracha: new BorrachaTool(svgCanvas),
+  lapis: new Lapis(svgCanvas),
 };
 
 /**
- * Atualiza o estado visual dos botões da barra lateral,
+ * Atualiza o estado visual dos botões da sidebar,
  * destacando apenas o botão da ferramenta ativa.
  *
  * @param {string} nomeDaFerramenta - Identificador da ferramenta ativa.
@@ -143,7 +154,7 @@ inputCorBorda.addEventListener('input', () => {
   });
 });
 
-// Atualizar os inputs da barra lateral quando o usuário selecionar um objeto
+// Atualizar os inputs da sidebar quando o usuário selecionar um objeto
 // Usamos um MutationObserver ou interceptamos cliques no Canvas para capturar a seleção.
 svgCanvas.addEventListener('mouseup', (evento) => {
   if (estado.ferramentaAtual) {
@@ -236,17 +247,23 @@ btnBringToFront.addEventListener('click', () => moverCamada('frente'));
 
 // Atalhos de Teclado (Tool Selection)
 window.addEventListener("keydown", (e) => {
+  // Prevenção de conflitos
+  // Verifica se o usuário está focado em um campo de texto ou input de cor.
   const elementoAtivo = document.activeElement;
   const tagAtiva = elementoAtivo.tagName.toLocaleLowerCase();
 
+  // Se o foco estiver em um input, textArea, select ou contentEditable, ignora o atalho.
   if (["input", "textarea", "select"].includes(tagAtiva) || elementoAtivo.isContentEditable)
     return;
-  
+
+  // Mapeamento das teclas
+  // Observação: o nome do data-ferramenta para o conta-gotas no HTML é "Conta-gotas"
   const mapaTeclas = {
     "s" : "selecao",
     "r" : "retangulo",
     "e" : "elipse",
     "l" : "linha",
+    "p" : "poligono",
     "t" : "texto",
     "i" : "conta-gotas"
   }
@@ -260,6 +277,24 @@ window.addEventListener("keydown", (e) => {
     if (botao) {
       botao.click();
     }
+  }
+});
+
+// --- Duplicar elemento ---
+function handlerDuplicar() {
+  const el = estado.elementosSelecionados[0];
+  if (el) {
+    const clone = duplicarElemento(el, svgCanvas);
+    if (clone) {
+      definirElementosSelecionados(clone);
+    }
+  }
+}
+
+document.addEventListener('keydown', (evento) => {
+  if ((evento.ctrlKey || evento.metaKey) && evento.key.toLowerCase() === 'd') {
+    evento.preventDefault();
+    handlerDuplicar();
   }
 });
 

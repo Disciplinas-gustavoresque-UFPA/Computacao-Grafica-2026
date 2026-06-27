@@ -123,6 +123,13 @@
                     </button>
                     <button
                         class="btn-ferramenta"
+                        data-ferramenta="poligono"
+                        title="Polígono Polilinha (P)"
+                    >
+                        &bowtie;
+                    </button>
+                    <button
+                        class="btn-ferramenta"
                         data-ferramenta="texto"
                         title="Texto (T)"
                     >
@@ -161,6 +168,10 @@
                         stroke-linecap="round" stroke-linejoin="round">
                         <path d="M20 20H7L3 16L14 5L21 12L13 20"/>
                         </svg>
+                    </button>
+
+                    <button class="btn-ferramenta" data-ferramenta="lapis" title="Lápis (P)">
+                        &#128393;
                     </button>
 
                     <button id="btn-zoom-click" class="btn-ferramenta" data-ferramenta="lupa" title="Zoom padrão">
@@ -205,8 +216,8 @@
                         <!-- Os elementos SVG criados pelo usuário serão inseridos aqui -->
                     </svg>
                 </main>
-                <button id="btn-toggle-sidebar" title="Esconder Painel">❯</button>
                 <aside id="barra-configuracoes">
+                    <button id="btn-toggle-sidebar" title="Esconder Painel">❯</button>
                     <nav class="tabs-nav"></nav>
 
                     <div class="tabs-container">
