@@ -76,6 +76,43 @@ body {
   padding: 2px;
 }
 
+.line-style-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-line-style {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 28px;
+  border: 1px solid var(--cor-borda-ui);
+  border-radius: var(--raio-borda);
+  background: transparent;
+  color: var(--cor-texto-secundario);
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.btn-line-style svg {
+  width: 32px;
+  height: 12px;
+}
+
+.btn-line-style line {
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.btn-line-style:hover,
+.btn-line-style.ativo {
+  background-color: rgba(74, 144, 217, 0.2);
+  border-color: var(--cor-destaque);
+  color: var(--cor-destaque);
+}
+
 #ferramenta-atual-label {
   margin-left: auto;
   font-size: 12px;
