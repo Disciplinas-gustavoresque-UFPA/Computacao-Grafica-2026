@@ -26,8 +26,8 @@ export class LosangoTool extends ToolBase {
     this.startX = pt.x;
     this.startY = pt.y;
 
-    // Cria o elemento SVG <losn> dinamicamente
-    this.losnElement = criarElementoSVG('losn', {
+    // Cria o elemento SVG <polygon> dinamicamente
+    this.losnElement = criarElementoSVG('polygon', {
       x: this.startX,
       y: this.startY,
       width: 0,
@@ -57,6 +57,14 @@ export class LosangoTool extends ToolBase {
     this.losnElement.setAttribute('y', novoY);
     this.losnElement.setAttribute('width', width);
     this.losnElement.setAttribute('height', height);
+
+    // Cálculo e definição dos vértices do losango
+    const centroX = novoX + width / 2;
+    const centroY = novoY + height / 2;
+
+    // Ordem dos pontos: Topo, Direita, Base, Esquerda
+    const pontos = `${centroX},${novoY} ${novoX + width},${centroY} ${centroX},${novoY + height} ${novoX},${centroY}`;
+    this.losnElement.setAttribute('points', pontos);
   }
 
   onMouseUp(evento) {
