@@ -43,6 +43,18 @@ export class LosangoShape extends ShapeBase {
             case 'bottom':
                 targetElement.setAttribute('height', coords.y - y);
                 break;
+
+            // Redefinição dos pontos do Losango
+            const nx = parseFloat(targetElement.getAttribute('x'));
+            const ny = parseFloat(targetElement.getAttribute('y'));
+            const nw = parseFloat(targetElement.getAttribute('width'));
+            const nh = parseFloat(targetElement.getAttribute('height'));
+
+            const centroX = nx + nw / 2;
+            const centroY = ny + nh / 2;
+            
+            const novosPontos = `${centroX},${ny} ${nx + nw},${centroY} ${centroX},${ny + nh} ${nx},${centroY}`;
+            targetElement.setAttribute('points', novosPontos);
             
             // Sincroniza os nodes (vértices)
             this.sincronizarTodosOsHandles(targetElement);
