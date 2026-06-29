@@ -525,22 +525,28 @@ body {
    ========================================================= */
 
 .regua {
-  position: absolute;
-  background: #ffffff;
+  position: fixed;
+  background: #a4dcb9;
+  margin-top: 20px;
+  margin-left: 60px;
+  z-index: 10;
 }
 
 .regua-h {
-  top: 0;
+  top: var(--altura-painel-superior);
   left: 20px;
-  width: calc(100% - 20px);
+  width: calc(100% - var(--altura-painel-superior) - 56px);
   height: 20px;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 5px solid #2e97b7;
+  /*background: red;*/
 }
 
 .regua-v {
-  top: 20px;
+  top: var(--altura-painel-superior);
   left: 0;
   width: 20px;
-  height: calc(100% - 20px);
-  border-right: 1px solid #ddd;
+  margin-top: 40px;
+  height: calc(100% - var(--altura-painel-superior) - 64px);
+  border-right: 5px solid #2e97b7;
+  /*  background: red;*/
 }
