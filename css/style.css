@@ -524,29 +524,69 @@ body {
    Reguas Vertical/Horizontal
    ========================================================= */
 
+:root {
+  --ruler-size: 28px;
+  --ruler-bg: #717171;
+  --ruler-bg-secondary: #8c8c8c;
+  --ruler-border: #343b47;
+  --ruler-text: #c9d1d9;
+  --ruler-shadow: 0 1px 0 rgba(255, 255, 255, 0.03) 0 1px 4px
+    rgba(0, 0, 0, 0.25);
+}
 .regua {
-  position: fixed;
-  background: #a4dcb9;
-  margin-top: 20px;
-  margin-left: 60px;
-  z-index: 10;
+  position: absolute;
+  background: var(--ruler-bg);
+  z-index: 30;
+  pointer-events: none;
+  overflow: hidden;
+  box-sizing: border-box;
+  image-rendering: auto;
+  box-shadow: var(--ruler-shadow);
 }
 
 .regua-h {
   top: var(--altura-painel-superior);
-  left: 20px;
-  width: calc(100% - var(--altura-painel-superior) - 56px);
-  height: 20px;
-  border-bottom: 5px solid #2e97b7;
-  /*background: red;*/
+  left: calc(var(--largura-barra-lateral) + var(--ruler-size));
+  width: calc(100% - var(--largura-barra-lateral) - var(--ruler-size));
+  height: var(--ruler-size);
+  border-bottom: 1px solid var(--ruler-border);
+  background: linear-gradient(
+    to bottom,
+    var(--ruler-bg-secondary),
+    var(--ruler-bg)
+  );
+  /*background: yellow;*/
 }
 
 .regua-v {
+  top: calc(var(--altura-painel-superior) + var(--ruler-size));
+  left: var(--largura-barra-lateral);
+  width: var(--ruler-size);
+  height: calc(100% - var(--altura-painel-superior) - var(--ruler-size));
+  border-right: 1px solid var(--ruler-border);
+  background: linear-gradient(
+    to right,
+    var(--ruler-bg-secondary),
+    var(--ruler-bg)
+  );
+  /*background: green;*/
+}
+
+.regua-quina {
+  position: absolute;
   top: var(--altura-painel-superior);
-  left: 0;
-  width: 20px;
-  margin-top: 40px;
-  height: calc(100% - var(--altura-painel-superior) - 64px);
-  border-right: 5px solid #2e97b7;
-  /*  background: red;*/
+  left: var(--largura-barra-lateral);
+  width: var(--ruler-size);
+  height: var(--ruler-size);
+  z-index: 31;
+  pointer-events: none;
+  box-sizing: border-box;
+  border-right: 1px solid var(--ruler-border);
+  border-bottom: 1px solid var(--ruler-border);
+  background: linear-gradient(
+    135deg,
+    var(--ruler-bg-secondary),
+    var(--ruler-bg)
+  );
+  /*background: red;*/
 }
