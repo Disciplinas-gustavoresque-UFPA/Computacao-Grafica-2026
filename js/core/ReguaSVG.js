@@ -51,6 +51,35 @@ export class ReguaSVG {
     console.log("Canvas configurado:", this.hCanvas.width, this.vCanvas.height);
   }
 
+  getStep() {
+    const vb = this.camera.viewBox;
+
+    // unidades SVG existentes por pixel
+    const unitsPerPixel = vb.width / this.hCanvas.width;
+
+    // distãncia entre traços
+    const targetPixels = 80;
+
+    // step bruto
+    const rawStep = unitsPerPixel * targetPixels;
+
+    // normalização
+    const pow10 = Math.pow(10, Math.floor(Math.log10(rawStep)));
+
+    const normalized = rawStep / pow10;
+
+    let step;
+
+    if (normalized < 2) {
+      step = 1;
+    } else if (normalized < 5) {
+      step = 2;
+    } else {
+      step = 5;
+    }
+
+    return step * pow10;
+  }
   render() {
     this.renderHorizontal();
     this.renderVertical();
@@ -71,16 +100,16 @@ export class ReguaSVG {
 
     const vb = this.camera.viewBox;
 
-    const divisions = 10;
+    const step = this.getStep();
 
-    const step = vb.width / divisions;
+    const start = Math.floor(vb.x / step) * step;
 
-    for (let i = 0; i <= divisions; i++) {
-      const x = (i / divisions) * width;
+    for (let value = start; value <= vb.x + vb.width; value += step) {
+      const x = ((value - vb.x) / vb.width) * width;
 
-      const value = Math.round(vb.x + i * step);
+      const label = Math.round(value);
 
-      // Tick
+      // Traço
       ctx.beginPath();
 
       ctx.moveTo(x, height);
@@ -89,7 +118,7 @@ export class ReguaSVG {
       ctx.stroke();
 
       // Texto
-      ctx.fillText(value, x + 4, 10);
+      ctx.fillText(label, x + 4, 10);
     }
   }
 
@@ -108,16 +137,16 @@ export class ReguaSVG {
 
     const vb = this.camera.viewBox;
 
-    const divisions = 10;
+    const step = this.getStep();
 
-    const step = vb.height / divisions;
+    const start = Math.floor(vb.y / step) * step;
 
-    for (let i = 0; i <= divisions; i++) {
-      const y = (i / divisions) * height;
+    for (let value = start; value <= vb.y + vb.height; value += step) {
+      const y = ((value - vb.y) / vb.height) * height;
 
-      const value = Math.round(vb.y + i * step);
+      const label = Math.round(value);
 
-      // Tick
+      // Traço
       ctx.beginPath();
 
       ctx.moveTo(width, y);
@@ -125,14 +154,14 @@ export class ReguaSVG {
 
       ctx.stroke();
 
-      // Texto rotacionado
+      // Texto
       ctx.save();
 
       ctx.translate(10, y + 4);
 
       ctx.rotate(-Math.PI / 2);
 
-      ctx.fillText(value, 0, 0);
+      ctx.fillText(label, 0, 0);
 
       ctx.restore();
     }

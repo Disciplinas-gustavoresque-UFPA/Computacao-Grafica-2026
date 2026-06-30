@@ -165,7 +165,9 @@ const reguas = new ReguaSVG(
   document.getElementById("regua-vertical"),
   camera,
 );
-
+camera.onChange = () => {
+  reguas.render();
+};
 // Instâncias das ferramentas disponíveis com todas as implementações da main
 const instanciasFerramentas = {
   selecao: new SelecaoTool(svgCanvas),
@@ -175,7 +177,7 @@ const instanciasFerramentas = {
   poligono: new PoligonoPolilinhaTool(svgCanvas),
   elipse: new ElipseTool(svgCanvas),
   "Conta-gotas": new ColorPickerTool(svgCanvas),
-  lupa: new LupaTool(svgCanvas, overlayCanvas),
+  lupa: new LupaTool(svgCanvas, overlayCanvas, camera),
   texto: new TextoTool(svgCanvas),
   borracha: new BorrachaTool(svgCanvas),
   lapis: new Lapis(svgCanvas),
