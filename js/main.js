@@ -195,6 +195,14 @@ botoesFerramenta.forEach((btn) => {
     const ferramentaId = btn.getAttribute('data-ferramenta');
     const ferramentaInstancia = instanciasFerramentas[ferramentaId] || null;
 
+    if (
+      ferramentaId === 'linha' &&
+      estado.ferramentaAtual === ferramentaInstancia
+    ) {
+      ferramentaInstancia.openPanel();
+      return;
+    }
+
     definirFerramenta(ferramentaInstancia);
     atualizarBotaoAtivo(ferramentaId);
   });

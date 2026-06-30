@@ -63,7 +63,7 @@ export class LinhaTool extends ToolBase {
 
     panel.style.top = `${rect.top}px`;
     panel.style.left = `${rect.right + 8}px`;
-    panel.classList.remove('hidden');
+    panel.classList.toggle('hidden');
   }
 
   closePanel() {
