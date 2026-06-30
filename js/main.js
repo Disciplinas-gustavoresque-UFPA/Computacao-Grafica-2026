@@ -29,6 +29,7 @@ import { Selecao } from './core/Selecao.js';
 import { BorrachaTool } from './tools/BorrachaTool.js';
 import { NodeEditTool } from './tools/NodeEditTool.js';
 import { LinhaTool } from './tools/LinhaTool.js';
+import { LinhaCurvadaTool } from './tools/LinhaCurvadaTool.js';
 import { ElipseTool } from './tools/ElipseTool.js';
 import { LupaTool } from './tools/LupaTool.js';
 import { inicializarImportadorImagem } from './tools/ImageImporter.js';
@@ -161,6 +162,7 @@ const instanciasFerramentas = {
   edicaoVertices: new NodeEditTool(svgCanvas),
   retangulo: new RetanguloTool(svgCanvas),
   linha: new LinhaTool(svgCanvas),    
+  linhaCurvada: new LinhaCurvadaTool(svgCanvas),
   poligono: new PoligonoPolilinhaTool(svgCanvas),
   elipse: new ElipseTool(svgCanvas),  
   "Conta-gotas": new ColorPickerTool(svgCanvas),
@@ -324,6 +326,7 @@ window.addEventListener("keydown", (e) => {
     "r" : "retangulo",
     "e" : "elipse",
     "l" : "linha",
+    "c" : "linhaCurvada",
     "p" : "poligono",
     "t" : "texto",
     "i" : "conta-gotas"
