@@ -43,27 +43,6 @@
             <span class="propriedade-label">Borda:</span>
             <input type="color" id="cor-borda" value="#1a1a2e" title="Cor da borda" />
 
-            <span class="propriedade-label">Linha:</span>
-            <div class="line-style-controls" aria-label="Estilo da linha">
-                <button class="btn-line-style ativo" type="button" data-estilo-linha="continua" title="Linha contínua">
-                    <svg viewBox="0 0 36 12" aria-hidden="true" focusable="false">
-                        <line x1="4" y1="6" x2="32" y2="6" />
-                    </svg>
-                </button>
-
-                <button class="btn-line-style" type="button" data-estilo-linha="tracejada" title="Linha tracejada">
-                    <svg viewBox="0 0 36 12" aria-hidden="true" focusable="false">
-                        <line x1="4" y1="6" x2="32" y2="6" stroke-dasharray="8 4" />
-                    </svg>
-                </button>
-
-                <button class="btn-line-style" type="button" data-estilo-linha="pontilhada" title="Linha pontilhada">
-                    <svg viewBox="0 0 36 12" aria-hidden="true" focusable="false">
-                        <line x1="4" y1="6" x2="32" y2="6" stroke-dasharray="1 5" stroke-linecap="round" />
-                    </svg>
-                </button>
-            </div>
-
             <span id="zoom-indicator">Zoom: 100%</span>
 
             <span id="ferramenta-atual-label">Ferramenta:
@@ -171,6 +150,29 @@
                     >
                         &#9135;
                     </button>
+
+                    <div id="line-options" class="hidden">
+                        <div class="line-style-controls" aria-label="Estilo da linha">
+                            <button class="btn-line-style ativo" type="button" data-estilo-linha="continua" title="Linha contínua">
+                                <svg viewBox="0 0 36 12" aria-hidden="true" focusable="false">
+                                    <line x1="4" y1="6" x2="32" y2="6" />
+                                </svg>
+                            </button>
+
+                            <button class="btn-line-style" type="button" data-estilo-linha="tracejada" title="Linha tracejada">
+                                <svg viewBox="0 0 36 12" aria-hidden="true" focusable="false">
+                                    <line x1="4" y1="6" x2="32" y2="6" stroke-dasharray="12 6" />
+                                </svg>
+                            </button>
+
+                            <button class="btn-line-style" type="button" data-estilo-linha="pontilhada" title="Linha pontilhada">
+                                <svg viewBox="0 0 36 12" aria-hidden="true" focusable="false">
+                                    <line x1="4" y1="6" x2="32" y2="6" stroke-dasharray="1 6" stroke-linecap="round" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
                     <button
                         id="btn-criar-polilinha"
                         class="btn-ferramenta"
