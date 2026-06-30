@@ -53,7 +53,7 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 0 16px;
+  padding: 0 25px 0 60px ;
   background-color: var(--cor-fundo-painel);
   border-bottom: 1px solid var(--cor-borda-ui);
   box-shadow: var(--sombra-padrao);
@@ -145,6 +145,56 @@ body {
   z-index: 5;
 }
 
+/* From Uiverse.io by adamgiebl */ 
+.cssbuttons-io-button,
+#btn-primeiros-passos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  height: 36px;
+  padding: 0 14px;
+
+  background: rgba(255,255,255,0.06);
+
+  color: var(--cor-texto);
+
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+
+  font-size: 13px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition:
+    background-color .2s ease,
+    border-color .2s ease,
+    box-shadow .2s ease,
+    transform .15s ease;
+}
+
+.cssbuttons-io-button svg,
+#btn-primeiros-passos svg,
+#btn-primeiros-passos i {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.cssbuttons-io-button:hover,
+#btn-primeiros-passos:hover {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.22);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.cssbuttons-io-button:active,
+#btn-primeiros-passos:active {
+  transform: translateY(1px);
+}
+
 .btn-ferramenta {
   display: flex;
   align-items: center;
@@ -158,6 +208,7 @@ body {
   font-size: 18px;
   cursor: pointer;
   transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  position: relative;
 }
 
 .btn-ferramenta:hover {
@@ -173,35 +224,34 @@ body {
   box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.25);
 }
 
+.btn-ferramenta[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%) translateX(-4px);
+  background-color: var(--cor-fundo-painel);
+  color: var(--cor-texto);
+  border: 1px solid var(--cor-destaque);
+  border-radius: var(--raio-borda);
+  padding: 4px 8px;
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 100;
+}
+
+.btn-ferramenta[data-tooltip]:hover::after {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
 
 /* =========================================================
    Área Exportação
    ========================================================= */
-
-/*Botão de salvar*/
-.btn-exportar {
-    background-color: white;
-    color: black;
-    border-radius: 10px;
-    font-size: 12px;
-    font-weight: 600;
-    padding: 1em 2em;
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
-    border: 1px solid black;
-    box-shadow: 0 0 0 0 black;
-}
-
-.btn-exportar:hover {
-    transform: translateY(-2px) translateX(-2px);
-    box-shadow: 2px 5px 0 0 black;
-}
-
-.btn-exportar:active {
-    transform: translateY(2px) translateX(1px);
-    box-shadow: 0 0 0 0 black;
-}
-
 /*select de formato de exportação */
 
 .select-wrapper {
@@ -214,31 +264,32 @@ body {
 }
 
 .select-format {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
 
-    font-family: "Inter", sans-serif;
-    font-size: 1rem;
-    color: #f0f0f0;
+  height: 36px;
+  padding: 0 36px 0 12px;
 
-    padding: 8px 32px 8px 12px;
-    border: 1px solid #f0f0f0;
-    border-radius: 4px;
-    background-color: transparent;
-    cursor: pointer;
+  background: transparent;
+  color: var(--cor-texto);
 
-    transition: border-color 0.2s;
-    outline: none;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+
+  font-size: 13px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition:
+    border-color .2s ease,
+    box-shadow .2s ease,
+    background-color .2s ease;
+
+  outline: none;
 }
 
-.select-format:hover {
-    border-color: #999;
-}
-
-.select-format:focus {
-    border-color: #000;
-}
 
 .select-format option {
     background-color: var(--cor-fundo-painel);
@@ -416,4 +467,52 @@ body {
 #btn-novo-doc:hover {
   background-color: #3a7bc2;
   transform: translateY(-2px);
+}
+
+.history-controls {
+    display: flex;
+    gap: 4px;
+    margin-left: 16px;
+    border-left: 1px solid var(--cor-borda-ui);
+    padding-left: 16px;
+}
+
+.btn-history {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid var(--cor-borda-ui);
+    color: var(--cor-texto-secundario);
+    border-radius: var(--raio-borda);
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-history:hover {
+    background-color: rgba(74, 144, 217, 0.2);
+    color: var(--cor-destaque);
+    border-color: var(--cor-destaque);
+}
+
+.btn-history:active {
+    transform: scale(0.95);
+}
+
+/* Indicador visual de que há ação disponível */
+.btn-history:not(:disabled) {
+    color: var(--cor-texto);
+}
+
+.btn-history:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-history:disabled:hover {
+    background-color: transparent;
+    border-color: var(--cor-borda-ui);
+    color: var(--cor-texto-secundario);
 }
