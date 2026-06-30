@@ -52,4 +52,38 @@ export class LinhaTool extends ToolBase {
   obterAtributosEstiloLinha() {
     return ESTILOS_LINHA[estado.estiloLinha] || ESTILOS_LINHA.continua;
   }
+
+  openPanel() {
+    const panel = document.getElementById('line-options');
+    const btnLinha = document.querySelector('[data-ferramenta="linha"]');
+
+    if (!panel || !btnLinha) return;
+
+    const rect = btnLinha.getBoundingClientRect();
+
+    panel.style.top = `${rect.top}px`;
+    panel.style.left = `${rect.right + 8}px`;
+    panel.classList.remove('hidden');
+  }
+
+  closePanel() {
+    const panel = document.getElementById('line-options');
+    if (!panel) return;
+
+    panel.classList.add('hidden');
+  }
+
+  onAtivar() {
+    this.openPanel();
+  }
+
+  onDesativar() {
+    if (this.isDrawing && this.lineElement) {
+      this.lineElement.remove();
+      this.isDrawing = false;
+      this.lineElement = null;
+    }
+
+    this.closePanel();
+  }
 }
