@@ -308,7 +308,7 @@ inputCorBorda.value = estado.corBorda;
 // Exportar / Salvar desenho
 btnExportar.addEventListener('click', () => {
   const formato = exportFormat.value || 'png';
-  exportarDesenho(svgCanvas, formato);
+  exportarDesenho(svgCanvas, formato, { areaPagina: obterAreaPagina() });
 });
 
 // Imprimir
