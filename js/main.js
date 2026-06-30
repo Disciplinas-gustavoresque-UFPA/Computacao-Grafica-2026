@@ -35,6 +35,7 @@ import { inicializarImportadorImagem } from './tools/ImageImporter.js';
 import { inicializarMenuInicial } from './core/UIManager.js';
 import { duplicarElemento } from './utils/duplicateHelpers.js';
 import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
+import { SideBar } from './core/SideBar.js';
 import { PincelTool } from './tools/PincelTool.js';
 import { CameraSVG } from './core/CameraSVG.js';
 import { obterCoordenadaSVG } from './utils/svgHelpers.js';
@@ -49,6 +50,9 @@ definirGerenciadorHistorico(historyManager);
 
 // Inicializar a tela de menu inicial
 inicializarMenuInicial(svgCanvas);
+
+// Inicializar a sidebar
+const barraLateral = new SideBar();
 
 const areaDesenho = document.getElementById('area-desenho');
 const botoesFerramenta = document.querySelectorAll('.btn-ferramenta');
@@ -177,7 +181,7 @@ const instanciasFerramentas = {
 };
 
 /**
- * Atualiza o estado visual dos botões da barra lateral,
+ * Atualiza o estado visual dos botões da sidebar,
  * destacando apenas o botão da ferramenta ativa.
  *
  * @param {string} nomeDaFerramenta - Identificador da ferramenta ativa.
@@ -204,13 +208,47 @@ botoesFerramenta.forEach((btn) => {
   });
 });
 
-// --- Controles de Cor ---
+// Ouvir mudanças no input de cor de preenchimento da sidebar
 inputCorPreenchimento.addEventListener('input', () => {
-  definirCorPreenchimento(inputCorPreenchimento.value);
+  const novaCor = inputCorPreenchimento.value;
+  definirCorPreenchimento(novaCor);
+  // Preenche cada elemento selecionado com a cor desejada
+  estado.elementosSelecionados.forEach(el => {
+    el.setAttribute('fill', novaCor);
+  });
 });
 
+// Ouvir mudanças no input de cor de borda da sidebar
 inputCorBorda.addEventListener('input', () => {
-  definirCorBorda(inputCorBorda.value);
+  const novaCor = inputCorBorda.value;
+  definirCorBorda(novaCor);
+  // Colore a borda de cada elemento selecionado com a cor desejada
+  estado.elementosSelecionados.forEach(el => {
+    el.setAttribute('stroke', novaCor);
+  });
+});
+
+// Atualizar os inputs da sidebar quando o usuário selecionar um objeto
+// Usamos um MutationObserver ou interceptamos cliques no Canvas para capturar a seleção.
+svgCanvas.addEventListener('mouseup', (evento) => {
+  if (estado.ferramentaAtual) {
+    estado.ferramentaAtual.onMouseUp(evento);
+  }
+
+  // Verifica se a ferramenta de seleção acabou de selecionar um elemento
+  // Se houver um elemento selecionado, sincroniza a sidebar com as cores dele
+  if (estado.elementoSelecionado) {
+    const corPreenchimentoAtual = estado.elementoSelecionado.getAttribute('fill') || '#ffffff';
+    const corBordaAtual = estado.elementoSelecionado.getAttribute('stroke') || '#000000';
+
+    // Atualiza o valor visual dos inputs para bater com o objeto selecionado
+    inputCorPreenchimento.value = corPreenchimentoAtual;
+    inputCorBorda.value = corBordaAtual;
+
+    // Atualiza também os valores armazenados no StateManager para consistência
+    definirCorPreenchimento(corPreenchimentoAtual);
+    definirCorBorda(corBordaAtual);
+  }
 });
 
 // Event listeners globais do SVG (delegados para a ferramenta ativa)
@@ -223,12 +261,6 @@ svgCanvas.addEventListener('mousedown', (evento) => {
 svgCanvas.addEventListener('mousemove', (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseMove(evento);
-  }
-});
-
-svgCanvas.addEventListener('mouseup', (evento) => {
-  if (estado.ferramentaAtual) {
-    estado.ferramentaAtual.onMouseUp(evento);
   }
 });
 

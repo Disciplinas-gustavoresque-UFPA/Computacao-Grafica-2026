@@ -37,11 +37,6 @@
     <div id="app" class="oculto">
         <!-- Painel Superior: propriedades (cor de preenchimento, cor de borda, etc.) -->
         <header id="painel-propriedades">
-            <span class="propriedade-label">Preenchimento:</span>
-            <input type="color" id="cor-preenchimento" value="#4a90d9" title="Cor de preenchimento" />
-
-            <span class="propriedade-label">Borda:</span>
-            <input type="color" id="cor-borda" value="#1a1a2e" title="Cor da borda" />
             <span id="zoom-indicator">Zoom: 100%</span>
 
             <span id="ferramenta-atual-label">Ferramenta:
@@ -269,6 +264,27 @@
                     <!-- Os elementos SVG criados pelo usuário serão inseridos aqui -->
                 </svg>
             </main>
+            <aside id="barra-configuracoes">
+                <button id="btn-toggle-sidebar" title="Esconder Painel">❯</button>
+                <nav class="tabs-nav"></nav>
+
+                <div class="tabs-container">
+                    <div id="tab-estilo" class="tab-content ativo">
+                        <h3>Estilo do Objeto</h3>
+                        <label>Preenchimento:
+                            <input type="color" id="cor-preenchimento" value="#4a90d9" />
+                        </label>
+                
+                        <label>Borda:
+                            <input type="color" id="cor-borda" value="#1a1a2e" />
+                        </label>
+                    </div>
+
+                    <div id="tab-tracer" class="tab-content"></div>
+
+                    <div id="tab-camadas" class="tab-content"></div>
+                </div>
+            </aside>
         </div><!-- /#workspace -->
     </div><!-- /#app -->
 
@@ -284,5 +300,4 @@
     </script>
 
 </body>
-
 </html>
