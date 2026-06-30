@@ -534,9 +534,10 @@ body {
     rgba(0, 0, 0, 0.25);
 }
 .regua {
+  display: block;
   position: absolute;
   background: var(--ruler-bg);
-  z-index: 30;
+  z-index: 31; /*0*/
   pointer-events: none;
   overflow: hidden;
   box-sizing: border-box;
@@ -578,7 +579,7 @@ body {
   left: var(--largura-barra-lateral);
   width: var(--ruler-size);
   height: var(--ruler-size);
-  z-index: 31;
+  z-index: 30; /*1*/
   pointer-events: none;
   box-sizing: border-box;
   border-right: 1px solid var(--ruler-border);

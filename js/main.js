@@ -7,35 +7,37 @@
  * - Conectar os botões da barra de ferramentas ao StateManager
  */
 
-import { 
-  estado, 
-  definirFerramenta, 
-  definirCorPreenchimento, 
-  definirCorBorda, 
+import {
+  estado,
+  definirFerramenta,
+  definirCorPreenchimento,
+  definirCorBorda,
   definirGerenciadorSelecao,
   definirGerenciadorHistorico,
   desfazerAcao,
   refazerAcao,
-  registrarAcaoHistorico
-} from './core/StateManager.js';
-import { ColorPickerTool } from './tools/ColorPickerTool.js';
-import { Lapis } from './tools/LapisTool.js';
-import { RetanguloTool } from './tools/RetanguloTool.js';
-import { TextoTool } from './tools/TextoTool.js';
-import { exportarDesenho } from './utils/exportHelpers.js';
-import { SelecaoTool } from './tools/SelecaoTool.js';
-import { Selecao } from './core/Selecao.js';
-import { BorrachaTool } from './tools/BorrachaTool.js';
-import { NodeEditTool } from './tools/NodeEditTool.js';
-import { LinhaTool } from './tools/LinhaTool.js';
-import { ElipseTool } from './tools/ElipseTool.js';
-import { LupaTool } from './tools/LupaTool.js';
-import { inicializarImportadorImagem } from './tools/ImageImporter.js';
-import { inicializarMenuInicial } from './core/UIManager.js';
-import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
-import { HistoryManager } from './core/HistoryManager.js';
+  registrarAcaoHistorico,
+} from "./core/StateManager.js";
+import { ColorPickerTool } from "./tools/ColorPickerTool.js";
+import { Lapis } from "./tools/LapisTool.js";
+import { RetanguloTool } from "./tools/RetanguloTool.js";
+import { TextoTool } from "./tools/TextoTool.js";
+import { exportarDesenho } from "./utils/exportHelpers.js";
+import { SelecaoTool } from "./tools/SelecaoTool.js";
+import { Selecao } from "./core/Selecao.js";
+import { BorrachaTool } from "./tools/BorrachaTool.js";
+import { NodeEditTool } from "./tools/NodeEditTool.js";
+import { LinhaTool } from "./tools/LinhaTool.js";
+import { ElipseTool } from "./tools/ElipseTool.js";
+import { LupaTool } from "./tools/LupaTool.js";
+import { inicializarImportadorImagem } from "./tools/ImageImporter.js";
+import { inicializarMenuInicial } from "./core/UIManager.js";
+import { PoligonoPolilinhaTool } from "./tools/PoligonoPolilinhaTool.js";
+import { HistoryManager } from "./core/HistoryManager.js";
+import { CameraSVG } from "./core/CameraSVG.js";
+import { ReguaSVG } from "./core/ReguaSVG.js";
 
-const svgCanvas = document.getElementById('canvas');
+const svgCanvas = document.getElementById("canvas");
 
 // Instancia HistoryManager
 const historyManager = new HistoryManager(svgCanvas);
@@ -44,122 +46,134 @@ definirGerenciadorHistorico(historyManager);
 // Inicializar a tela de menu inicial
 inicializarMenuInicial(svgCanvas);
 
-const areaDesenho = document.getElementById('area-desenho');
-const botoesFerramenta = document.querySelectorAll('.btn-ferramenta');
-const btnImportarImagem = document.getElementById('btn-importar-imagem');
-const inputImagem = document.getElementById('input-imagem');
-const inputCorPreenchimento = document.getElementById('cor-preenchimento');
-const inputCorBorda = document.getElementById('cor-borda');
-const nomeFerramenta = document.getElementById('nome-ferramenta');
-const btnExportar = document.getElementById('btn-exportar');
-const exportFormat = document.getElementById('export-format');
+const areaDesenho = document.getElementById("area-desenho");
+const botoesFerramenta = document.querySelectorAll(".btn-ferramenta");
+const btnImportarImagem = document.getElementById("btn-importar-imagem");
+const inputImagem = document.getElementById("input-imagem");
+const inputCorPreenchimento = document.getElementById("cor-preenchimento");
+const inputCorBorda = document.getElementById("cor-borda");
+const nomeFerramenta = document.getElementById("nome-ferramenta");
+const btnExportar = document.getElementById("btn-exportar");
+const exportFormat = document.getElementById("export-format");
 
 // Botões de histórico
-const btnDesfazer = document.getElementById('btn-desfazer');
-const btnRefazer = document.getElementById('btn-refazer');
+const btnDesfazer = document.getElementById("btn-desfazer");
+const btnRefazer = document.getElementById("btn-refazer");
 
 // Função para atualizar o estado dos botões de histórico
 function atualizarBotoesHistorico() {
-    if (!historyManager) return;
-    
-    const podeDesfazer = historyManager.podeDesfazer();
-    const podeRefazer = historyManager.podeRefazer();
-    
-    if (btnDesfazer) {
-        btnDesfazer.disabled = !podeDesfazer;
-        btnDesfazer.title = podeDesfazer ? 'Desfazer (Ctrl+Z)' : 'Nada para desfazer';
-    }
-    
-    if (btnRefazer) {
-        btnRefazer.disabled = !podeRefazer;
-        btnRefazer.title = podeRefazer ? 'Refazer (Ctrl+Y)' : 'Nada para refazer';
-    }
+  if (!historyManager) return;
+
+  const podeDesfazer = historyManager.podeDesfazer();
+  const podeRefazer = historyManager.podeRefazer();
+
+  if (btnDesfazer) {
+    btnDesfazer.disabled = !podeDesfazer;
+    btnDesfazer.title = podeDesfazer
+      ? "Desfazer (Ctrl+Z)"
+      : "Nada para desfazer";
+  }
+
+  if (btnRefazer) {
+    btnRefazer.disabled = !podeRefazer;
+    btnRefazer.title = podeRefazer ? "Refazer (Ctrl+Y)" : "Nada para refazer";
+  }
 }
 
 // Sobrescrever o método salvarEstado do historyManager para atualizar os botões
 const salvarEstadoOriginal = historyManager.salvarEstado.bind(historyManager);
-historyManager.salvarEstado = function() {
-    const resultado = salvarEstadoOriginal();
-    atualizarBotoesHistorico();
-    return resultado;
+historyManager.salvarEstado = function () {
+  const resultado = salvarEstadoOriginal();
+  atualizarBotoesHistorico();
+  return resultado;
 };
 
 const desfazerOriginal = historyManager.desfazer.bind(historyManager);
-historyManager.desfazer = function() {
-    const resultado = desfazerOriginal();
-    atualizarBotoesHistorico();
-    return resultado;
+historyManager.desfazer = function () {
+  const resultado = desfazerOriginal();
+  atualizarBotoesHistorico();
+  return resultado;
 };
 
 const refazerOriginal = historyManager.refazer.bind(historyManager);
-historyManager.refazer = function() {
-    const resultado = refazerOriginal();
-    atualizarBotoesHistorico();
-    return resultado;
+historyManager.refazer = function () {
+  const resultado = refazerOriginal();
+  atualizarBotoesHistorico();
+  return resultado;
 };
 
 // Configurar event listeners dos botões de histórico
 if (btnDesfazer) {
-    btnDesfazer.addEventListener('click', () => {
-        desfazerAcao();
-        atualizarBotoesHistorico();
-    });
+  btnDesfazer.addEventListener("click", () => {
+    desfazerAcao();
+    atualizarBotoesHistorico();
+  });
 }
 
 if (btnRefazer) {
-    btnRefazer.addEventListener('click', () => {
-        refazerAcao();
-        atualizarBotoesHistorico();
-    });
+  btnRefazer.addEventListener("click", () => {
+    refazerAcao();
+    atualizarBotoesHistorico();
+  });
 }
 
 // Wrapper para sincronizar perfeitamente as coordenadas do #canvas com o #overlay-canvas
-const canvasContainer = document.createElement('div');
-canvasContainer.style.position = 'relative';
-canvasContainer.style.width = '100%';
-canvasContainer.style.height = '100%';
+const canvasContainer = document.createElement("div");
+canvasContainer.style.position = "relative";
+canvasContainer.style.width = "100%";
+canvasContainer.style.height = "100%";
 
 // Encapsulando o svg original
 svgCanvas.parentNode.insertBefore(canvasContainer, svgCanvas);
 canvasContainer.appendChild(svgCanvas);
 
 // Camada de Interação: instanciar o novo SVG de overlay para seleções
-const overlayCanvas = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-overlayCanvas.setAttribute('id', 'overlay-canvas');
-overlayCanvas.setAttribute('width', '100%');
-overlayCanvas.setAttribute('height', '100%');
-overlayCanvas.style.position = 'absolute';
-overlayCanvas.style.top = '0';
-overlayCanvas.style.left = '0';
-overlayCanvas.style.pointerEvents = 'none'; // Coordenado com o principal
+const overlayCanvas = document.createElementNS(
+  "http://www.w3.org/2000/svg",
+  "svg",
+);
+overlayCanvas.setAttribute("id", "overlay-canvas");
+overlayCanvas.setAttribute("width", "100%");
+overlayCanvas.setAttribute("height", "100%");
+overlayCanvas.style.position = "absolute";
+overlayCanvas.style.top = "0";
+overlayCanvas.style.left = "0";
+overlayCanvas.style.pointerEvents = "none"; // Coordenado com o principal
 canvasContainer.appendChild(overlayCanvas);
 
 const observer = new MutationObserver((mutations) => {
   mutations.forEach((mutation) => {
-    if (mutation.attributeName === 'viewBox') {
-      const vb = svgCanvas.getAttribute('viewBox');
+    if (mutation.attributeName === "viewBox") {
+      const vb = svgCanvas.getAttribute("viewBox");
       if (vb) {
-        overlayCanvas.setAttribute('viewBox', vb);
+        overlayCanvas.setAttribute("viewBox", vb);
       } else {
-        overlayCanvas.removeAttribute('viewBox');
+        overlayCanvas.removeAttribute("viewBox");
       }
     }
   });
 });
-observer.observe(svgCanvas, { attributes: true, attributeFilter: ['viewBox'] });
+observer.observe(svgCanvas, { attributes: true, attributeFilter: ["viewBox"] });
 
 // Inicializar a classe de seleção visual
 const selecaoVisual = new Selecao(overlayCanvas);
 definirGerenciadorSelecao(selecaoVisual);
+
+const camera = new CameraSVG([svgCanvas, overlayCanvas]);
+const reguas = new ReguaSVG(
+  document.getElementById("regua-horizontal"),
+  document.getElementById("regua-vertical"),
+  camera,
+);
 
 // Instâncias das ferramentas disponíveis com todas as implementações da main
 const instanciasFerramentas = {
   selecao: new SelecaoTool(svgCanvas),
   edicaoVertices: new NodeEditTool(svgCanvas),
   retangulo: new RetanguloTool(svgCanvas),
-  linha: new LinhaTool(svgCanvas),    
+  linha: new LinhaTool(svgCanvas),
   poligono: new PoligonoPolilinhaTool(svgCanvas),
-  elipse: new ElipseTool(svgCanvas),  
+  elipse: new ElipseTool(svgCanvas),
   "Conta-gotas": new ColorPickerTool(svgCanvas),
   lupa: new LupaTool(svgCanvas, overlayCanvas),
   texto: new TextoTool(svgCanvas),
@@ -175,19 +189,19 @@ const instanciasFerramentas = {
  */
 function atualizarBotaoAtivo(nomeDaFerramenta) {
   botoesFerramenta.forEach((btn) => {
-    if (btn.getAttribute('data-ferramenta') === nomeDaFerramenta) {
-      btn.classList.add('ativo');
+    if (btn.getAttribute("data-ferramenta") === nomeDaFerramenta) {
+      btn.classList.add("ativo");
     } else {
-      btn.classList.remove('ativo');
+      btn.classList.remove("ativo");
     }
   });
-  nomeFerramenta.textContent = nomeDaFerramenta || 'Nenhuma';
+  nomeFerramenta.textContent = nomeDaFerramenta || "Nenhuma";
 }
 
 // --- Barra de Ferramentas & Modos ---
 botoesFerramenta.forEach((btn) => {
-  btn.addEventListener('click', () => {
-    const ferramentaId = btn.getAttribute('data-ferramenta');
+  btn.addEventListener("click", () => {
+    const ferramentaId = btn.getAttribute("data-ferramenta");
     const ferramentaInstancia = instanciasFerramentas[ferramentaId] || null;
 
     definirFerramenta(ferramentaInstancia);
@@ -196,36 +210,36 @@ botoesFerramenta.forEach((btn) => {
 });
 
 // --- Controles de Cor ---
-inputCorPreenchimento.addEventListener('input', () => {
+inputCorPreenchimento.addEventListener("input", () => {
   definirCorPreenchimento(inputCorPreenchimento.value);
 });
 
-inputCorBorda.addEventListener('input', () => {
+inputCorBorda.addEventListener("input", () => {
   definirCorBorda(inputCorBorda.value);
 });
 
 // Event listeners globais do SVG (delegados para a ferramenta ativa)
-svgCanvas.addEventListener('mousedown', (evento) => {
+svgCanvas.addEventListener("mousedown", (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseDown(evento);
   }
 });
 
-svgCanvas.addEventListener('mousemove', (evento) => {
+svgCanvas.addEventListener("mousemove", (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseMove(evento);
   }
 });
 
-svgCanvas.addEventListener('mouseup', (evento) => {
+svgCanvas.addEventListener("mouseup", (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseUp(evento);
   }
 });
 
 // Previne o menu de opções do botão direito no canvas
-svgCanvas.addEventListener('contextmenu', (e) => {
-  if (e.target.closest('#canvas')) {
+svgCanvas.addEventListener("contextmenu", (e) => {
+  if (e.target.closest("#canvas")) {
     e.preventDefault();
   }
 });
@@ -235,21 +249,21 @@ inputCorPreenchimento.value = estado.corPreenchimento;
 inputCorBorda.value = estado.corBorda;
 
 // Exportar / Salvar desenho
-btnExportar.addEventListener('click', () => {
-  const formato = exportFormat.value || 'png';
+btnExportar.addEventListener("click", () => {
+  const formato = exportFormat.value || "png";
   exportarDesenho(svgCanvas, formato);
 });
 
 // --- Controle de Camadas (Z-Index) ---
-const btnSendToBack = document.getElementById('btn-send-to-back');
-const btnStepBackward = document.getElementById('btn-step-backward');
-const btnStepForward = document.getElementById('btn-step-forward');
-const btnBringToFront = document.getElementById('btn-bring-to-front');
+const btnSendToBack = document.getElementById("btn-send-to-back");
+const btnStepBackward = document.getElementById("btn-step-backward");
+const btnStepForward = document.getElementById("btn-step-forward");
+const btnBringToFront = document.getElementById("btn-bring-to-front");
 
 function moverCamada(acao) {
   const elementos = estado.elementosSelecionados;
   if (!elementos || elementos.length === 0) return;
-  
+
   // Move o primeiro elemento selecionado (para simplicidade)
   const el = elementos[0];
   if (!el) return;
@@ -258,20 +272,20 @@ function moverCamada(acao) {
   if (!pai) return;
 
   switch (acao) {
-    case 'fundo':
+    case "fundo":
       pai.prepend(el);
       break;
-    case 'recuar':
+    case "recuar":
       if (el.previousElementSibling) {
         el.previousElementSibling.before(el);
       }
       break;
-    case 'avancar':
+    case "avancar":
       if (el.nextElementSibling) {
         el.nextElementSibling.after(el);
       }
       break;
-    case 'frente':
+    case "frente":
       pai.appendChild(el);
       break;
   }
@@ -280,22 +294,26 @@ function moverCamada(acao) {
   atualizarBotoesHistorico();
 }
 
-btnSendToBack.addEventListener('click', () => moverCamada('fundo'));
-btnStepBackward.addEventListener('click', () => moverCamada('recuar'));
-btnStepForward.addEventListener('click', () => moverCamada('avancar'));
-btnBringToFront.addEventListener('click', () => moverCamada('frente'));
+btnSendToBack.addEventListener("click", () => moverCamada("fundo"));
+btnStepBackward.addEventListener("click", () => moverCamada("recuar"));
+btnStepForward.addEventListener("click", () => moverCamada("avancar"));
+btnBringToFront.addEventListener("click", () => moverCamada("frente"));
 
 // Atalhos de Teclado (Tool Selection)
 window.addEventListener("keydown", (e) => {
   const elementoAtivo = document.activeElement;
   const tagAtiva = elementoAtivo.tagName.toLocaleLowerCase();
 
-  if (["input", "textarea", "select"].includes(tagAtiva) || elementoAtivo.isContentEditable)
+  if (
+    ["input", "textarea", "select"].includes(tagAtiva) ||
+    elementoAtivo.isContentEditable
+  )
     return;
-  
+
   // Atalhos de teclado para o histórico
-  if (e.ctrlKey || e.metaKey) { // metaKey é o Cmd do Mac
-    if (e.key.toLowerCase() === 'z') {
+  if (e.ctrlKey || e.metaKey) {
+    // metaKey é o Cmd do Mac
+    if (e.key.toLowerCase() === "z") {
       e.preventDefault();
       if (e.shiftKey) {
         refazerAcao();
@@ -305,7 +323,7 @@ window.addEventListener("keydown", (e) => {
       atualizarBotoesHistorico();
       return;
     }
-    if (e.key.toLowerCase() === 'y') {
+    if (e.key.toLowerCase() === "y") {
       e.preventDefault();
       refazerAcao();
       atualizarBotoesHistorico();
@@ -314,21 +332,23 @@ window.addEventListener("keydown", (e) => {
   }
 
   const mapaTeclas = {
-    "s" : "selecao",
-    "r" : "retangulo",
-    "e" : "elipse",
-    "l" : "linha",
-    "p" : "poligono",
-    "t" : "texto",
-    "i" : "conta-gotas"
-  }
+    s: "selecao",
+    r: "retangulo",
+    e: "elipse",
+    l: "linha",
+    p: "poligono",
+    t: "texto",
+    i: "conta-gotas",
+  };
 
   const teclaPressionada = e.key.toLowerCase();
   const ferramentaAlvo = mapaTeclas[teclaPressionada];
-  
+
   if (ferramentaAlvo) {
     e.preventDefault();
-    const botao = document.querySelector(`.btn-ferramenta[data-ferramenta="${ferramentaAlvo}"]`);
+    const botao = document.querySelector(
+      `.btn-ferramenta[data-ferramenta="${ferramentaAlvo}"]`,
+    );
     if (botao) {
       botao.click();
     }
@@ -336,7 +356,7 @@ window.addEventListener("keydown", (e) => {
 });
 
 // Importação de imagens
-btnImportarImagem.addEventListener('click', () => {
+btnImportarImagem.addEventListener("click", () => {
   inputImagem.click();
 });
 
