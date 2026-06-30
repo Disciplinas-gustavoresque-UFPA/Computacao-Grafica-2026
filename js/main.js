@@ -7,11 +7,11 @@
  * - Conectar os botões da barra de ferramentas ao StateManager
  */
 
-import { 
-  estado, 
-  definirFerramenta, 
-  definirCorPreenchimento, 
-  definirCorBorda, 
+import {
+  estado,
+  definirFerramenta,
+  definirCorPreenchimento,
+  definirCorBorda,
   definirGerenciadorSelecao,
   definirElementosSelecionados,
   definirGerenciadorHistorico,
@@ -64,15 +64,15 @@ const btnRefazer = document.getElementById('btn-refazer');
 // Função para atualizar o estado dos botões de histórico
 function atualizarBotoesHistorico() {
     if (!historyManager) return;
-    
+
     const podeDesfazer = historyManager.podeDesfazer();
     const podeRefazer = historyManager.podeRefazer();
-    
+
     if (btnDesfazer) {
         btnDesfazer.disabled = !podeDesfazer;
         btnDesfazer.title = podeDesfazer ? 'Desfazer (Ctrl+Z)' : 'Nada para desfazer';
     }
-    
+
     if (btnRefazer) {
         btnRefazer.disabled = !podeRefazer;
         btnRefazer.title = podeRefazer ? 'Refazer (Ctrl+Y)' : 'Nada para refazer';
@@ -161,10 +161,10 @@ const instanciasFerramentas = {
   selecao: new SelecaoTool(svgCanvas),
   edicaoVertices: new NodeEditTool(svgCanvas),
   retangulo: new RetanguloTool(svgCanvas),
-  linha: new LinhaTool(svgCanvas),    
+  linha: new LinhaTool(svgCanvas),
   linhaCurvada: new LinhaCurvadaTool(svgCanvas),
   poligono: new PoligonoPolilinhaTool(svgCanvas),
-  elipse: new ElipseTool(svgCanvas),  
+  elipse: new ElipseTool(svgCanvas),
   "Conta-gotas": new ColorPickerTool(svgCanvas),
   lupa: new LupaTool(svgCanvas, overlayCanvas),
   texto: new TextoTool(svgCanvas),
@@ -254,7 +254,7 @@ const btnBringToFront = document.getElementById('btn-bring-to-front');
 function moverCamada(acao) {
   const elementos = estado.elementosSelecionados;
   if (!elementos || elementos.length === 0) return;
-  
+
   // Move o primeiro elemento selecionado (para simplicidade)
   const el = elementos[0];
   if (!el) return;
@@ -300,7 +300,7 @@ window.addEventListener("keydown", (e) => {
   // Se o foco estiver em um input, textArea, select ou contentEditable, ignora o atalho.
   if (["input", "textarea", "select"].includes(tagAtiva) || elementoAtivo.isContentEditable)
     return;
-  
+
   // Atalhos de teclado para o histórico
   if (e.ctrlKey || e.metaKey) { // metaKey é o Cmd do Mac
     if (e.key.toLowerCase() === 'z') {
@@ -334,7 +334,7 @@ window.addEventListener("keydown", (e) => {
 
   const teclaPressionada = e.key.toLowerCase();
   const ferramentaAlvo = mapaTeclas[teclaPressionada];
-  
+
   if (ferramentaAlvo) {
     e.preventDefault();
     const botao = document.querySelector(`.btn-ferramenta[data-ferramenta="${ferramentaAlvo}"]`);
