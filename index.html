@@ -64,10 +64,54 @@
                     </button>
                 </div>
 
+                <!-- Controle de Camadas -->
+                <div class="layer-controls">
+                    <button id="btn-send-to-back" title="Enviar para o Fundo" class="btn-layer">⏮</button>
+                    <button id="btn-step-backward" title="Recuar" class="btn-layer">⏪</button>
+                    <button id="btn-step-forward" title="Avançar" class="btn-layer">⏩</button>
+                    <button id="btn-bring-to-front" title="Trazer para a Frente" class="btn-layer">⏭</button>
+                </div>
+
                 <!-- Botão de ajuda/tutorial -->
                 <button id="btn-primeiros-passos" class="btn-ajuda">
                     <i class="btn-primeiros-passos-i" data-lucide="info"></i>
                     Primeiros Passos
+                </button>
+
+                <!-- Botão de exportar/descarregar desenho -->
+                <label for="export-format" class="propriedade-label">Exportar:</label>
+                <div class="select-wrapper">
+                    <select class="select-format" id="export-format" title="Formato de exportação">
+                        <option value="png" selected>PNG</option>
+                        <option value="jpg">JPG</option>
+                        <option value="svg">SVG</option>
+                    </select>
+                    <svg class="select-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path d="M7 10l5 5 5-5z" />
+                    </svg>
+                </div>
+                <button class="cssbuttons-io-button" class="btn-exportar" id="btn-exportar" title="Salvar/Exportar desenho">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                        <path fill="none" d="M0 0h24v24H0z"></path>
+                        <path fill="white"
+                            d="M1 14.5a6.496 6.496 0 0 1 3.064-5.519 8.001 8.001 0 0 1 15.872 0 6.5 6.5 0 0 1-2.936 12L7 21c-3.356-.274-6-3.078-6-6.5zm15.848 4.487a4.5 4.5 0 0 0 2.03-8.309l-.807-.503-.12-.942a6.001 6.001 0 0 0-11.903 0l-.12.942-.805.503a4.5 4.5 0 0 0 2.029 8.309l.173.013h9.35l.173-.013zM13 12h3l-4 5-4-5h3V8h2v4z">
+                        </path>
+                    </svg>
+                    <span style="color: white;">Baixar</span>
+                </button>
+
+                <!-- Tamanho da página -->
+                <span class="propriedade-label">Página:</span>
+                <input type="number" id="page-width" value="800" min="50" style="width:70px;padding:2px 4px;border:1px solid #ccc;border-radius:4px;text-align:center;" title="Largura da página" />
+                <span style="margin:0 4px;">×</span>
+                <input type="number" id="page-height" value="1131" min="50" style="width:70px;padding:2px 4px;border:1px solid #ccc;border-radius:4px;text-align:center;" title="Altura da página" />
+                <button id="btn-fit-page" title="Enquadrar à página" style="background:none;border:1px solid #999;border-radius:4px;padding:4px 8px;cursor:pointer;display:inline-flex;align-items:center;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+                    </svg>
+                </button>
+                <button id="btn-imprimir" title="Imprimir (Ctrl+Shift+P)" style="background:none;border:1px solid #999;border-radius:4px;padding:4px 8px;cursor:pointer;display:inline-flex;align-items:center;">
+                    🖨️
                 </button>
             </header>
 
@@ -243,4 +287,11 @@
             </div><!-- /#workspace -->
         </div><!-- /#app -->
         <script type="module" src="js/main.js"></script>
-        <script src="https://cdn.jsdelivr.net
+        <script src="https://cdn.jsdelivr.net/npm/driver.js/dist/driver.js.iife.js"></script>
+        <script src="js/tour.js"></script>
+        <script src="https://unpkg.com/lucide@latest"></script>
+        <script>
+            lucide.createIcons();
+        </script>
+    </body>
+</html>
