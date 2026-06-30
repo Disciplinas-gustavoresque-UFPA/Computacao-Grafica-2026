@@ -13,6 +13,7 @@ import {
   definirCorPreenchimento, 
   definirCorBorda, 
   definirGerenciadorSelecao,
+  definirElementosSelecionados,
   definirGerenciadorHistorico,
   desfazerAcao,
   refazerAcao,
@@ -32,6 +33,7 @@ import { ElipseTool } from './tools/ElipseTool.js';
 import { LupaTool } from './tools/LupaTool.js';
 import { inicializarImportadorImagem } from './tools/ImageImporter.js';
 import { inicializarMenuInicial } from './core/UIManager.js';
+import { duplicarElemento } from './utils/duplicateHelpers.js';
 import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
 import { PincelTool } from './tools/PincelTool.js';
 import { CameraSVG } from './core/CameraSVG.js';
@@ -137,6 +139,7 @@ overlayCanvas.style.left = '0';
 overlayCanvas.style.pointerEvents = 'none'; // Coordenado com o principal
 canvasContainer.appendChild(overlayCanvas);
 
+// Sincronizar viewBox entre canvas principal e overlay quando necessário
 const observer = new MutationObserver((mutations) => {
   mutations.forEach((mutation) => {
     if (mutation.attributeName === 'viewBox') {
@@ -292,9 +295,12 @@ btnBringToFront.addEventListener('click', () => moverCamada('frente'));
 
 // Atalhos de Teclado (Tool Selection)
 window.addEventListener("keydown", (e) => {
+  // Prevenção de conflitos
+  // Verifica se o usuário está focado em um campo de texto ou input de cor.
   const elementoAtivo = document.activeElement;
   const tagAtiva = elementoAtivo.tagName.toLocaleLowerCase();
 
+  // Se o foco estiver em um input, textArea, select ou contentEditable, ignora o atalho.
   if (["input", "textarea", "select"].includes(tagAtiva) || elementoAtivo.isContentEditable)
     return;
   
@@ -337,6 +343,24 @@ window.addEventListener("keydown", (e) => {
     if (botao) {
       botao.click();
     }
+  }
+});
+
+// --- Duplicar elemento ---
+function handlerDuplicar() {
+  const el = estado.elementosSelecionados[0];
+  if (el) {
+    const clone = duplicarElemento(el, svgCanvas);
+    if (clone) {
+      definirElementosSelecionados(clone);
+    }
+  }
+}
+
+document.addEventListener('keydown', (evento) => {
+  if ((evento.ctrlKey || evento.metaKey) && evento.key.toLowerCase() === 'd') {
+    evento.preventDefault();
+    handlerDuplicar();
   }
 });
 
