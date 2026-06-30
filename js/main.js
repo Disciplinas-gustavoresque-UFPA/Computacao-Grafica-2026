@@ -7,10 +7,10 @@
  * - Conectar os botões da barra de ferramentas ao StateManager
  */
 
-import { 
-  estado, 
-  definirFerramenta, 
-  definirCorPreenchimento, 
+import {
+  estado,
+  definirFerramenta,
+  definirCorPreenchimento,
   definirCorBorda,
   definirGerenciadorSelecao,
   definirElementosSelecionados,
