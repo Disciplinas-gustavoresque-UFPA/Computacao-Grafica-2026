@@ -96,7 +96,9 @@ export class LinhaCurvadaTool extends ToolBase {
   }
 
   finalizarCurva(pontoFinal) {
-    if (!this.pathElement || this.pontos.length === 0 || !pontoFinal) {
+    const pontosFinais = this.montarPontosPath(pontoFinal);
+
+    if (!this.pathElement || pontosFinais.length < 2) {
       this.resetarDesenho();
       return;
     }
@@ -119,7 +121,7 @@ export class LinhaCurvadaTool extends ToolBase {
   }
 
   criarPathData(pontoPreview = null) {
-    const pontosPath = pontoPreview ? [...this.pontos, pontoPreview] : [...this.pontos];
+    const pontosPath = this.montarPontosPath(pontoPreview);
 
     if (pontosPath.length === 0) return '';
 
@@ -153,6 +155,21 @@ export class LinhaCurvadaTool extends ToolBase {
       x: (pontoA.x + pontoB.x) / 2,
       y: (pontoA.y + pontoB.y) / 2,
     };
+  }
+
+  montarPontosPath(pontoExtra = null) {
+    const pontosPath = [...this.pontos];
+    const ultimoPonto = pontosPath[pontosPath.length - 1];
+
+    if (pontoExtra && (!ultimoPonto || !this.pontosSaoIguais(ultimoPonto, pontoExtra))) {
+      pontosPath.push(pontoExtra);
+    }
+
+    return pontosPath;
+  }
+
+  pontosSaoIguais(pontoA, pontoB) {
+    return pontoA.x === pontoB.x && pontoA.y === pontoB.y;
   }
 
   obterAtributosEstiloLinha() {
