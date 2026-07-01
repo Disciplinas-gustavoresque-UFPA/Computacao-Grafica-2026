@@ -42,6 +42,7 @@ import { CameraSVG } from './core/CameraSVG.js';
 import { obterCoordenadaSVG } from './utils/svgHelpers.js';
 import { HistoryManager } from './core/HistoryManager.js';
 import { agruparElementos, desagruparElementos } from './core/GroupManager.js';
+import { ToolbarGroup } from './core/ToolbarGroup.js';
 
 const svgCanvas = document.getElementById('canvas');
 
@@ -54,6 +55,7 @@ inicializarMenuInicial(svgCanvas);
 
 // Inicializar a sidebar
 const barraLateral = new SideBar();
+const toolbarGroup = new ToolbarGroup();
 
 const areaDesenho = document.getElementById('area-desenho');
 const botoesFerramenta = document.querySelectorAll('.btn-ferramenta');
