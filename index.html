@@ -296,7 +296,6 @@
             <div style="padding: 16px;">
                 <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #0f3460;">Estilo do Objeto</h3>
                 
-                <!-- Linha 1: Preenchimento e Borda -->
                 <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 12px;">
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <span style="font-size: 13px; color: #333;">Preenchimento:</span>
@@ -311,8 +310,8 @@
                 <!-- Linha 2: Grossura da Borda com exibição de pixels -->
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <span style="font-size: 13px; color: #333; min-width: 120px;">Grossura da Borda:</span>
-                    <input type="range" id="grossura-borda" min="0.5" max="20" value="2" step="0.5" style="flex: 1; height: 4px; -webkit-appearance: none; appearance: none; background: #d0d0d0; border-radius: 2px; outline: none;" />
-                    <span id="grossura-valor" style="font-size: 14px; font-weight: 700; min-width: 45px; text-align: center; color: #ffffff; background: #4a90d9; padding: 3px 10px; border-radius: 4px; border: 1px solid #2a6bb0;">2px</span>
+                    <input type="range" id="grossura-borda" min="0.5" max="20" value="2" step="0.5" style="flex: 1; height: 4px; -webkit-appearance: none; appearance: none; background: #d0d0d0; border-radius: 2px; outline: none; min-width: 30px;" />
+                    <span id="grossura-valor" style="font-size: 13px; font-weight: 600; width: 40px; text-align: center; color: #0f3460; flex-shrink: 0; display: inline-block;">2px</span>
                 </div>
             </div>
         </div>
@@ -323,10 +322,6 @@
 </aside>
         </div><!-- /#workspace -->
     </div><!-- /#app -->
-
-    <button id="btn-opcao-borda" class="oculto btn-flutuante" title="Ajustar Borda">
-    ⚙️ Borda
-    </button>
     
     <div id="card-edicao-borda" class="oculto painel-flutuante">
         <div class="card-header">
