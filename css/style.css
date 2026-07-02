@@ -536,15 +536,15 @@ body {
   flex-direction: column;
   color: #0f3460;
   flex-shrink: 0;
-  
+
   /* Transição por margem faz o Canvas redimensionar dinamicamente */
-  transition: margin-right 0.3s ease; 
-  margin-right: 0; 
+  transition: margin-right 0.3s ease;
+  margin-right: 0;
 }
 
 /* Quando escondida, puxa a barra para fora e cede o espaço no Flexbox */
 #barra-configuracoes.escondida {
-  margin-right: -300px; 
+  margin-right: -300px;
 }
 
 /* Estilo do botão de toggle posicionado dinamicamente */
@@ -559,7 +559,9 @@ body {
   cursor: pointer;
   padding: 10px 5px;
   z-index: 10;
-  transition: right 0.3s ease, transform 0.3s ease;
+  transition:
+    right 0.3s ease,
+    transform 0.3s ease;
 }
 
 /* Rotaciona a setinha quando esconder */
@@ -593,7 +595,7 @@ body {
 
 /* Container do conteúdo */
 .tabs-container {
-  overflow-y: scroll; 
+  overflow-y: scroll;
   overflow-x: hidden;
 }
 .tab-content {
@@ -606,8 +608,8 @@ body {
 }
 
 .node-handle:hover {
-    fill: #4a90d9; /* Inverte a cor ao passar o mouse */
-    stroke: white;
+  fill: #4a90d9; /* Inverte a cor ao passar o mouse */
+  stroke: white;
 }
 
 /* =========================================================
@@ -627,7 +629,7 @@ body {
   display: block;
   position: absolute;
   background: var(--ruler-bg);
-  z-index: 1; /*0*/
+  z-index: 2; /*0*/
   pointer-events: none;
   overflow: hidden;
   box-sizing: border-box;
@@ -636,7 +638,7 @@ body {
 }
 
 .regua-h {
-  top: var(--altura-painel-superior);
+  top: 0;
   left: calc(var(--largura-barra-lateral) + var(--ruler-size));
   width: calc(100% - var(--largura-barra-lateral) - var(--ruler-size));
   height: var(--ruler-size);
@@ -650,10 +652,10 @@ body {
 }
 
 .regua-v {
-  top: calc(var(--altura-painel-superior) + var(--ruler-size));
+  top: var(--ruler-size);
   left: var(--largura-barra-lateral);
   width: var(--ruler-size);
-  height: calc(100% - var(--altura-painel-superior) - var(--ruler-size));
+  height: calc(100% - var(--ruler-size));
   border-right: 1px solid var(--ruler-border);
   background: linear-gradient(
     to right,
@@ -679,11 +681,11 @@ body {
 }
 .regua-quina {
   position: absolute;
-  top: var(--altura-painel-superior);
+  top: 0;
   left: var(--largura-barra-lateral);
   width: var(--ruler-size);
   height: var(--ruler-size);
-  z-index: 0; /*1*/
+  z-index: 3; /*1*/
   pointer-events: none;
   box-sizing: border-box;
   border-right: 1px solid var(--ruler-border);

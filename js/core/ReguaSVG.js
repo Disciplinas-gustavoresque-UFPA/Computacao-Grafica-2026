@@ -62,10 +62,12 @@ export class ReguaSVG {
   }
 
   setupCanvas() {
-    const svgRect = this.svg.getBoundingClientRect();
+    // const svgRect = this.svg.getBoundingClientRect();
+    const hRect = this.hCanvas.parentElement.getBoundingClientRect();
+    const vRect = this.vCanvas.parentElement.getBoundingClientRect();
     const dpr = this.dpr;
-    const width = Math.round(svgRect.width);
-    const height = Math.round(svgRect.height);
+    const width = Math.round(hRect.width);
+    const height = Math.round(vRect.height);
 
     if (width === 0 || height === 0) return;
 
@@ -182,14 +184,27 @@ export class ReguaSVG {
 
   worldToScreenX(value) {
     const vb = this.camera.viewBox;
-    const viewWidth = this.hCanvas.width / this.dpr;
-    return ((value - vb.x) / vb.width) * viewWidth;
+    // const viewWidth = this.hCanvas.width / this.dpr;
+    // return ((value - vb.x) / vb.width) * viewWidth;
+    const svgRect = this.svg.getBoundingClientRect();
+    const rulerRect = this.hCanvas.parentElement.getBoundingClientRect();
+    return (
+      ((value - vb.x) / vb.width) * svgRect.width +
+      (svgRect.left - rulerRect.left)
+    );
   }
 
   worldToScreenY(value) {
     const vb = this.camera.viewBox;
-    const viewHeight = this.vCanvas.height / this.dpr;
-    return ((value - vb.y) / vb.height) * viewHeight;
+    // const viewHeight = this.vCanvas.height / this.dpr;
+    // return ((value - vb.y) / vb.height) * viewHeight;
+    const svgRect = this.svg.getBoundingClientRect();
+    const rulerRect = this.vCanvas.parentElement.getBoundingClientRect();
+
+    return (
+      ((value - vb.y) / vb.height) * svgRect.height +
+      (svgRect.top - rulerRect.top)
+    );
   }
 
   isMultiple(value, step) {
@@ -247,10 +262,16 @@ export class ReguaSVG {
     ctx.fillStyle = this.numberColor;
     ctx.font = this.textFont;
 
+    const svgRect = this.svg.getBoundingClientRect();
+    const rulerRect = this.hCanvas.parentElement.getBoundingClientRect();
+    const rulerLeftWorld =
+      vb.x - ((svgRect.left - rulerRect.left) / svgRect.width) * vb.width;
+    const rulerWidthWorld = (rulerRect.width / svgRect.width) * vb.width;
+
     // MICRO
     ctx.beginPath();
-    const microStart = Math.floor(vb.x / microStep) * microStep;
-    const microCount = Math.ceil(vb.width / microStep) + 4;
+    const microStart = Math.floor(rulerLeftWorld / microStep) * microStep;
+    const microCount = Math.ceil(rulerWidthWorld / microStep) + 4;
 
     for (let i = 0; i < microCount; i++) {
       const value = microStart + i * microStep;
@@ -267,8 +288,8 @@ export class ReguaSVG {
 
     // MINOR
     ctx.beginPath();
-    const minorStart = Math.floor(vb.x / minorStep) * minorStep;
-    const minorCount = Math.ceil(vb.width / minorStep) + 4;
+    const minorStart = Math.floor(rulerLeftWorld / minorStep) * minorStep;
+    const minorCount = Math.ceil(rulerWidthWorld / minorStep) + 4;
 
     for (let i = 0; i < minorCount; i++) {
       const value = minorStart + i * minorStep;
@@ -282,8 +303,8 @@ export class ReguaSVG {
     // MAJOR & LABELS
     const precision = this.getLabelPrecision(majorStep);
     ctx.beginPath();
-    const majorStart = Math.floor(vb.x / majorStep) * majorStep;
-    const majorCount = Math.ceil(vb.width / majorStep) + 4;
+    const majorStart = Math.floor(rulerLeftWorld / majorStep) * majorStep;
+    const majorCount = Math.ceil(rulerWidthWorld / majorStep) + 4;
 
     for (let i = 0; i < majorCount; i++) {
       const value = majorStart + i * majorStep;
@@ -315,10 +336,16 @@ export class ReguaSVG {
     ctx.fillStyle = this.numberColor;
     ctx.font = this.textFont;
 
+    const svgRect = this.svg.getBoundingClientRect();
+    const rulerRect = this.vCanvas.parentElement.getBoundingClientRect();
+    const rulerTopWorld =
+      vb.y - ((svgRect.top - rulerRect.top) / svgRect.height) * vb.height;
+    const rulerHeightWorld = (rulerRect.height / svgRect.height) * vb.height;
+
     // MICRO
     ctx.beginPath();
-    const microStart = Math.floor(vb.y / microStep) * microStep;
-    const microCount = Math.ceil(vb.height / microStep) + 4;
+    const microStart = Math.floor(rulerTopWorld / microStep) * microStep;
+    const microCount = Math.ceil(rulerHeightWorld / microStep) + 4;
 
     for (let i = 0; i < microCount; i++) {
       const value = microStart + i * microStep;
@@ -335,8 +362,8 @@ export class ReguaSVG {
 
     // MINOR
     ctx.beginPath();
-    const minorStart = Math.floor(vb.y / minorStep) * minorStep;
-    const minorCount = Math.ceil(vb.height / minorStep) + 4;
+    const minorStart = Math.floor(rulerTopWorld / minorStep) * minorStep;
+    const minorCount = Math.ceil(rulerHeightWorld / minorStep) + 4;
 
     for (let i = 0; i < minorCount; i++) {
       const value = minorStart + i * minorStep;
@@ -350,8 +377,8 @@ export class ReguaSVG {
     // MAJOR & LABELS
     const precision = this.getLabelPrecision(majorStep);
     ctx.beginPath();
-    const majorStart = Math.floor(vb.y / majorStep) * majorStep;
-    const majorCount = Math.ceil(vb.height / majorStep) + 4;
+    const majorStart = Math.floor(rulerTopWorld / majorStep) * majorStep;
+    const majorCount = Math.ceil(rulerHeightWorld / majorStep) + 4;
 
     for (let i = 0; i < majorCount; i++) {
       const value = majorStart + i * majorStep;
@@ -380,7 +407,7 @@ export class ReguaSVG {
 
     if (!this.mouse.inside) return;
 
-    const x = this.mouse.screenX;
+    const x = this.worldToScreenX(this.mouse.worldX);
     ctx.beginPath();
     ctx.moveTo(x, 0);
     ctx.lineTo(x, height / this.dpr);
@@ -407,7 +434,7 @@ export class ReguaSVG {
 
     if (!this.mouse.inside) return;
 
-    const y = this.mouse.screenY;
+    const y = this.worldToScreenY(this.mouse.worldY);
     ctx.beginPath();
     ctx.moveTo(0, y);
     ctx.lineTo(width / this.dpr, y);
