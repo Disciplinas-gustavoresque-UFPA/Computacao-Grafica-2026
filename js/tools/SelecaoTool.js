@@ -69,7 +69,7 @@ export class SelecaoTool extends ToolBase {
     const target = evento.target;
     const isShift = evento.shiftKey;
 
-    const allowedTags = ['rect', 'text', 'image', 'circle', 'ellipse', 'g', 'path', 'line', 'lapis'];
+    const allowedTags = ['rect', 'text', 'image', 'circle', 'ellipse', 'g', 'path', 'line', 'lapis', 'polygon'];
     const tag = target.tagName ? target.tagName.toLowerCase() : '';
 
     // Verifica se o clique foi em um elemento válido dentro do canvas
@@ -130,7 +130,7 @@ export class SelecaoTool extends ToolBase {
           el.setAttribute('y1', String(novoY));
           el.setAttribute('x2', String(parseFloat(el.getAttribute('x2') || 0) + dx));
           el.setAttribute('y2', String(parseFloat(el.getAttribute('y2') || 0) + dy));
-      } else if (tag === 'path' || tag === 'g') {
+      } else if (tag === 'path' || tag === 'g' || tag === 'polygon') {
         // Aplica a translação nativa em vez de escrever string template
         this._definirTranslacao(el, novoX, novoY);
       }
@@ -203,7 +203,7 @@ export class SelecaoTool extends ToolBase {
       } else if (tag === 'line') {
         x = parseFloat(el.getAttribute('x1') || 0);
         y = parseFloat(el.getAttribute('y1') || 0);
-      } else if (tag === 'path' || tag === 'g') {
+      } else if (tag === 'path' || tag === 'g' || tag === 'polygon') {
         const translacao = this._obterTranslacao(el);
         x = translacao.x;
         y = translacao.y;
@@ -233,7 +233,7 @@ export class SelecaoTool extends ToolBase {
       } else if (tag === 'line') {
         xAtual = parseFloat(el.getAttribute('x1') || 0);
         yAtual = parseFloat(el.getAttribute('y1') || 0);
-      } else if (tag === 'path' || tag === 'g') {
+      } else if (tag === 'path' || tag === 'g' || tag === 'polygon') {
         const translacao = this._obterTranslacao(el);
         xAtual = translacao.x;
         yAtual = translacao.y;
@@ -299,7 +299,7 @@ export class SelecaoTool extends ToolBase {
       } else if (tag === 'line') {
         elX = parseFloat(el.getAttribute('x1') || 0);
         elY = parseFloat(el.getAttribute('y1') || 0);
-      } else if (tag === 'path' || tag === 'g') {
+      } else if (tag === 'path' || tag === 'g' || tag === 'polygon') {
         // Usa a leitura nativa em vez do atributo 'data-x'
         const translacao = this._obterTranslacao(el);
         elX = translacao.x;

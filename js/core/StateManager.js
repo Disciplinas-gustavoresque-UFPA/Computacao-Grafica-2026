@@ -8,7 +8,8 @@
  * - ferramentaAtual {ToolBase|null} - Instância da ferramenta de desenho ativa.
  * - corPreenchimento {string}       - Cor de preenchimento dos elementos (formato hex).
  * - corBorda {string}               - Cor da borda/stroke dos elementos (formato hex).
- * - elementosSelecionados {SVGElement[]} - Elementos SVG atualmente selecionados.
+* numeroLados {number}            - Quantidade de lados do polígono regular. 
+* - elementosSelecionados {SVGElement[]} - Elementos SVG atualmente selecionados.
  * - interfaceAtual {string}         - Flag para sabermos a tela onde o usuário está.
  */
 
@@ -19,6 +20,7 @@ export const estado = {
   corBorda: '#1a1a2e',
   interfaceAtual: 'inicio', // Nova flag para sabermos onde o usuário está
   elementosSelecionados: [],
+  numeroLados: 6, // novo estado para o número de lados do polígono regular
 };
 
 let gerenciadorSelecaoVisual = null;

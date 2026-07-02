@@ -177,6 +177,15 @@
                         &bowtie;
                     </button>
                     <button
+                        id="btn-criar-poligono"
+                        class="btn-ferramenta"
+                        data-ferramenta="poligonoRegular"
+                        data-nome="Polígono Regular"
+                        data-tooltip="Polígono Regular (O)"
+                    >
+                        ⬡
+                    </button>
+                    <button
                         id="btn-criar-texto"
                         class="btn-ferramenta"
                         data-ferramenta="texto"
@@ -300,6 +309,16 @@
                 
                         <label>Borda:
                             <input type="color" id="cor-borda" value="#1a1a2e" />
+                        </label>
+
+                        <label>Lados:
+                            <input
+                                type="number"
+                                id="numero-lados"
+                                min="3"
+                                max="30"
+                                value="6"
+                            />
                         </label>
                     </div>
 
