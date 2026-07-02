@@ -24,10 +24,9 @@ import { Lapis } from './tools/LapisTool.js';
 import { RetanguloTool } from './tools/RetanguloTool.js';
 import { TextoTool } from './tools/TextoTool.js';
 import { exportarDesenho } from './utils/exportHelpers.js';
-import { SelecaoTool } from './tools/SelecaoTool.js';
+import { SelectionNodeEditTool } from './tools/SelectionNodeEditTool.js';
 import { Selecao } from './core/Selecao.js';
 import { BorrachaTool } from './tools/BorrachaTool.js';
-import { NodeEditTool } from './tools/NodeEditTool.js';
 import { LinhaTool } from './tools/LinhaTool.js';
 import { LinhaCurvadaTool } from './tools/LinhaCurvadaTool.js';
 import { ElipseTool } from './tools/ElipseTool.js';
@@ -167,8 +166,7 @@ definirGerenciadorSelecao(selecaoVisual);
 // Instâncias das ferramentas disponíveis com todas as implementações da main
 const cameraGlobal = new CameraSVG([svgCanvas, overlayCanvas]);
 const instanciasFerramentas = {
-  selecao: new SelecaoTool(svgCanvas),
-  edicaoVertices: new NodeEditTool(svgCanvas),
+  selecao: new SelectionNodeEditTool(svgCanvas),
   retangulo: new RetanguloTool(svgCanvas),
   linha: new LinhaTool(svgCanvas),
   linhaCurvada: new LinhaCurvadaTool(svgCanvas),
