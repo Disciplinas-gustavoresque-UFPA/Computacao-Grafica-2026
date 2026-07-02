@@ -83,8 +83,9 @@ export class PoligonoRegularTool extends ToolBase {
         const width = parseFloat(this.poligonoElement.getAttribute("width"));
         const height = parseFloat(this.poligonoElement.getAttribute("height"));
 
-        const lados = parseInt(
-            this.poligonoElement.getAttribute("data-lados")
+        const lados = Math.max(
+            3,
+            parseInt(this.poligonoElement.getAttribute("data-lados"))
         );
 
         const cx = x + width / 2;

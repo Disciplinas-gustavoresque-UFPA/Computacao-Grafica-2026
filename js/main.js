@@ -62,6 +62,7 @@ const btnImportarImagem = document.getElementById('btn-importar-imagem');
 const inputImagem = document.getElementById('input-imagem');
 const inputCorPreenchimento = document.getElementById('cor-preenchimento');
 const inputCorBorda = document.getElementById('cor-borda');
+const inputNumeroLados = document.getElementById('numero-lados');
 const nomeFerramenta = document.getElementById('nome-ferramenta');
 const btnExportar = document.getElementById('btn-exportar');
 const exportFormat = document.getElementById('export-format');
@@ -232,6 +233,22 @@ inputCorBorda.addEventListener('input', () => {
   });
 });
 
+// Ouvir mudanças no input de número de lados do polígono regular
+inputNumeroLados.addEventListener('input', () => {
+
+    let lados = parseInt(inputNumeroLados.value);
+
+    if (isNaN(lados))
+        lados = 3;
+
+    lados = Math.max(3, Math.min(30, lados));
+
+    inputNumeroLados.value = lados;
+
+    estado.numeroLados = lados;
+
+});
+
 // Atualizar os inputs da sidebar quando o usuário selecionar um objeto
 // Usamos um MutationObserver ou interceptamos cliques no Canvas para capturar a seleção.
 svgCanvas.addEventListener('mouseup', (evento) => {
@@ -278,6 +295,7 @@ svgCanvas.addEventListener('contextmenu', (e) => {
 // Inicializa os valores dos inputs com os valores padrão do estado
 inputCorPreenchimento.value = estado.corPreenchimento;
 inputCorBorda.value = estado.corBorda;
+inputNumeroLados.value = estado.numeroLados;
 
 // Exportar / Salvar desenho
 btnExportar.addEventListener('click', () => {
