@@ -42,6 +42,7 @@ import { CameraSVG } from './core/CameraSVG.js';
 import { obterCoordenadaSVG } from './utils/svgHelpers.js';
 import { HistoryManager } from './core/HistoryManager.js';
 import { agruparElementos, desagruparElementos } from './core/GroupManager.js';
+import { PoligonoRegularTool } from './tools/PoligonoRegularTool.js';
 
 const svgCanvas = document.getElementById('canvas');
 
@@ -180,6 +181,7 @@ const instanciasFerramentas = {
   borracha: new BorrachaTool(svgCanvas),
   lapis: new Lapis(svgCanvas),
   pincel: new PincelTool(svgCanvas),
+  poligonoRegular: new PoligonoRegularTool(svgCanvas),
 };
 
 /**
@@ -377,7 +379,8 @@ window.addEventListener("keydown", (e) => {
     "c" : "linhaCurvada",
     "p" : "poligono",
     "t" : "texto",
-    "i" : "conta-gotas"
+    "i" : "conta-gotas",
+    "o": "poligonoRegular",
   }
 
   const teclaPressionada = e.key.toLowerCase();
