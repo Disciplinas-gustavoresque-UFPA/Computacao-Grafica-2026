@@ -2,6 +2,7 @@ import { ToolBase } from './ToolBase.js';
 import { obterCoordenadaSVG, criarElementoSVG } from '../utils/svgHelpers.js';
 import { RetanguloShape } from '../shape/RetanguloShape.js';
 import { ElipseShape } from '../shape/ElipseShape.js';
+import { PoligonoRegularShape } from '../shape/PoligonoRegularShape.js';
 
 /**
  * NodeEditTool
@@ -20,6 +21,7 @@ export class NodeEditTool extends ToolBase {
             'rect': new RetanguloShape(svgCanvas),
             'ellipse': new ElipseShape(svgCanvas),
             'image': new RetanguloShape(svgCanvas), // Image possui as mesmas propriedades de retangulos
+            'polygon': new PoligonoRegularShape(svgCanvas)
         }
     }
 

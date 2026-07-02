@@ -44,7 +44,8 @@ export class PoligonoRegularTool extends ToolBase {
             stroke: estado.corBorda,
             'stroke-width': 2,
 
-            'data-lados': estado.numeroLados || 6
+            'data-shape': 'regular-polygon',
+            'data-lados': estado.numeroLados
 
         });
 
