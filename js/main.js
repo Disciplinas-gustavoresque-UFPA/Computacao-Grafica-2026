@@ -13,6 +13,7 @@ import {
   definirCorPreenchimento,
   definirCorBorda,
   definirGerenciadorSelecao,
+  definirElementosSelecionados,
   definirGerenciadorHistorico,
   desfazerAcao,
   refazerAcao,
@@ -28,14 +29,21 @@ import { Selecao } from "./core/Selecao.js";
 import { BorrachaTool } from "./tools/BorrachaTool.js";
 import { NodeEditTool } from "./tools/NodeEditTool.js";
 import { LinhaTool } from "./tools/LinhaTool.js";
+import { LinhaCurvadaTool } from './tools/LinhaCurvadaTool.js';
 import { ElipseTool } from "./tools/ElipseTool.js";
 import { LupaTool } from "./tools/LupaTool.js";
 import { inicializarImportadorImagem } from "./tools/ImageImporter.js";
 import { inicializarMenuInicial } from "./core/UIManager.js";
+import { duplicarElemento } from './utils/duplicateHelpers.js';
 import { PoligonoPolilinhaTool } from "./tools/PoligonoPolilinhaTool.js";
+import { SideBar } from './core/SideBar.js';
+import { PincelTool } from './tools/PincelTool.js';
+import { CameraSVG } from './core/CameraSVG.js';
+import { obterCoordenadaSVG } from './utils/svgHelpers.js';
 import { HistoryManager } from "./core/HistoryManager.js";
 import { CameraSVG } from "./core/CameraSVG.js";
 import { ReguaSVG } from "./core/ReguaSVG.js";
+import { agruparElementos, desagruparElementos } from './core/GroupManager.js';
 
 const svgCanvas = document.getElementById("canvas");
 
@@ -45,6 +53,9 @@ definirGerenciadorHistorico(historyManager);
 
 // Inicializar a tela de menu inicial
 inicializarMenuInicial(svgCanvas);
+
+// Inicializar a sidebar
+const barraLateral = new SideBar();
 
 const areaDesenho = document.getElementById("area-desenho");
 const botoesFerramenta = document.querySelectorAll(".btn-ferramenta");
@@ -62,22 +73,20 @@ const btnRefazer = document.getElementById("btn-refazer");
 
 // Função para atualizar o estado dos botões de histórico
 function atualizarBotoesHistorico() {
-  if (!historyManager) return;
+    if (!historyManager) return;
 
-  const podeDesfazer = historyManager.podeDesfazer();
-  const podeRefazer = historyManager.podeRefazer();
+    const podeDesfazer = historyManager.podeDesfazer();
+    const podeRefazer = historyManager.podeRefazer();
 
-  if (btnDesfazer) {
-    btnDesfazer.disabled = !podeDesfazer;
-    btnDesfazer.title = podeDesfazer
-      ? "Desfazer (Ctrl+Z)"
-      : "Nada para desfazer";
-  }
+    if (btnDesfazer) {
+        btnDesfazer.disabled = !podeDesfazer;
+        btnDesfazer.title = podeDesfazer ? 'Desfazer (Ctrl+Z)' : 'Nada para desfazer';
+    }
 
-  if (btnRefazer) {
-    btnRefazer.disabled = !podeRefazer;
-    btnRefazer.title = podeRefazer ? "Refazer (Ctrl+Y)" : "Nada para refazer";
-  }
+    if (btnRefazer) {
+        btnRefazer.disabled = !podeRefazer;
+        btnRefazer.title = podeRefazer ? 'Refazer (Ctrl+Y)' : 'Nada para refazer';
+    }
 }
 
 // Sobrescrever o método salvarEstado do historyManager para atualizar os botões
@@ -141,6 +150,7 @@ overlayCanvas.style.left = "0";
 overlayCanvas.style.pointerEvents = "none"; // Coordenado com o principal
 canvasContainer.appendChild(overlayCanvas);
 
+// Sincronizar viewBox entre canvas principal e overlay quando necessário
 const observer = new MutationObserver((mutations) => {
   mutations.forEach((mutation) => {
     if (mutation.attributeName === "viewBox") {
@@ -159,33 +169,36 @@ observer.observe(svgCanvas, { attributes: true, attributeFilter: ["viewBox"] });
 const selecaoVisual = new Selecao(overlayCanvas);
 definirGerenciadorSelecao(selecaoVisual);
 
-const camera = new CameraSVG([svgCanvas, overlayCanvas]);
+
+
+// Instâncias das ferramentas disponíveis com todas as implementações da main
+const cameraGlobal = new CameraSVG([svgCanvas, overlayCanvas]);
 const reguas = new ReguaSVG(
   document.getElementById("regua-h-base"),
   document.getElementById("regua-h-overlay"),
 
   document.getElementById("regua-v-base"),
   document.getElementById("regua-v-overlay"),
-  camera,
+  cameraGlobal,
 );
-
-// Instâncias das ferramentas disponíveis com todas as implementações da main
 const instanciasFerramentas = {
   selecao: new SelecaoTool(svgCanvas),
   edicaoVertices: new NodeEditTool(svgCanvas),
   retangulo: new RetanguloTool(svgCanvas),
   linha: new LinhaTool(svgCanvas),
+  linhaCurvada: new LinhaCurvadaTool(svgCanvas),
   poligono: new PoligonoPolilinhaTool(svgCanvas),
   elipse: new ElipseTool(svgCanvas),
   "Conta-gotas": new ColorPickerTool(svgCanvas),
-  lupa: new LupaTool(svgCanvas, overlayCanvas, camera),
+  lupa: new LupaTool(svgCanvas, overlayCanvas, cameraGlobal),
   texto: new TextoTool(svgCanvas),
   borracha: new BorrachaTool(svgCanvas),
   lapis: new Lapis(svgCanvas),
+  pincel: new PincelTool(svgCanvas),
 };
 
 /**
- * Atualiza o estado visual dos botões da barra lateral,
+ * Atualiza o estado visual dos botões da sidebar,
  * destacando apenas o botão da ferramenta ativa.
  *
  * @param {string} nomeDaFerramenta - Identificador da ferramenta ativa.
@@ -212,13 +225,47 @@ botoesFerramenta.forEach((btn) => {
   });
 });
 
-// --- Controles de Cor ---
-inputCorPreenchimento.addEventListener("input", () => {
-  definirCorPreenchimento(inputCorPreenchimento.value);
+// Ouvir mudanças no input de cor de preenchimento da sidebar
+inputCorPreenchimento.addEventListener('input', () => {
+  const novaCor = inputCorPreenchimento.value;
+  definirCorPreenchimento(novaCor);
+  // Preenche cada elemento selecionado com a cor desejada
+  estado.elementosSelecionados.forEach(el => {
+    el.setAttribute('fill', novaCor);
+  });
 });
 
-inputCorBorda.addEventListener("input", () => {
-  definirCorBorda(inputCorBorda.value);
+// Ouvir mudanças no input de cor de borda da sidebar
+inputCorBorda.addEventListener('input', () => {
+  const novaCor = inputCorBorda.value;
+  definirCorBorda(novaCor);
+  // Colore a borda de cada elemento selecionado com a cor desejada
+  estado.elementosSelecionados.forEach(el => {
+    el.setAttribute('stroke', novaCor);
+  });
+});
+
+// Atualizar os inputs da sidebar quando o usuário selecionar um objeto
+// Usamos um MutationObserver ou interceptamos cliques no Canvas para capturar a seleção.
+svgCanvas.addEventListener('mouseup', (evento) => {
+  if (estado.ferramentaAtual) {
+    estado.ferramentaAtual.onMouseUp(evento);
+  }
+
+  // Verifica se a ferramenta de seleção acabou de selecionar um elemento
+  // Se houver um elemento selecionado, sincroniza a sidebar com as cores dele
+  if (estado.elementoSelecionado) {
+    const corPreenchimentoAtual = estado.elementoSelecionado.getAttribute('fill') || '#ffffff';
+    const corBordaAtual = estado.elementoSelecionado.getAttribute('stroke') || '#000000';
+
+    // Atualiza o valor visual dos inputs para bater com o objeto selecionado
+    inputCorPreenchimento.value = corPreenchimentoAtual;
+    inputCorBorda.value = corBordaAtual;
+
+    // Atualiza também os valores armazenados no StateManager para consistência
+    definirCorPreenchimento(corPreenchimentoAtual);
+    definirCorBorda(corBordaAtual);
+  }
 });
 
 // Event listeners globais do SVG (delegados para a ferramenta ativa)
@@ -231,12 +278,6 @@ svgCanvas.addEventListener("mousedown", (evento) => {
 svgCanvas.addEventListener("mousemove", (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseMove(evento);
-  }
-});
-
-svgCanvas.addEventListener("mouseup", (evento) => {
-  if (estado.ferramentaAtual) {
-    estado.ferramentaAtual.onMouseUp(evento);
   }
 });
 
@@ -304,19 +345,28 @@ btnBringToFront.addEventListener("click", () => moverCamada("frente"));
 
 // Atalhos de Teclado (Tool Selection)
 window.addEventListener("keydown", (e) => {
+  // Prevenção de conflitos
+  // Verifica se o usuário está focado em um campo de texto ou input de cor.
   const elementoAtivo = document.activeElement;
   const tagAtiva = elementoAtivo.tagName.toLocaleLowerCase();
 
-  if (
-    ["input", "textarea", "select"].includes(tagAtiva) ||
-    elementoAtivo.isContentEditable
-  )
+  // Se o foco estiver em um input, textArea, select ou contentEditable, ignora o atalho.
+  if (["input", "textarea", "select"].includes(tagAtiva) || elementoAtivo.isContentEditable)
     return;
 
   // Atalhos de teclado para o histórico
-  if (e.ctrlKey || e.metaKey) {
-    // metaKey é o Cmd do Mac
-    if (e.key.toLowerCase() === "z") {
+  if (e.ctrlKey || e.metaKey) { // metaKey é o Cmd do Mac
+    if (e.key.toLowerCase() === 'g') {
+      e.preventDefault(); // Impede o navegador de tentar buscar (find)
+      if (e.shiftKey) {
+        desagruparElementos();
+      } else {
+        agruparElementos();
+      }
+      atualizarBotoesHistorico(); // Sincroniza a interface de histórico
+      return;
+    }
+    if (e.key.toLowerCase() === 'z') {
       e.preventDefault();
       if (e.shiftKey) {
         refazerAcao();
@@ -335,14 +385,15 @@ window.addEventListener("keydown", (e) => {
   }
 
   const mapaTeclas = {
-    s: "selecao",
-    r: "retangulo",
-    e: "elipse",
-    l: "linha",
-    p: "poligono",
-    t: "texto",
-    i: "conta-gotas",
-  };
+    "s" : "selecao",
+    "r" : "retangulo",
+    "e" : "elipse",
+    "l" : "linha",
+    "c" : "linhaCurvada",
+    "p" : "poligono",
+    "t" : "texto",
+    "i" : "conta-gotas"
+  }
 
   const teclaPressionada = e.key.toLowerCase();
   const ferramentaAlvo = mapaTeclas[teclaPressionada];
@@ -358,6 +409,24 @@ window.addEventListener("keydown", (e) => {
   }
 });
 
+// --- Duplicar elemento ---
+function handlerDuplicar() {
+  const el = estado.elementosSelecionados[0];
+  if (el) {
+    const clone = duplicarElemento(el, svgCanvas);
+    if (clone) {
+      definirElementosSelecionados(clone);
+    }
+  }
+}
+
+document.addEventListener('keydown', (evento) => {
+  if ((evento.ctrlKey || evento.metaKey) && evento.key.toLowerCase() === 'd') {
+    evento.preventDefault();
+    handlerDuplicar();
+  }
+});
+
 // Importação de imagens
 btnImportarImagem.addEventListener("click", () => {
   inputImagem.click();
@@ -367,3 +436,17 @@ inicializarImportadorImagem(svgCanvas, inputImagem);
 
 // Inicializar o estado dos botões de histórico
 atualizarBotoesHistorico();
+
+// Ctrl + Scroll — Zoom global (funciona com qualquer ferramenta ativa)
+svgCanvas.addEventListener('wheel', (e) => {
+  if (!e.ctrlKey) return;
+  e.preventDefault();
+
+  const coords = obterCoordenadaSVG(e, svgCanvas);
+  const fator = 0.1;
+  const escala = e.deltaY > 0
+    ? 1 + fator   // scroll para baixo = zoom out
+    : 1 - fator;  // scroll para cima  = zoom in
+
+  cameraGlobal.zoom(escala, coords.x, coords.y);
+}, { passive: false });

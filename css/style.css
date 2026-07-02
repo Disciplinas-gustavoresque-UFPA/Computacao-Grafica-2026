@@ -34,6 +34,7 @@ body {
   color: var(--cor-texto);
   height: 100vh;
   overflow: hidden;
+  overscroll-behavior: contain;
 }
 
 /* =========================================================
@@ -126,6 +127,7 @@ body {
 #workspace {
   display: flex;
   overflow: hidden;
+  position: relative;
 }
 
 /* =========================================================
@@ -518,6 +520,94 @@ body {
   background-color: transparent;
   border-color: var(--cor-borda-ui);
   color: var(--cor-texto-secundario);
+}
+
+/* =========================================================
+   Barra Lateral
+   ========================================================= */
+
+/* Nova Barra Lateral Direita */
+#barra-configuracoes {
+  width: 300px;
+  height: auto;
+  background-color: #f4f4f4;
+  border-left: 1px solid #ccc;
+  display: flex;
+  flex-direction: column;
+  color: #0f3460;
+  flex-shrink: 0;
+  
+  /* Transição por margem faz o Canvas redimensionar dinamicamente */
+  transition: margin-right 0.3s ease; 
+  margin-right: 0; 
+}
+
+/* Quando escondida, puxa a barra para fora e cede o espaço no Flexbox */
+#barra-configuracoes.escondida {
+  margin-right: -300px; 
+}
+
+/* Estilo do botão de toggle posicionado dinamicamente */
+#btn-toggle-sidebar {
+  position: absolute;
+  right: 300px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #eee;
+  border: 1px solid #ddd;
+  border-radius: 5px 0 0 5px;
+  cursor: pointer;
+  padding: 10px 5px;
+  z-index: 10;
+  transition: right 0.3s ease, transform 0.3s ease;
+}
+
+/* Rotaciona a setinha quando esconder */
+#btn-toggle-sidebar.sidebar-escondida {
+  right: 0;
+  transform: translateY(-50%) rotate(180deg);
+}
+
+/* Navegação das Abas */
+.tabs-nav {
+  display: flex;
+  background-color: #e0e0e0;
+  border-bottom: 1px solid #ccc;
+}
+
+/* Botão das abas */
+.tab-btn {
+  flex: 1;
+  padding: 10px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-size: 1.2rem;
+}
+
+/* Destaca a aba que está clicada */
+.tab-btn.ativo {
+  background-color: #f4f4f4;
+  border-bottom: 2px solid #4a90d9;
+}
+
+/* Container do conteúdo */
+.tabs-container {
+  overflow-y: scroll; 
+  overflow-x: hidden;
+}
+.tab-content {
+  display: none;
+  height: auto;
+}
+
+.tab-content.ativo {
+  display: block;
+}
+
+.node-handle:hover {
+    fill: #4a90d9; /* Inverte a cor ao passar o mouse */
+    stroke: white;
 }
 
 /* =========================================================
