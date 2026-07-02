@@ -17,7 +17,9 @@ import {
   definirGerenciadorHistorico,
   desfazerAcao,
   refazerAcao,
-  registrarAcaoHistorico
+  registrarAcaoHistorico,
+  definirGrossuraBorda, 
+  obterGrossuraBorda
 } from './core/StateManager.js';
 import { ColorPickerTool } from './tools/ColorPickerTool.js';
 import { Lapis } from './tools/LapisTool.js';
@@ -421,15 +423,56 @@ inicializarImportadorImagem(svgCanvas, inputImagem);
 atualizarBotoesHistorico();
 
 // Ctrl + Scroll — Zoom global (funciona com qualquer ferramenta ativa)
-svgCanvas.addEventListener('wheel', (e) => {
-  if (!e.ctrlKey) return;
-  e.preventDefault();
+// Atualizar os inputs da sidebar quando o usuário selecionar um objeto
+svgCanvas.addEventListener('mouseup', (evento) => {
+  if (estado.ferramentaAtual) {
+    estado.ferramentaAtual.onMouseUp(evento);
+  }
 
-  const coords = obterCoordenadaSVG(e, svgCanvas);
-  const fator = 0.1;
-  const escala = e.deltaY > 0
-    ? 1 + fator   // scroll para baixo = zoom out
-    : 1 - fator;  // scroll para cima  = zoom in
+  // Verifica se a ferramenta de seleção acabou de selecionar um elemento
+  if (estado.elementoSelecionado) {
+    const corPreenchimentoAtual = estado.elementoSelecionado.getAttribute('fill') || '#ffffff';
+    const corBordaAtual = estado.elementoSelecionado.getAttribute('stroke') || '#000000';
+    const grossuraAtual = estado.elementoSelecionado.getAttribute('stroke-width') || '2';
 
-  cameraGlobal.zoom(escala, coords.x, coords.y);
-}, { passive: false });
+    // Atualiza o valor visual dos inputs para bater com o objeto selecionado
+    inputCorPreenchimento.value = corPreenchimentoAtual;
+    inputCorBorda.value = corBordaAtual;
+    
+    // Atualiza o slider de grossura
+    if (inputGrossuraBorda) {
+        const grossuraNum = parseFloat(grossuraAtual) || 2;
+        inputGrossuraBorda.value = grossuraNum;
+        if (valorGrossuraDisplay) {
+            valorGrossuraDisplay.textContent = `${grossuraNum}px`;
+        }
+    }
+
+    // Atualiza os valores armazenados no StateManager
+    definirCorPreenchimento(corPreenchimentoAtual);
+    definirCorBorda(corBordaAtual);
+    definirGrossuraBorda(parseFloat(grossuraAtual) || 2);
+  }
+});
+const inputGrossuraBorda = document.getElementById('grossura-borda');
+const valorGrossuraDisplay = document.getElementById('grossura-valor');
+
+if (inputGrossuraBorda) {
+    // Define o valor inicial
+    inputGrossuraBorda.value = estado.grossuraBorda || 2;
+    if (valorGrossuraDisplay) {
+        valorGrossuraDisplay.textContent = `${inputGrossuraBorda.value}px`;
+    }
+    
+    inputGrossuraBorda.addEventListener('input', () => {
+        const valor = parseFloat(inputGrossuraBorda.value);
+        definirGrossuraBorda(valor);
+        if (valorGrossuraDisplay) {
+            valorGrossuraDisplay.textContent = `${valor}px`;
+        }
+        registrarAcaoHistorico();
+        atualizarBotoesHistorico();
+    });
+}
+
+

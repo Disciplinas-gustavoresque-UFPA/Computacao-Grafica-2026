@@ -20,6 +20,69 @@ export class SelecaoTool extends ToolBase {
     this.isDragging = false;
     this.offsets = [];
     this.estadoInicialMovimento = null;
+
+    this.btnOpcaoBorda = document.getElementById('btn-opcao-borda');
+    this.cardEdicaoBorda = document.getElementById('card-edicao-borda');
+    this.sliderEspessura = document.getElementById('slider-espessura-borda');
+    this.valorEspessuraText = document.getElementById('valor-espessura-borda');
+    this.btnFecharCard = document.getElementById('btn-fechar-card-borda');
+
+    this.elementoAtivoBorda = null; 
+    this.comprimentoElemento = 0;
+
+    this._initEventosBorda();
+  }
+
+  _initEventosBorda() {
+    if (!this.btnOpcaoBorda) return;
+
+    this.btnOpcaoBorda.addEventListener('click', (e) => {
+      const rect = this.btnOpcaoBorda.getBoundingClientRect();
+      this.cardEdicaoBorda.style.left = `${rect.right + 10}px`;
+      this.cardEdicaoBorda.style.top = `${rect.top}px`;
+      
+      this.cardEdicaoBorda.classList.remove('oculto');
+      this.btnOpcaoBorda.classList.add('oculto');
+    });
+
+    this.sliderEspessura.addEventListener('input', (e) => {
+      if (!this.elementoAtivoBorda) return;
+      
+      const porcentagem = parseFloat(e.target.value);
+      this.valorEspessuraText.textContent = `${porcentagem}%`;
+      
+      const novaEspessura = (porcentagem / 100) * this.comprimentoElemento;
+      
+      this.elementoAtivoBorda.setAttribute('stroke-width', String(novaEspessura));
+    });
+
+    this.sliderEspessura.addEventListener('change', () => {
+        registrarAcaoHistorico();
+    });
+
+    this.btnFecharCard.addEventListener('click', () => {
+      this.esconderOpcaoBorda();
+    });
+  }
+
+  mostrarOpcaoBorda(elementoSVG, eventoMouse) {
+    this.elementoAtivoBorda = elementoSVG;
+    
+    const bbox = this.elementoAtivoBorda.getBBox();
+    
+    this.comprimentoElemento = Math.max(bbox.width, bbox.height);
+    
+    this.btnOpcaoBorda.style.left = `${eventoMouse.clientX + 15}px`;
+    this.btnOpcaoBorda.style.top = `${eventoMouse.clientY - 15}px`;
+    this.btnOpcaoBorda.classList.remove('oculto');
+    
+    this.cardEdicaoBorda.classList.add('oculto'); 
+  }
+
+  esconderOpcaoBorda() {
+    if(this.btnOpcaoBorda) this.btnOpcaoBorda.classList.add('oculto');
+    if(this.cardEdicaoBorda) this.cardEdicaoBorda.classList.add('oculto');
+    this.elementoAtivoBorda = null;
   }
 
   /**
@@ -80,13 +143,16 @@ export class SelecaoTool extends ToolBase {
         // Alterna seleção com Shift
         if (estado.elementosSelecionados.includes(elementoAlvo)) {
           removerElementoSelecao(elementoAlvo);
+          this.esconderOpcaoBorda();
         } else {
           adicionarElementoSelecao(elementoAlvo);
+          this.mostrarOpcaoBorda(elementoAlvo, evento);
         }
       } else {
         if (!estado.elementosSelecionados.includes(elementoAlvo)) {
           definirElementosSelecionados([elementoAlvo]);
         }
+        this.mostrarOpcaoBorda(elementoAlvo, evento);
       }
 
       if (estado.elementosSelecionados.length > 0) {
@@ -95,6 +161,7 @@ export class SelecaoTool extends ToolBase {
         this._salvarEstadoInicialMovimento();
       }
     } else {
+      this.esconderOpcaoBorda();
       if (!isShift) {
         this.limparSelecao();
       }
@@ -103,6 +170,8 @@ export class SelecaoTool extends ToolBase {
 
   onMouseMove(evento) {
     if (!this.isDragging || estado.elementosSelecionados.length === 0) return;
+
+    this.esconderOpcaoBorda();
 
     const pt = obterCoordenadaSVG(evento, this.svgCanvas);
 
@@ -144,6 +213,8 @@ export class SelecaoTool extends ToolBase {
       const houveMovimento = this._houveMovimentoReal();
       if (houveMovimento) {
         registrarAcaoHistorico();
+      } else if (estado.elementosSelecionados.length === 1) {
+         this.mostrarOpcaoBorda(estado.elementosSelecionados[0], evento);
       }
     }
     this.isDragging = false;
@@ -161,7 +232,6 @@ export class SelecaoTool extends ToolBase {
     const elementos = [...estado.elementosSelecionados];
     if (elementos.length === 0) return;
     
-
     elementos.forEach(el => {
       if (el && el.parentNode) {
         el.remove();
@@ -170,6 +240,7 @@ export class SelecaoTool extends ToolBase {
     
     // Limpa a seleção
     definirElementosSelecionados([]);
+    this.esconderOpcaoBorda();
     
     // Registrar a exclusão no histórico
     registrarAcaoHistorico();
@@ -184,6 +255,7 @@ export class SelecaoTool extends ToolBase {
     this.offsets = [];
     this.estadoInicialMovimento = null;
     definirElementosSelecionados([]);
+    this.esconderOpcaoBorda();
   }
 
   /**
