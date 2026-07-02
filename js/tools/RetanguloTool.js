@@ -36,7 +36,7 @@ export class RetanguloTool extends ToolBase {
       height: 0,
       fill: estado.corPreenchimento,
       stroke: estado.corBorda,
-      'stroke-width': 2
+      'stroke-width': estado.grossuraBorda || 2
     });
 
     this.svgCanvas.appendChild(this.rectElement);

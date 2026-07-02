@@ -56,7 +56,7 @@ export class PoligonoPolilinhaTool extends ToolBase {
             this.polylineElement = criarElementoSVG('polyline', {
                 points: this.formatarPoints(),
                 stroke: estado.corBorda,
-                'stroke-width': 2,
+                'stroke-width': estado.grossuraBorda || 2,
                 fill: 'transparent'
             });
             this.svgCanvas.appendChild(this.polylineElement);
@@ -133,7 +133,7 @@ export class PoligonoPolilinhaTool extends ToolBase {
         const poligonoFinal = criarElementoSVG('polygon', {
             points: this.formatarPoints(),
             stroke: estado.corBorda,
-            'stroke-width': 2,
+            'stroke-width': estado.grossuraBorda || 2,
             fill: estado.corPreenchimento || 'transparent'
         });
 

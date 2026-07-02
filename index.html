@@ -287,27 +287,40 @@
                     <!-- Os elementos SVG criados pelo usuário serão inseridos aqui -->
                 </svg>
             </main>
-            <aside id="barra-configuracoes">
-                <button id="btn-toggle-sidebar" title="Esconder Painel">❯</button>
-                <nav class="tabs-nav"></nav>
+<aside id="barra-configuracoes">
+    <button id="btn-toggle-sidebar" title="Esconder Painel">❯</button>
+    <nav class="tabs-nav"></nav>
 
-                <div class="tabs-container">
-                    <div id="tab-estilo" class="tab-content ativo">
-                        <h3>Estilo do Objeto</h3>
-                        <label>Preenchimento:
-                            <input type="color" id="cor-preenchimento" value="#4a90d9" />
-                        </label>
+    <div class="tabs-container">
+        <div id="tab-estilo" class="tab-content ativo">
+            <div style="padding: 16px;">
+                <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #0f3460;">Estilo do Objeto</h3>
                 
-                        <label>Borda:
-                            <input type="color" id="cor-borda" value="#1a1a2e" />
-                        </label>
+                <!-- Linha 1: Preenchimento e Borda -->
+                <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 12px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 13px; color: #333;">Preenchimento:</span>
+                        <input type="color" id="cor-preenchimento" value="#4a90d9" style="width: 32px; height: 28px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; padding: 2px;" />
                     </div>
-
-                    <div id="tab-tracer" class="tab-content"></div>
-
-                    <div id="tab-camadas" class="tab-content"></div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 13px; color: #333;">Borda:</span>
+                        <input type="color" id="cor-borda" value="#1a1a2e" style="width: 32px; height: 28px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; padding: 2px;" />
+                    </div>
                 </div>
-            </aside>
+                
+                <!-- Linha 2: Grossura da Borda com exibição de pixels -->
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="font-size: 13px; color: #333; min-width: 120px;">Grossura da Borda:</span>
+                    <input type="range" id="grossura-borda" min="0.5" max="20" value="2" step="0.5" style="flex: 1; height: 4px; -webkit-appearance: none; appearance: none; background: #d0d0d0; border-radius: 2px; outline: none;" />
+                    <span id="grossura-valor" style="font-size: 14px; font-weight: 700; min-width: 45px; text-align: center; color: #ffffff; background: #4a90d9; padding: 3px 10px; border-radius: 4px; border: 1px solid #2a6bb0;">2px</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-tracer" class="tab-content"></div>
+        <div id="tab-camadas" class="tab-content"></div>
+    </div>
+</aside>
         </div><!-- /#workspace -->
     </div><!-- /#app -->
 

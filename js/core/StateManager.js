@@ -8,15 +8,17 @@
  * - ferramentaAtual {ToolBase|null} - Instância da ferramenta de desenho ativa.
  * - corPreenchimento {string}       - Cor de preenchimento dos elementos (formato hex).
  * - corBorda {string}               - Cor da borda/stroke dos elementos (formato hex).
+ * - grossuraBorda {number}          - Grossura da borda em pixels.
  * - elementosSelecionados {SVGElement[]} - Elementos SVG atualmente selecionados.
  * - interfaceAtual {string}         - Flag para sabermos a tela onde o usuário está.
  */
 
-/** @type {{ ferramentaAtual: import('../tools/ToolBase.js').ToolBase|null, corPreenchimento: string, corBorda: string, elementosSelecionados: SVGElement[], interfaceAtual: string }} */
+/** @type {{ ferramentaAtual: import('../tools/ToolBase.js').ToolBase|null, corPreenchimento: string, corBorda: string, grossuraBorda: number, elementosSelecionados: SVGElement[], interfaceAtual: string }} */
 export const estado = {
   ferramentaAtual: null,
   corPreenchimento: '#4a90d9',
   corBorda: '#1a1a2e',
+  grossuraBorda: 2, // Valor padrão em pixels
   interfaceAtual: 'inicio', // Nova flag para sabermos onde o usuário está
   elementosSelecionados: [],
 };
@@ -73,6 +75,37 @@ export function definirCorPreenchimento(cor) {
  */
 export function definirCorBorda(cor) {
   estado.corBorda = cor;
+}
+
+/**
+ * Define a grossura da borda ativa.
+ *
+ * @param {number} valor - Grossura em pixels.
+ */
+export function definirGrossuraBorda(valor) {
+  estado.grossuraBorda = parseFloat(valor) || 2;
+  
+  // Atualiza elementos selecionados em tempo real
+  if (estado.elementosSelecionados && estado.elementosSelecionados.length > 0) {
+    estado.elementosSelecionados.forEach(el => {
+      // Verifica se o elemento suporta stroke-width
+      if (el.tagName === 'rect' || el.tagName === 'ellipse' || 
+          el.tagName === 'polygon' || el.tagName === 'polyline' ||
+          el.tagName === 'path' || el.tagName === 'circle' || 
+          el.tagName === 'line') {
+        el.setAttribute('stroke-width', estado.grossuraBorda);
+      }
+    });
+  }
+}
+
+/**
+ * Obtém a grossura da borda atual.
+ *
+ * @returns {number} Grossura em pixels.
+ */
+export function obterGrossuraBorda() {
+  return estado.grossuraBorda;
 }
 
 /**

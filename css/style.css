@@ -602,7 +602,21 @@ body {
   display: block;
 }
 
-.node-handle:hover {
-    fill: #4a90d9; /* Inverte a cor ao passar o mouse */
-    stroke: white;
+#btn-toggle-sidebar {
+    position: absolute;
+    right: 240px;  /* Mesmo valor da largura */
+    top: 50%;
+    transform: translateY(-50%);
+    background: #eee;
+    border: 1px solid #ddd;
+    border-radius: 5px 0 0 5px;
+    cursor: pointer;
+    padding: 10px 5px;
+    z-index: 10;
+    transition: right 0.3s ease, transform 0.3s ease;
+}
+
+#btn-toggle-sidebar.sidebar-escondida {
+    right: 0;
+    transform: translateY(-50%) rotate(180deg);
 }
