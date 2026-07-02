@@ -57,13 +57,13 @@ export class PoligonoRegularShape extends ShapeBase {
                 break;
         }
 
-        this.recalcularVertices(targetElement);
+        this.atualizarVertices(targetElement);
 
         this.sincronizarTodosOsHandles(targetElement);
 
     }
 
-    recalcularVertices(targetElement) {
+    atualizarVertices(targetElement) {
 
         const x = parseFloat(targetElement.getAttribute('x'));
         const y = parseFloat(targetElement.getAttribute('y'));
