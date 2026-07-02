@@ -38,8 +38,13 @@ export class CameraSVG {
 
     // Guarda posição inicial do viewBox
     this.initialViewBox = { ...this.viewBox };
+    this.listeners = [];
     this.onChange = null;
     this.applyViewBox();
+  }
+
+  addListener(callback) {
+    this.listeners.push(callback);
   }
 
   // Aproxima o viewBox atual no SVG (aplica o "zoom")
@@ -54,8 +59,8 @@ export class CameraSVG {
     this.svgs.forEach((svg) => {
       svg.setAttribute("viewBox", viewBoxValue);
     });
-    if (this.onChange) {
-      this.onChange(this.viewBox);
+    for (const listener of this.listeners) {
+      listener(this.viewBox);
     }
   }
 

@@ -356,8 +356,15 @@
         </aside>
 
         <div class="regua-quina"></div>
-        <canvas id="regua-horizontal" class="regua regua-h"></canvas>
-        <canvas id="regua-vertical" class="regua regua-v"></canvas>
+        <div id="regua-horizontal" class="regua regua-h">
+          <canvas id="regua-h-base"></canvas>
+          <canvas id="regua-h-overlay"></canvas>
+        </div>
+        <div id="regua-vertical" class="regua regua-v">
+          <canvas id="regua-v-base"></canvas>
+          <canvas id="regua-v-overlay"></canvas>
+        </div>
+
         <!-- Área Central de Desenho -->
         <main id="area-desenho">
           <svg

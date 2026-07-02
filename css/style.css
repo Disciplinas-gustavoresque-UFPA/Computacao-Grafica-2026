@@ -537,7 +537,7 @@ body {
   display: block;
   position: absolute;
   background: var(--ruler-bg);
-  z-index: 31; /*0*/
+  z-index: 1; /*0*/
   pointer-events: none;
   overflow: hidden;
   box-sizing: border-box;
@@ -572,14 +572,28 @@ body {
   );
   /*background: green;*/
 }
+.regua-h,
+.regua-v {
+  position: isolate;
+}
+.regua-h canvas,
+.regua-v canvas {
+  position: absolute;
+  display: block;
+  inset: 0;
+}
 
+#regua-h-overlay,
+#regua-v-overlay {
+  pointer-events: none;
+}
 .regua-quina {
   position: absolute;
   top: var(--altura-painel-superior);
   left: var(--largura-barra-lateral);
   width: var(--ruler-size);
   height: var(--ruler-size);
-  z-index: 30; /*1*/
+  z-index: 0; /*1*/
   pointer-events: none;
   box-sizing: border-box;
   border-right: 1px solid var(--ruler-border);

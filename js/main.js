@@ -161,13 +161,14 @@ definirGerenciadorSelecao(selecaoVisual);
 
 const camera = new CameraSVG([svgCanvas, overlayCanvas]);
 const reguas = new ReguaSVG(
-  document.getElementById("regua-horizontal"),
-  document.getElementById("regua-vertical"),
+  document.getElementById("regua-h-base"),
+  document.getElementById("regua-h-overlay"),
+
+  document.getElementById("regua-v-base"),
+  document.getElementById("regua-v-overlay"),
   camera,
 );
-camera.onChange = () => {
-  reguas.render();
-};
+
 // Instâncias das ferramentas disponíveis com todas as implementações da main
 const instanciasFerramentas = {
   selecao: new SelecaoTool(svgCanvas),
