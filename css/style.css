@@ -143,6 +143,57 @@ body {
   border-color: var(--cor-destaque);
 }
 
+#popup-stroke-width {
+  width: 52px;
+  height: 28px;
+  background: var(--cor-fundo-barra);
+  border: 1px solid var(--cor-borda-ui);
+  border-radius: var(--raio-borda);
+  color: var(--cor-texto);
+  font-size: 12px;
+  text-align: center;
+  padding: 0 4px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+#popup-stroke-width:hover,
+#popup-stroke-width:focus {
+  border-color: var(--cor-destaque);
+  outline: none;
+}
+
+.popup-stroke-estilo {
+  display: flex;
+  gap: 4px;
+}
+
+.btn-estilo-borda {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 28px;
+  background: var(--cor-fundo-barra);
+  border: 1px solid var(--cor-borda-ui);
+  border-radius: var(--raio-borda);
+  color: var(--cor-texto-secundario);
+  cursor: pointer;
+  transition: all 0.15s;
+  padding: 0;
+}
+
+.btn-estilo-borda:hover {
+  border-color: var(--cor-destaque);
+  color: var(--cor-destaque);
+}
+
+.btn-estilo-borda.ativo {
+  border-color: var(--cor-destaque);
+  color: var(--cor-destaque);
+  background: rgba(74, 144, 217, 0.15);
+}
+
 /* =========================================================
    Controles de Camada (Z-Index)
    ========================================================= */
