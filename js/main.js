@@ -19,6 +19,7 @@ import {
   refazerAcao,
   registrarAcaoHistorico
 } from './core/StateManager.js';
+import { rgbToHex } from './utils/colorHelpers.js';
 import { ColorPickerTool } from './tools/ColorPickerTool.js';
 import { Lapis } from './tools/LapisTool.js';
 import { RetanguloTool } from './tools/RetanguloTool.js';
@@ -61,6 +62,9 @@ const btnImportarImagem = document.getElementById('btn-importar-imagem');
 const inputImagem = document.getElementById('input-imagem');
 const inputCorPreenchimento = document.getElementById('cor-preenchimento');
 const inputCorBorda = document.getElementById('cor-borda');
+const popupCores = document.getElementById('popup-cores');
+const popupCorPreenchimento = document.getElementById('popup-cor-preenchimento');
+const popupCorBorda = document.getElementById('popup-cor-borda');
 const nomeFerramenta = document.getElementById('nome-ferramenta');
 const btnExportar = document.getElementById('btn-exportar');
 const exportFormat = document.getElementById('export-format');
@@ -210,6 +214,57 @@ botoesFerramenta.forEach((btn) => {
   });
 });
 
+// --- Popup de Cores ---
+
+function normalizarCorHex(cor, fallback) {
+  if (!cor || cor === 'none' || cor === 'transparent') return fallback;
+  if (cor.startsWith('#')) return cor.length === 4
+    ? '#' + cor.slice(1).split('').map(c => c + c).join('')
+    : cor;
+  if (cor.startsWith('rgb')) return rgbToHex(cor);
+  return fallback;
+}
+
+function sincronizarInputsCores(elementos) {
+  const el = elementos[0];
+  const fill = normalizarCorHex(el.getAttribute('fill'), estado.corPreenchimento);
+  const stroke = normalizarCorHex(el.getAttribute('stroke'), estado.corBorda);
+
+  popupCorPreenchimento.value = fill;
+  popupCorBorda.value = stroke;
+  inputCorPreenchimento.value = fill;
+  inputCorBorda.value = stroke;
+
+  definirCorPreenchimento(fill);
+  definirCorBorda(stroke);
+}
+
+document.addEventListener('selecao-mudou', (e) => {
+  const elementos = e.detail.elementos;
+  if (elementos.length > 0) {
+    sincronizarInputsCores(elementos);
+    popupCores.classList.add('visivel');
+  } else {
+    popupCores.classList.remove('visivel');
+    popupCorPreenchimento.value = estado.corPreenchimento;
+    popupCorBorda.value = estado.corBorda;
+  }
+});
+
+popupCorPreenchimento.addEventListener('input', () => {
+  const novaCor = popupCorPreenchimento.value;
+  definirCorPreenchimento(novaCor);
+  inputCorPreenchimento.value = novaCor;
+  estado.elementosSelecionados.forEach(el => el.setAttribute('fill', novaCor));
+});
+
+popupCorBorda.addEventListener('input', () => {
+  const novaCor = popupCorBorda.value;
+  definirCorBorda(novaCor);
+  inputCorBorda.value = novaCor;
+  estado.elementosSelecionados.forEach(el => el.setAttribute('stroke', novaCor));
+});
+
 // Ouvir mudanças no input de cor de preenchimento da sidebar
 inputCorPreenchimento.addEventListener('input', () => {
   const novaCor = inputCorPreenchimento.value;
@@ -230,26 +285,9 @@ inputCorBorda.addEventListener('input', () => {
   });
 });
 
-// Atualizar os inputs da sidebar quando o usuário selecionar um objeto
-// Usamos um MutationObserver ou interceptamos cliques no Canvas para capturar a seleção.
 svgCanvas.addEventListener('mouseup', (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseUp(evento);
-  }
-
-  // Verifica se a ferramenta de seleção acabou de selecionar um elemento
-  // Se houver um elemento selecionado, sincroniza a sidebar com as cores dele
-  if (estado.elementoSelecionado) {
-    const corPreenchimentoAtual = estado.elementoSelecionado.getAttribute('fill') || '#ffffff';
-    const corBordaAtual = estado.elementoSelecionado.getAttribute('stroke') || '#000000';
-
-    // Atualiza o valor visual dos inputs para bater com o objeto selecionado
-    inputCorPreenchimento.value = corPreenchimentoAtual;
-    inputCorBorda.value = corBordaAtual;
-
-    // Atualiza também os valores armazenados no StateManager para consistência
-    definirCorPreenchimento(corPreenchimentoAtual);
-    definirCorBorda(corBordaAtual);
   }
 });
 
@@ -276,6 +314,8 @@ svgCanvas.addEventListener('contextmenu', (e) => {
 // Inicializa os valores dos inputs com os valores padrão do estado
 inputCorPreenchimento.value = estado.corPreenchimento;
 inputCorBorda.value = estado.corBorda;
+popupCorPreenchimento.value = estado.corPreenchimento;
+popupCorBorda.value = estado.corBorda;
 
 // Exportar / Salvar desenho
 btnExportar.addEventListener('click', () => {

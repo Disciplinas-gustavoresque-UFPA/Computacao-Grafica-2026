@@ -92,6 +92,10 @@ export function definirElementosSelecionados(elementos) {
   if (gerenciadorSelecaoVisual) {
     gerenciadorSelecaoVisual.desenhar(estado.elementosSelecionados);
   }
+
+  document.dispatchEvent(new CustomEvent('selecao-mudou', {
+    detail: { elementos: estado.elementosSelecionados }
+  }));
 }
 
 /**
@@ -113,6 +117,9 @@ export function adicionarElementoSelecao(elemento) {
     if (gerenciadorSelecaoVisual) {
       gerenciadorSelecaoVisual.desenhar(estado.elementosSelecionados);
     }
+    document.dispatchEvent(new CustomEvent('selecao-mudou', {
+      detail: { elementos: estado.elementosSelecionados }
+    }));
   }
 }
 
@@ -126,6 +133,9 @@ export function removerElementoSelecao(elemento) {
   if (gerenciadorSelecaoVisual) {
     gerenciadorSelecaoVisual.desenhar(estado.elementosSelecionados);
   }
+  document.dispatchEvent(new CustomEvent('selecao-mudou', {
+    detail: { elementos: estado.elementosSelecionados }
+  }));
 }
 
 export function definirInterface(novaInterface) {

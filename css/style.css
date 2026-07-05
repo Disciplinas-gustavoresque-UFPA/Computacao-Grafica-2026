@@ -88,6 +88,62 @@ body {
 }
 
 /* =========================================================
+   Popup de Cores (aparece ao selecionar elemento)
+   ========================================================= */
+#popup-cores {
+  position: fixed;
+  top: calc(var(--altura-painel-superior) + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-6px);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background-color: var(--cor-fundo-painel);
+  border: 1px solid var(--cor-borda-ui);
+  border-radius: var(--raio-borda);
+  box-shadow: var(--sombra-padrao);
+  z-index: 20;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+#popup-cores.visivel {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.popup-cores-label {
+  font-size: 11px;
+  color: var(--cor-texto-secundario);
+  white-space: nowrap;
+}
+
+.popup-cores-separador {
+  width: 1px;
+  height: 20px;
+  background-color: var(--cor-borda-ui);
+  margin: 0 4px;
+}
+
+#popup-cores input[type="color"] {
+  width: 32px;
+  height: 28px;
+  border: 1px solid var(--cor-borda-ui);
+  border-radius: var(--raio-borda);
+  background: none;
+  cursor: pointer;
+  padding: 2px;
+  transition: border-color 0.15s;
+}
+
+#popup-cores input[type="color"]:hover {
+  border-color: var(--cor-destaque);
+}
+
+/* =========================================================
    Controles de Camada (Z-Index)
    ========================================================= */
 .layer-controls {

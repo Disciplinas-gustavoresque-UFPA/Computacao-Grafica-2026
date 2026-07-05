@@ -96,6 +96,15 @@
 
         </header>
 
+        <!-- Popup de cores: aparece ao selecionar um elemento -->
+        <div id="popup-cores" aria-label="Propriedades de cor do objeto selecionado">
+            <span class="popup-cores-label">Preenchimento</span>
+            <input type="color" id="popup-cor-preenchimento" title="Cor de preenchimento" />
+            <span class="popup-cores-separador"></span>
+            <span class="popup-cores-label">Borda</span>
+            <input type="color" id="popup-cor-borda" title="Cor da borda" />
+        </div>
+
             <div id="workspace">
                 <!-- Barra Lateral: botões das ferramentas de desenho -->
                 <aside id="barra-ferramentas">
@@ -106,7 +115,9 @@
                         data-nome="Seleção"
                         data-tooltip="Seleção (S)"
                     >
-                        &#9654;
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                            <path d="M4 2L4 17L8.5 13L11.5 20L13.5 19L10.5 12L16 12Z"/>
+                        </svg>
                     </button>
                     <button
                         id="btn-edicao-vertices"
