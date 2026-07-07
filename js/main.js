@@ -14,7 +14,6 @@ import {
   definirCorBorda, 
   definirGerenciadorSelecao,
   definirElementosSelecionados,
-  definirGerenciadorSelecao,
   definirGerenciadorHistorico,
   desfazerAcao,
   refazerAcao,

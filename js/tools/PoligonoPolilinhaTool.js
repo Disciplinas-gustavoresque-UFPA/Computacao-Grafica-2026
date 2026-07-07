@@ -1,6 +1,7 @@
 import { ToolBase } from "./ToolBase.js";
 import { criarElementoSVG, obterCoordenadaSVG } from '../utils/svgHelpers.js';
 import { estado } from '../core/StateManager.js';
+import { registrarAcaoHistorico } from '../core/StateManager.js';
 
 export class PoligonoPolilinhaTool extends ToolBase {
     constructor(svgCanvas) {
