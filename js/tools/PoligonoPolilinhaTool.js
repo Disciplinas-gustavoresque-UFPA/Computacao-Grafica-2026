@@ -139,7 +139,7 @@ export class PoligonoPolilinhaTool extends ToolBase {
         });
 
         this.svgCanvas.appendChild(poligonoFinal);
-
+        registrarAcaoHistorico();
         // Limpa o estado interno para o próximo desenho
         this.polylineElement = null;
         this.vertices = [];
