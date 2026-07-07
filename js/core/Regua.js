@@ -45,4 +45,15 @@ export class Regua {
     });
     this._resizeObserver.observe(this.svgCanvas);
   }
+
+  /** Escolhe um "passo" (intervalo entre marcações) legível para a escala atual. */
+  _calcularPasso(escalaPxPorUnidade) {
+    const passosCandidatos = [1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000, 5000];
+    const distanciaMinimaPx = 60; // espaço mínimo confortável entre marcações
+
+    for (const passo of passosCandidatos) {
+      if (passo * escalaPxPorUnidade >= distanciaMinimaPx) return passo;
+    }
+    return passosCandidatos[passosCandidatos.length - 1];
+  }
 }
