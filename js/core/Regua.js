@@ -129,4 +129,9 @@ export class Regua {
     console.log('[Regua] esconder()');
   }
 
+  /** Alterna visibilidade. Retorna o novo estado (true = visível). */
+  alternar() {
+    this.ativa ? this.esconder() : this.mostrar();
+    return this.ativa;
+  }
 }
