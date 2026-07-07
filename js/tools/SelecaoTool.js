@@ -27,7 +27,7 @@ export class SelecaoTool extends ToolBase {
     const target = evento.target;
     const isShift = evento.shiftKey;
 
-    const allowedTags = ['rect', 'text', 'image', 'circle', 'ellipse', 'g', 'path', 'line', 'lapis'];
+    const allowedTags = ['rect', 'text', 'image', 'circle', 'ellipse', 'g', 'path', 'line', 'lapis', 'polygon'];
     const tag = target.tagName ? target.tagName.toLowerCase() : '';
 
     // Verifica se o clique foi em um elemento válido dentro do canvas
@@ -77,6 +77,18 @@ export class SelecaoTool extends ToolBase {
       if (tag === 'rect' || tag === 'text' || tag === 'image') {
         el.setAttribute('x', String(novoX));
         el.setAttribute('y', String(novoY));
+      } else if (tag === 'polygon') {
+        // Losango armazenado como <polygon> com atributos x,y,width,height e points
+        el.setAttribute('x', String(novoX));
+        el.setAttribute('y', String(novoY));
+
+        const w = parseFloat(el.getAttribute('width') || 0);
+        const h = parseFloat(el.getAttribute('height') || 0);
+        const centroX = novoX + w / 2;
+        const centroY = novoY + h / 2;
+        const novosPontos = `${centroX},${novoY} ${novoX + w},${centroY} ${centroX},${novoY + h} ${novoX},${centroY}`;
+        
+        el.setAttribute('points', novosPontos);
       } else if (tag === 'circle' || tag === 'ellipse') {
         el.setAttribute('cx', String(novoX));
         el.setAttribute('cy', String(novoY));
@@ -158,6 +170,9 @@ export class SelecaoTool extends ToolBase {
       if (tag === 'rect' || tag === 'text' || tag === 'image') {
         x = parseFloat(el.getAttribute('x') || 0);
         y = parseFloat(el.getAttribute('y') || 0);
+      } else if (tag === 'polygon') {
+        x = parseFloat(el.getAttribute('x') || 0);
+        y = parseFloat(el.getAttribute('y') || 0);
       } else if (tag === 'circle' || tag === 'ellipse') {
         x = parseFloat(el.getAttribute('cx') || 0);
         y = parseFloat(el.getAttribute('cy') || 0);
@@ -182,6 +197,9 @@ export class SelecaoTool extends ToolBase {
       let xAtual = 0, yAtual = 0;
       
       if (tag === 'rect' || tag === 'text' || tag === 'image') {
+        xAtual = parseFloat(el.getAttribute('x') || 0);
+        yAtual = parseFloat(el.getAttribute('y') || 0);
+      } else if (tag === 'polygon') {
         xAtual = parseFloat(el.getAttribute('x') || 0);
         yAtual = parseFloat(el.getAttribute('y') || 0);
       } else if (tag === 'circle' || tag === 'ellipse') {
@@ -226,6 +244,9 @@ export class SelecaoTool extends ToolBase {
       let elX = 0, elY = 0;
 
       if (tag === 'rect' || tag === 'text' || tag === 'image') {
+        elX = parseFloat(el.getAttribute('x') || 0);
+        elY = parseFloat(el.getAttribute('y') || 0);
+      } else if (tag === 'polygon') {
         elX = parseFloat(el.getAttribute('x') || 0);
         elY = parseFloat(el.getAttribute('y') || 0);
       } else if (tag === 'circle' || tag === 'ellipse') {
