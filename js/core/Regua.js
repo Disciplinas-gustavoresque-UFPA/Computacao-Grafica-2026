@@ -67,4 +67,66 @@ export class Regua {
     }
     return { x: 0, y: 0, width: rect.width, height: rect.height, rect };
   }
+
+  /** Recalcula e redesenha as marcações das duas réguas. Chamado automaticamente. */
+  atualizar() {
+    if (!this.ativa) return;
+
+    const { x, y, width, height, rect } = this._obterViewBox();
+    console.log('[Regua] atualizar()', { x, y, width, height, rect });
+    if (width <= 0 || height <= 0) {
+      console.warn('[Regua] largura/altura inválida, abortando desenho', { width, height });
+      return;
+    }
+
+    const escalaX = rect.width / width;
+    const escalaY = rect.height / height;
+
+    this._desenharEixo(this.horizontal, x, width, escalaX, 'horizontal');
+    this._desenharEixo(this.vertical, y, height, escalaY, 'vertical');
+  }
+
+  _desenharEixo(elementoRegua, origem, extensao, escala, orientacao) {
+    elementoRegua.innerHTML = '';
+    const passo = this._calcularPasso(escala);
+
+    const inicio = Math.floor(origem / passo) * passo;
+    const fim = origem + extensao;
+
+    for (let valor = inicio; valor <= fim; valor += passo) {
+      const posicaoPx = (valor - origem) * escala;
+
+      const marcador = document.createElement('div');
+      marcador.className = 'regua-marcador';
+      marcador.style[orientacao === 'horizontal' ? 'left' : 'top'] = `${posicaoPx}px`;
+
+      const rotulo = document.createElement('span');
+      rotulo.className = 'regua-rotulo';
+      rotulo.textContent = Math.round(valor);
+      marcador.appendChild(rotulo);
+
+      elementoRegua.appendChild(marcador);
+    }
+  }
+
+  mostrar() {
+    this.ativa = true;
+    this.horizontal.classList.remove('oculto');
+    this.vertical.classList.remove('oculto');
+    this.canto.classList.remove('oculto');
+    console.log('[Regua] mostrar() — classes agora:', {
+      horizontal: this.horizontal.className,
+      vertical: this.vertical.className,
+    });
+    this.atualizar();
+  }
+
+  esconder() {
+    this.ativa = false;
+    this.horizontal.classList.add('oculto');
+    this.vertical.classList.add('oculto');
+    this.canto.classList.add('oculto');
+    console.log('[Regua] esconder()');
+  }
+
 }
