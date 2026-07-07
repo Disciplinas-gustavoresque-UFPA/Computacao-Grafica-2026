@@ -1,3 +1,5 @@
+const ESPESSURA_REGUA_PX = 20;
+
 export class Regua {
   constructor(container, svgCanvas) {
     this.container = container;
