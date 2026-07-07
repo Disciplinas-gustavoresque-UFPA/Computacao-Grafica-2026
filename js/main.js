@@ -14,17 +14,18 @@ import {
   definirCorBorda, 
   definirGerenciadorSelecao,
   definirElementosSelecionados,
-  definirGerenciadorSelecao,
   definirGerenciadorHistorico,
   desfazerAcao,
   refazerAcao,
-  registrarAcaoHistorico
+  registrarAcaoHistorico,
+  atualizarPosicaoSelecaoVisual
 } from './core/StateManager.js';
 import { ColorPickerTool } from './tools/ColorPickerTool.js';
 import { Lapis } from './tools/LapisTool.js';
 import { RetanguloTool } from './tools/RetanguloTool.js';
 import { TextoTool } from './tools/TextoTool.js';
 import { exportarDesenho } from './utils/exportHelpers.js';
+import { espelharHorizontal, espelharVertical } from './utils/flipHelpers.js';
 import { SelecaoTool } from './tools/SelecaoTool.js';
 import { Selecao } from './core/Selecao.js';
 import { BorrachaTool } from './tools/BorrachaTool.js';
@@ -288,6 +289,31 @@ btnSendToBack.addEventListener('click', () => moverCamada('fundo'));
 btnStepBackward.addEventListener('click', () => moverCamada('recuar'));
 btnStepForward.addEventListener('click', () => moverCamada('avancar'));
 btnBringToFront.addEventListener('click', () => moverCamada('frente'));
+
+const btnFlipHorizontal = document.getElementById('btn-flip-horizontal');
+const btnFlipVertical = document.getElementById('btn-flip-vertical');
+
+btnFlipHorizontal.addEventListener("click", () => {
+
+    estado.elementosSelecionados.forEach(el => {
+        espelharHorizontal(el);
+    });
+
+    atualizarPosicaoSelecaoVisual();
+    registrarAcaoHistorico();
+
+});
+
+btnFlipVertical.addEventListener("click", () => {
+
+    estado.elementosSelecionados.forEach(el => {
+        espelharVertical(el);
+    });
+
+    atualizarPosicaoSelecaoVisual();
+    registrarAcaoHistorico();
+
+});
 
 // Atalhos de Teclado (Tool Selection)
 window.addEventListener("keydown", (e) => {

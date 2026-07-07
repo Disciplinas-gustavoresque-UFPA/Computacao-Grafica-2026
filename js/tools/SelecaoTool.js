@@ -8,6 +8,7 @@ import {
   atualizarPosicaoSelecaoVisual,
   registrarAcaoHistorico
 } from '../core/StateManager.js';
+import { atualizarTransformacao } from '../utils/flipHelpers.js';
 
 /**
  * Ferramenta de Seleção
@@ -74,12 +75,18 @@ export class SelecaoTool extends ToolBase {
       const tag = el.tagName.toLowerCase();
 
       // Atualiza coordenadas baseado no tipo de elemento
-      if (tag === 'rect' || tag === 'text' || tag === 'image') {
+      if (tag === 'rect') {
         el.setAttribute('x', String(novoX));
         el.setAttribute('y', String(novoY));
+        atualizarTransformacao(el);
+      } else if (tag === 'text' || tag === 'image') {
+        el.setAttribute('x', String(novoX));
+        el.setAttribute('y', String(novoY));
+        atualizarTransformacao(el);
       } else if (tag === 'circle' || tag === 'ellipse') {
         el.setAttribute('cx', String(novoX));
         el.setAttribute('cy', String(novoY));
+        atualizarTransformacao(el);
       } else if (tag === 'line') {
           // Exemplo simplificado para linha (move mantendo comprimento)
           const dx = novoX - parseFloat(el.getAttribute('x1') || 0);
@@ -89,9 +96,9 @@ export class SelecaoTool extends ToolBase {
           el.setAttribute('x2', String(parseFloat(el.getAttribute('x2') || 0) + dx));
           el.setAttribute('y2', String(parseFloat(el.getAttribute('y2') || 0) + dy));
       } else if (tag === 'path' || tag === 'g') {
-          //Usa a tranformação de translação, a mesma que foi vista em sala :), pra mover o objeto
-          el.setAttribute('transform', `translate(${novoX}, ${novoY})`);
-          // Guarda a posição atual para o próximo clique
+          el.dataset.translateX = novoX;
+          el.dataset.translateY = novoY;
+          atualizarTransformacao(el);
           el.setAttribute('data-x', String(novoX));
           el.setAttribute('data-y', String(novoY));
       }
