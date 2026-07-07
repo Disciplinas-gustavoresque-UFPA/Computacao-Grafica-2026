@@ -239,9 +239,10 @@ svgCanvas.addEventListener('mouseup', (evento) => {
 
   // Verifica se a ferramenta de seleção acabou de selecionar um elemento
   // Se houver um elemento selecionado, sincroniza a sidebar com as cores dele
-  if (estado.elementoSelecionado) {
-    const corPreenchimentoAtual = estado.elementoSelecionado.getAttribute('fill') || '#ffffff';
-    const corBordaAtual = estado.elementoSelecionado.getAttribute('stroke') || '#000000';
+  const elementoParaSincronizar = estado.elementosSelecionados[0] || null;
+  if (elementoParaSincronizar) {
+    const corPreenchimentoAtual = elementoParaSincronizar.getAttribute('fill') || '#ffffff';
+    const corBordaAtual = elementoParaSincronizar.getAttribute('stroke') || '#000000';
 
     // Atualiza o valor visual dos inputs para bater com o objeto selecionado
     inputCorPreenchimento.value = corPreenchimentoAtual;
