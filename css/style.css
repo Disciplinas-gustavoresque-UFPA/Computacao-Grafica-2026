@@ -253,6 +253,26 @@ body {
   transform: translateY(-50%) translateX(0);
 }
 
+/* Topbar (desfazer/refazer, camadas, exportar, menu e ajuda):
+   tooltip exibido abaixo do botão */
+.btn-history[data-tooltip]::after,
+.btn-layer[data-tooltip]::after,
+.btn-exportar[data-tooltip]::after,
+.btn-menu[data-tooltip]::after,
+.btn-ajuda[data-tooltip]::after {
+  left: 50%;
+  top: calc(100% + 8px);
+  transform: translateX(-50%) translateY(-4px);
+}
+
+.btn-history[data-tooltip]:hover::after,
+.btn-layer[data-tooltip]:hover::after,
+.btn-exportar[data-tooltip]:hover::after,
+.btn-menu[data-tooltip]:hover::after,
+.btn-ajuda[data-tooltip]:hover::after {
+  transform: translateX(-50%) translateY(0);
+}
+
 
 /* =========================================================
    Área Exportação
