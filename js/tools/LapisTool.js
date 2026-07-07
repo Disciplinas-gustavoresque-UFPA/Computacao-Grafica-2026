@@ -1,6 +1,7 @@
 import { ToolBase } from './ToolBase.js';
 import { criarElementoSVG, obterCoordenadaSVG } from '../utils/svgHelpers.js';
 import { estado } from '../core/StateManager.js';
+import { registrarAcaoHistorico } from '../core/StateManager.js';
 
 export class Lapis extends ToolBase {
     constructor(svgCanvas){
@@ -59,5 +60,7 @@ export class Lapis extends ToolBase {
         this.d = "";
         this.ultimoPonto = null;
         this.penultimoPonto = null;
+
+        registrarAcaoHistorico();
     }
 }
