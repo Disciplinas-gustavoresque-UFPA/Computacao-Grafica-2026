@@ -56,4 +56,15 @@ export class Regua {
     }
     return passosCandidatos[passosCandidatos.length - 1];
   }
+
+  /** Lê o viewBox atual (ou assume 1 unidade de documento = 1px de tela, se não houver). */
+  _obterViewBox() {
+    const vb = this.svgCanvas.viewBox.baseVal;
+    const rect = this.svgCanvas.getBoundingClientRect();
+
+    if (vb && vb.width > 0 && vb.height > 0) {
+      return { x: vb.x, y: vb.y, width: vb.width, height: vb.height, rect };
+    }
+    return { x: 0, y: 0, width: rect.width, height: rect.height, rect };
+  }
 }
