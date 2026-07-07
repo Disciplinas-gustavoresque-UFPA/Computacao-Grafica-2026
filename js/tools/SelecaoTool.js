@@ -164,6 +164,9 @@ export class SelecaoTool extends ToolBase {
       } else if (tag === 'line') {
         x = parseFloat(el.getAttribute('x1') || 0);
         y = parseFloat(el.getAttribute('y1') || 0);
+      } else if (tag === 'path' || tag === 'g') {
+        x = parseFloat(el.getAttribute('data-x') || 0);
+        y = parseFloat(el.getAttribute('data-y') || 0);
       }
       
       return { elemento: el, x, y, tag };
@@ -190,6 +193,9 @@ export class SelecaoTool extends ToolBase {
       } else if (tag === 'line') {
         xAtual = parseFloat(el.getAttribute('x1') || 0);
         yAtual = parseFloat(el.getAttribute('y1') || 0);
+      } else if (tag === 'path' || tag === 'g') {
+        xAtual = parseFloat(el.getAttribute('data-x') || 0);
+        yAtual = parseFloat(el.getAttribute('data-y') || 0);
       }
       
       if (xAtual !== estadoInicial.x || yAtual !== estadoInicial.y) {
