@@ -44,13 +44,13 @@
 
                 <!-- Botões de Desfazer/Refazer -->
                 <div class="history-controls">
-                    <button id="btn-desfazer" class="btn-history" title="Desfazer (Ctrl+Z)">
+                    <button id="btn-desfazer" class="btn-history" data-tooltip="Desfazer (Ctrl+Z)">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M3 7v6h6"/>
                             <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/>
                         </svg>
                     </button>
-                    <button id="btn-refazer" class="btn-history" title="Refazer (Ctrl+Y / Ctrl+Shift+Z)">
+                    <button id="btn-refazer" class="btn-history" data-tooltip="Refazer (Ctrl+Y / Ctrl+Shift+Z)">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 7v6h-6"/>
                             <path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13"/>
@@ -60,10 +60,10 @@
 
             <!-- Controle de Camadas -->
             <div class="layer-controls">
-                <button id="btn-send-to-back" title="Enviar para o Fundo" class="btn-layer">⏮</button>
-                <button id="btn-step-backward" title="Recuar" class="btn-layer">⏪</button>
-                <button id="btn-step-forward" title="Avançar" class="btn-layer">⏩</button>
-                <button id="btn-bring-to-front" title="Trazer para a Frente" class="btn-layer">⏭</button>
+                <button id="btn-send-to-back" data-tooltip="Enviar para o Fundo" class="btn-layer">⏮</button>
+                <button id="btn-step-backward" data-tooltip="Recuar" class="btn-layer">⏪</button>
+                <button id="btn-step-forward" data-tooltip="Avançar" class="btn-layer">⏩</button>
+                <button id="btn-bring-to-front" data-tooltip="Trazer para a Frente" class="btn-layer">⏭</button>
             </div>
 
             <!-- Botão de exportar/descarregar desenho -->
