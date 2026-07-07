@@ -28,7 +28,9 @@ export class Lapis extends ToolBase {
             "stroke-width": 2,
             fill: "none",
             "stroke-linecap": "round",
-            "stroke-linejoin": "round"
+            "stroke-linejoin": "round",
+            "data-x": "0",
+            "data-y": "0"
         });
     
         this.svgCanvas.appendChild(this.path);
