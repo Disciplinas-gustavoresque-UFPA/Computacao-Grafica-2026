@@ -148,7 +148,7 @@ body {
   z-index: 5;
 }
 
-/* From Uiverse.io by adamgiebl */ 
+/* From Uiverse.io by adamgiebl */
 .cssbuttons-io-button,
 #btn-primeiros-passos {
   display: flex;
@@ -229,12 +229,11 @@ body {
   box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.25);
 }
 
-.btn-ferramenta[data-tooltip]::after {
+/* Tooltip customizado (data-tooltip) — base compartilhada por
+   sidebar e topbar; cada grupo só sobrescreve o posicionamento. */
+[data-tooltip]::after {
   content: attr(data-tooltip);
   position: absolute;
-  left: calc(100% + 10px);
-  top: 50%;
-  transform: translateY(-50%) translateX(-4px);
   background-color: var(--cor-fundo-painel);
   color: var(--cor-texto);
   border: 1px solid var(--cor-destaque);
@@ -248,8 +247,18 @@ body {
   z-index: 100;
 }
 
-.btn-ferramenta[data-tooltip]:hover::after {
+[data-tooltip]:hover::after {
   opacity: 1;
+}
+
+/* Sidebar: tooltip exibido à direita do botão */
+.btn-ferramenta[data-tooltip]::after {
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%) translateX(-4px);
+}
+
+.btn-ferramenta[data-tooltip]:hover::after {
   transform: translateY(-50%) translateX(0);
 }
 
