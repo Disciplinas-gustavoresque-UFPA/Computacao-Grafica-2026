@@ -369,18 +369,44 @@ window.addEventListener("keydown", (e) => {
     }
   }
 
+  const teclaPressionada = e.key.toLowerCase();
+
+  // Atalhos com Shift
+  if (e.shiftKey) {
+    if (teclaPressionada === "z") {
+      e.preventDefault();
+      const btnDrag = document.getElementById('btn-drag');
+      if (btnDrag) {
+        btnDrag.click();
+      } else {
+        const botaoZoom = document.querySelector('.btn-ferramenta[data-ferramenta="lupa"]');
+        if (botaoZoom) {
+          botaoZoom.click();
+          setTimeout(() => document.getElementById('btn-drag')?.click(), 0);
+        }
+      }
+    } else if (teclaPressionada === "i") {
+      e.preventDefault();
+      btnImportarImagem?.click();
+    }
+    return;
+  }
+
   const mapaTeclas = {
     "s" : "selecao",
     "r" : "retangulo",
     "e" : "elipse",
     "l" : "linha",
     "c" : "linhaCurvada",
-    "p" : "poligono",
+    "g" : "poligono",
+    "p" : "lapis",
     "t" : "texto",
-    "i" : "conta-gotas"
+    "i" : "Conta-gotas",
+    "b" : "borracha",
+    "v" : "edicaoVertices",
+    "z" : "lupa",
   }
 
-  const teclaPressionada = e.key.toLowerCase();
   const ferramentaAlvo = mapaTeclas[teclaPressionada];
 
   if (ferramentaAlvo) {
