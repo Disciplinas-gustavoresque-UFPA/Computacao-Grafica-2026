@@ -108,6 +108,7 @@ body {
   cursor: pointer;
   font-size: 12px;
   transition: all 0.2s;
+  position: relative;
 }
 
 .btn-layer:hover {
@@ -169,6 +170,8 @@ body {
   font-weight: 500;
 
   cursor: pointer;
+
+  position: relative;
 
   transition:
     background-color .2s ease,
@@ -450,6 +453,7 @@ body {
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: inherit;
+  position: relative;
 }
 
 .btn-menu:hover {
@@ -490,6 +494,7 @@ body {
     padding: 6px 10px;
     cursor: pointer;
     transition: all 0.2s ease;
+    position: relative;
 }
 
 .btn-history:hover {
