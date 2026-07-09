@@ -26,20 +26,22 @@ export class BorrachaTool extends ToolBase {
     this.isErasing = false;
   }
 
-  apagarElemento(evento) {
-    const target = evento.target;
+ apagarElemento(evento) {
+  const allowedTags = ['rect', 'text', 'image', 'circle', 'ellipse', 'line', 'path', 'polyline', 'g', 'polygon'];
 
-    const allowedTags = ['rect', 'text', 'image', 'circle', 'ellipse', 'line', 'path', 'polygon', 'polyline'];
+  let target = evento.target;
+
+  while (target && target !== this.svgCanvas) {
     const tag = target.tagName ? target.tagName.toLowerCase() : '';
 
-    if (
-      target !== this.svgCanvas &&
-      target.parentNode === this.svgCanvas &&
-      allowedTags.includes(tag)
-    ) {
+    if (allowedTags.includes(tag) && target.parentNode === this.svgCanvas) {
       target.remove();
+      return;
     }
+
+    target = target.parentNode;
   }
+}
 
   onDesativar() {
     this.isErasing = false;
