@@ -64,6 +64,22 @@ export class SelecaoTool extends ToolBase {
     }
   }
 
+  onDblClick(evento) {
+    const target = evento.target;
+    if (target && target.tagName && target.tagName.toLowerCase() === 'text') {
+      // Alterna para a ferramenta de texto
+      const btnTexto = document.querySelector('.btn-ferramenta[data-ferramenta="texto"]');
+      if (btnTexto) {
+        btnTexto.click();
+        
+        // Passa o evento para a ferramenta de texto lidar com o clique
+        if (estado.ferramentaAtual && estado.ferramentaAtual.onMouseDown) {
+          estado.ferramentaAtual.onMouseDown(evento);
+        }
+      }
+    }
+  }
+
   onMouseDown(evento) {
     const pt = obterCoordenadaSVG(evento, this.svgCanvas);
     const target = evento.target;

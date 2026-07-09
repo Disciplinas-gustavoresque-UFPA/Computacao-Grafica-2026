@@ -71,57 +71,57 @@ const btnRefazer = document.getElementById('btn-refazer');
 
 // Função para atualizar o estado dos botões de histórico
 function atualizarBotoesHistorico() {
-    if (!historyManager) return;
+  if (!historyManager) return;
 
-    const podeDesfazer = historyManager.podeDesfazer();
-    const podeRefazer = historyManager.podeRefazer();
+  const podeDesfazer = historyManager.podeDesfazer();
+  const podeRefazer = historyManager.podeRefazer();
 
-    if (btnDesfazer) {
-        btnDesfazer.disabled = !podeDesfazer;
-        btnDesfazer.title = podeDesfazer ? 'Desfazer (Ctrl+Z)' : 'Nada para desfazer';
-    }
+  if (btnDesfazer) {
+    btnDesfazer.disabled = !podeDesfazer;
+    btnDesfazer.title = podeDesfazer ? 'Desfazer (Ctrl+Z)' : 'Nada para desfazer';
+  }
 
-    if (btnRefazer) {
-        btnRefazer.disabled = !podeRefazer;
-        btnRefazer.title = podeRefazer ? 'Refazer (Ctrl+Y)' : 'Nada para refazer';
-    }
+  if (btnRefazer) {
+    btnRefazer.disabled = !podeRefazer;
+    btnRefazer.title = podeRefazer ? 'Refazer (Ctrl+Y)' : 'Nada para refazer';
+  }
 }
 
 // Sobrescrever o método salvarEstado do historyManager para atualizar os botões
 const salvarEstadoOriginal = historyManager.salvarEstado.bind(historyManager);
-historyManager.salvarEstado = function() {
-    const resultado = salvarEstadoOriginal();
-    atualizarBotoesHistorico();
-    return resultado;
+historyManager.salvarEstado = function () {
+  const resultado = salvarEstadoOriginal();
+  atualizarBotoesHistorico();
+  return resultado;
 };
 
 const desfazerOriginal = historyManager.desfazer.bind(historyManager);
-historyManager.desfazer = function() {
-    const resultado = desfazerOriginal();
-    atualizarBotoesHistorico();
-    return resultado;
+historyManager.desfazer = function () {
+  const resultado = desfazerOriginal();
+  atualizarBotoesHistorico();
+  return resultado;
 };
 
 const refazerOriginal = historyManager.refazer.bind(historyManager);
-historyManager.refazer = function() {
-    const resultado = refazerOriginal();
-    atualizarBotoesHistorico();
-    return resultado;
+historyManager.refazer = function () {
+  const resultado = refazerOriginal();
+  atualizarBotoesHistorico();
+  return resultado;
 };
 
 // Configurar event listeners dos botões de histórico
 if (btnDesfazer) {
-    btnDesfazer.addEventListener('click', () => {
-        desfazerAcao();
-        atualizarBotoesHistorico();
-    });
+  btnDesfazer.addEventListener('click', () => {
+    desfazerAcao();
+    atualizarBotoesHistorico();
+  });
 }
 
 if (btnRefazer) {
-    btnRefazer.addEventListener('click', () => {
-        refazerAcao();
-        atualizarBotoesHistorico();
-    });
+  btnRefazer.addEventListener('click', () => {
+    refazerAcao();
+    atualizarBotoesHistorico();
+  });
 }
 
 // Wrapper para sincronizar perfeitamente as coordenadas do #canvas com o #overlay-canvas
@@ -266,6 +266,12 @@ svgCanvas.addEventListener('mousemove', (evento) => {
   }
 });
 
+svgCanvas.addEventListener('dblclick', (evento) => {
+  if (estado.ferramentaAtual && typeof estado.ferramentaAtual.onDblClick === 'function') {
+    estado.ferramentaAtual.onDblClick(evento);
+  }
+});
+
 // Previne o menu de opções do botão direito no canvas
 svgCanvas.addEventListener('contextmenu', (e) => {
   if (e.target.closest('#canvas')) {
@@ -370,14 +376,14 @@ window.addEventListener("keydown", (e) => {
   }
 
   const mapaTeclas = {
-    "s" : "selecao",
-    "r" : "retangulo",
-    "e" : "elipse",
-    "l" : "linha",
-    "c" : "linhaCurvada",
-    "p" : "poligono",
-    "t" : "texto",
-    "i" : "conta-gotas"
+    "s": "selecao",
+    "r": "retangulo",
+    "e": "elipse",
+    "l": "linha",
+    "c": "linhaCurvada",
+    "p": "poligono",
+    "t": "texto",
+    "i": "conta-gotas"
   }
 
   const teclaPressionada = e.key.toLowerCase();
