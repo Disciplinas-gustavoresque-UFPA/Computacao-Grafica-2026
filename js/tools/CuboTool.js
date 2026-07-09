@@ -1,6 +1,7 @@
 import { ToolBase } from './ToolBase.js';
 import { getCubeVertices, CUBE_FACES } from '../shape/CuboShape.js';
 import { projectIsometric, computeFaceNormalZ, computeFaceDepth } from '../core/Projection3D.js';
+import { registrarAcaoHistorico } from '../core/StateManager.js';
 
 const NS = 'http://www.w3.org/2000/svg';
 
@@ -63,6 +64,13 @@ export class CuboTool extends ToolBase {
     const grupo = this._criarGrupo();
     this._renderizarCubo(grupo, this._origem, tamanho, 1.0);
     this.canvas.appendChild(grupo);
+    registrarAcaoHistorico({
+      tipo: 'criacao',
+      elemento: grupo
+    });
+
+    this._desenhando = false;
+    this._origem = null;
   }
 
   // ── Auxiliares ────────────────────────────────────────────
