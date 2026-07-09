@@ -2,6 +2,7 @@ import { ToolBase } from './ToolBase.js';
 import { getCubeVertices, CUBE_FACES } from '../shape/CuboShape.js';
 import { projectIsometric, computeFaceNormalZ, computeFaceDepth } from '../core/Projection3D.js';
 import { registrarAcaoHistorico } from '../core/StateManager.js';
+import { estado } from '../core/StateManager.js';
 
 const NS = 'http://www.w3.org/2000/svg';
 
@@ -131,8 +132,8 @@ export class CuboTool extends ToolBase {
       }))
       .sort((a, b) => b.profundidade - a.profundidade); // mais fundo primeiro
 
-    const corBase = '#4a90d9';
-    const corBorda = '#1a1a2e';
+    const corBase = estado.corPreenchimento;
+    const corBorda = estado.corBorda;
 
     for (const face of facesOrdenadas) {
       const pts2D = face.indices.map(i => vertices2D[i]);
