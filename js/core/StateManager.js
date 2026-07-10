@@ -33,6 +33,18 @@ export function atualizarPosicaoSelecaoVisual() {
   }
 }
 
+export function ocultarSelecaoVisual() {
+  if (gerenciadorSelecaoVisual) {
+    gerenciadorSelecaoVisual.limpar();
+  }
+}
+
+export function redesenharSelecaoVisual() {
+  if (gerenciadorSelecaoVisual && estado.elementosSelecionados.length > 0) {
+    gerenciadorSelecaoVisual.desenhar(estado.elementosSelecionados);
+  }
+}
+
 /**
  * Define a ferramenta de desenho ativa.
  * Invoca os métodos de ciclo de vida `onDesativar` na ferramenta anterior
