@@ -77,6 +77,43 @@ body {
   padding: 2px;
 }
 
+.line-style-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-line-style {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 28px;
+  border: 1px solid var(--cor-borda-ui);
+  border-radius: var(--raio-borda);
+  background: transparent;
+  color: var(--cor-texto-secundario);
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.btn-line-style svg {
+  width: 32px;
+  height: 12px;
+}
+
+.btn-line-style line {
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.btn-line-style:hover,
+.btn-line-style.ativo {
+  background-color: rgba(74, 144, 217, 0.2);
+  border-color: var(--cor-destaque);
+  color: var(--cor-destaque);
+}
+
 #ferramenta-atual-label {
   margin-left: auto;
   font-size: 12px;
@@ -163,7 +200,7 @@ body {
   z-index: 5;
 }
 
-/* From Uiverse.io by adamgiebl */ 
+/* From Uiverse.io by adamgiebl */
 .cssbuttons-io-button,
 #btn-primeiros-passos {
   display: flex;
@@ -424,7 +461,8 @@ body {
     stroke: white;
 }
 
-#zoom-options {
+#zoom-options,
+#line-options {
   position: absolute;
   background: var(--cor-fundo-barra);
   border: 1px solid var(--cor-borda-ui);
@@ -435,15 +473,18 @@ body {
   gap: 4px;
 }
 
-#zoom-options.hidden {
+#zoom-options.hidden,
+#line-options.hidden {
   display: none;
 }
 
-#zoom-options:not(.hidden) {
+#zoom-options:not(.hidden),
+#line-options:not(.hidden) {
   display: flex;
 }
 
-#zoom-options button {
+#zoom-options button,
+#line-options .btn-line-style {
   background-color: #4a90d9;
   width: 36px;
   height: 36px;
@@ -451,13 +492,26 @@ body {
   border-radius: var(--raio-borda);
 }
 
-#zoom-options button:hover {
+#zoom-options button:hover,
+#line-options .btn-line-style:hover {
   border-color: var(--cor-destaque);
 }
 
-#zoom-options button.ativo {
+#zoom-options button.ativo,
+#line-options .btn-line-style.ativo {
   background: rgba(0, 38, 255, 0.35);
   border-color: var(--cor-destaque);
+}
+
+#line-options .line-style-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+#line-options .btn-line-style svg {
+  width: 28px;
+  height: 12px;
 }
 
 #zoom-indicator {
@@ -616,15 +670,15 @@ body {
   flex-direction: column;
   color: #0f3460;
   flex-shrink: 0;
-  
+
   /* Transição por margem faz o Canvas redimensionar dinamicamente */
-  transition: margin-right 0.3s ease; 
-  margin-right: 0; 
+  transition: margin-right 0.3s ease;
+  margin-right: 0;
 }
 
 /* Quando escondida, puxa a barra para fora e cede o espaço no Flexbox */
 #barra-configuracoes.escondida {
-  margin-right: -300px; 
+  margin-right: -300px;
 }
 
 /* Estilo do botão de toggle posicionado dinamicamente */
@@ -673,7 +727,7 @@ body {
 
 /* Container do conteúdo */
 .tabs-container {
-  overflow-y: scroll; 
+  overflow-y: scroll;
   overflow-x: hidden;
 }
 .tab-content {
