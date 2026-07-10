@@ -37,11 +37,6 @@
     <div id="app" class="oculto">
         <!-- Painel Superior: propriedades (cor de preenchimento, cor de borda, etc.) -->
         <header id="painel-propriedades">
-            <span class="propriedade-label">Preenchimento:</span>
-            <input type="color" id="cor-preenchimento" value="#4a90d9" title="Cor de preenchimento" />
-
-            <span class="propriedade-label">Borda:</span>
-            <input type="color" id="cor-borda" value="#1a1a2e" title="Cor da borda" />
             <span id="zoom-indicator">Zoom: 100%</span>
 
             <span id="ferramenta-atual-label">Ferramenta:
@@ -149,6 +144,50 @@
                     >
                         &#9135;
                     </button>
+                    <div id="line-options" class="hidden">
+                        <div class="line-style-controls" aria-label="Estilo da linha">
+                            <button class="btn-line-style ativo" type="button" data-estilo-linha="continua" title="Linha contínua">
+                                <svg viewBox="0 0 36 12" aria-hidden="true" focusable="false">
+                                    <line x1="4" y1="6" x2="32" y2="6" />
+                                </svg>
+                            </button>
+
+                            <button class="btn-line-style" type="button" data-estilo-linha="tracejada" title="Linha tracejada">
+                                <svg viewBox="0 0 36 12" aria-hidden="true" focusable="false">
+                                    <line x1="4" y1="6" x2="32" y2="6" stroke-dasharray="12 6" />
+                                </svg>
+                            </button>
+
+                            <button class="btn-line-style" type="button" data-estilo-linha="pontilhada" title="Linha pontilhada">
+                                <svg viewBox="0 0 36 12" aria-hidden="true" focusable="false">
+                                    <line x1="4" y1="6" x2="32" y2="6" stroke-dasharray="1 6" stroke-linecap="round" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <button
+                        id="btn-criar-linha-curvada"
+                        class="btn-ferramenta"
+                        data-ferramenta="linhaCurvada"
+                        data-nome="Linha Curvada"
+                        data-tooltip="Linha Curvada (C)"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            aria-hidden="true"
+                            focusable="false"
+                        >
+                            <path d="M4 18C8 4 16 4 20 18" />
+                        </svg>
+                    </button>
                     <button 
                         id="btn-criar-cubo" 
                         class="btn-ferramenta" 
@@ -204,10 +243,10 @@
                             <path d="m2 22 .414-.414" />
                         </svg>
                     </button>
-                    <button 
+                    <button
                         id="btn-borracha"
-                        class="btn-ferramenta" 
-                        data-ferramenta="borracha" 
+                        class="btn-ferramenta"
+                        data-ferramenta="borracha"
                         data-nome="Borracha"
                         data-tooltip="Borracha (B)"
                     >
@@ -219,20 +258,34 @@
                         </svg>
                     </button>
 
-                    <button 
+                    <button
                         id="btn-lapis"
-                        class="btn-ferramenta" 
-                        data-ferramenta="lapis" 
+                        class="btn-ferramenta"
+                        data-ferramenta="lapis"
                         data-nome="Lápis"
                         data-tooltip="Lápis (P)"
                     >
                         &#128393;
                     </button>
 
-                    <button 
-                        id="btn-zoom-click" 
-                        class="btn-ferramenta" 
-                        data-ferramenta="lupa" 
+                    <button
+                        id="btn-pincel"
+                        class="btn-ferramenta"
+                        data-ferramenta="pincel"
+                        data-nome="Pincel"
+                        data-tooltip="Pincel dinâmico"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round">
+                            <line x1="18" y1="2" x2="9" y2="11"/>
+                            <path d="M6 14 L9 11 L13 15 L10 18 Z"/>
+                            <path d="M10 18 Q8 21 6 22 Q7 20 6 14"/>
+                        </svg>
+                    </button>
+
+                    <button
+                        id="btn-zoom-click"
+                        class="btn-ferramenta"
+                        data-ferramenta="lupa"
                         data-nome="Zoom"
                         data-tooltip="Zoom (Z)"
                     >
@@ -249,7 +302,7 @@
                     </svg>
                 </button>
                 <div id="zoom-options" class="hidden"></div> <!-- Menu de opçoes para a lupa/zoom -->
-                    
+
                 <button class="btn-ferramenta" id="btn-importar-imagem" data-nome="Importar Imagem"
                         data-tooltip="Importar Imagem (Shift+I)">
                     🖼️
@@ -264,6 +317,27 @@
                     <!-- Os elementos SVG criados pelo usuário serão inseridos aqui -->
                 </svg>
             </main>
+            <aside id="barra-configuracoes">
+                <button id="btn-toggle-sidebar" title="Esconder Painel">❯</button>
+                <nav class="tabs-nav"></nav>
+
+                <div class="tabs-container">
+                    <div id="tab-estilo" class="tab-content ativo">
+                        <h3>Estilo do Objeto</h3>
+                        <label>Preenchimento:
+                            <input type="color" id="cor-preenchimento" value="#4a90d9" />
+                        </label>
+
+                        <label>Borda:
+                            <input type="color" id="cor-borda" value="#1a1a2e" />
+                        </label>
+                    </div>
+
+                    <div id="tab-tracer" class="tab-content"></div>
+
+                    <div id="tab-camadas" class="tab-content"></div>
+                </div>
+            </aside>
         </div><!-- /#workspace -->
     </div><!-- /#app -->
 
@@ -279,5 +353,4 @@
     </script>
 
 </body>
-
 </html>
