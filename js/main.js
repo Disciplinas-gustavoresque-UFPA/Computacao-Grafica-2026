@@ -264,6 +264,12 @@ svgCanvas.addEventListener('mousemove', (evento) => {
   }
 });
 
+svgCanvas.addEventListener('dblclick', (evento) => {
+  if (estado.ferramentaAtual) {
+    estado.ferramentaAtual.dblclick(evento);
+  }
+})
+
 // Previne o menu de opções do botão direito no canvas
 svgCanvas.addEventListener('contextmenu', (e) => {
   if (e.target.closest('#canvas')) {
