@@ -34,6 +34,7 @@ body {
   color: var(--cor-texto);
   height: 100vh;
   overflow: hidden;
+  overscroll-behavior: contain;
 }
 
 /* =========================================================
@@ -74,6 +75,43 @@ body {
   background: none;
   cursor: pointer;
   padding: 2px;
+}
+
+.line-style-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-line-style {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 28px;
+  border: 1px solid var(--cor-borda-ui);
+  border-radius: var(--raio-borda);
+  background: transparent;
+  color: var(--cor-texto-secundario);
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.btn-line-style svg {
+  width: 32px;
+  height: 12px;
+}
+
+.btn-line-style line {
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.btn-line-style:hover,
+.btn-line-style.ativo {
+  background-color: rgba(74, 144, 217, 0.2);
+  border-color: var(--cor-destaque);
+  color: var(--cor-destaque);
 }
 
 #ferramenta-atual-label {
@@ -126,6 +164,7 @@ body {
 #workspace {
   display: flex;
   overflow: hidden;
+  position: relative;
 }
 
 /* =========================================================
@@ -145,7 +184,7 @@ body {
   z-index: 5;
 }
 
-/* From Uiverse.io by adamgiebl */ 
+/* From Uiverse.io by adamgiebl */
 .cssbuttons-io-button,
 #btn-primeiros-passos {
   display: flex;
@@ -339,7 +378,8 @@ body {
     stroke: white;
 }
 
-#zoom-options {
+#zoom-options,
+#line-options {
   position: absolute;
   background: var(--cor-fundo-barra);
   border: 1px solid var(--cor-borda-ui);
@@ -350,15 +390,18 @@ body {
   gap: 4px;
 }
 
-#zoom-options.hidden {
+#zoom-options.hidden,
+#line-options.hidden {
   display: none;
 }
 
-#zoom-options:not(.hidden) {
+#zoom-options:not(.hidden),
+#line-options:not(.hidden) {
   display: flex;
 }
 
-#zoom-options button {
+#zoom-options button,
+#line-options .btn-line-style {
   background-color: #4a90d9;
   width: 36px;
   height: 36px;
@@ -366,13 +409,26 @@ body {
   border-radius: var(--raio-borda);
 }
 
-#zoom-options button:hover {
+#zoom-options button:hover,
+#line-options .btn-line-style:hover {
   border-color: var(--cor-destaque);
 }
 
-#zoom-options button.ativo {
+#zoom-options button.ativo,
+#line-options .btn-line-style.ativo {
   background: rgba(0, 38, 255, 0.35);
   border-color: var(--cor-destaque);
+}
+
+#line-options .line-style-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+#line-options .btn-line-style svg {
+  width: 28px;
+  height: 12px;
 }
 
 #zoom-indicator {
@@ -515,4 +571,92 @@ body {
     background-color: transparent;
     border-color: var(--cor-borda-ui);
     color: var(--cor-texto-secundario);
+}
+
+/* =========================================================
+   Barra Lateral
+   ========================================================= */
+
+/* Nova Barra Lateral Direita */
+#barra-configuracoes {
+  width: 300px;
+  height: auto;
+  background-color: #f4f4f4;
+  border-left: 1px solid #ccc;
+  display: flex;
+  flex-direction: column;
+  color: #0f3460;
+  flex-shrink: 0;
+
+  /* Transição por margem faz o Canvas redimensionar dinamicamente */
+  transition: margin-right 0.3s ease;
+  margin-right: 0;
+}
+
+/* Quando escondida, puxa a barra para fora e cede o espaço no Flexbox */
+#barra-configuracoes.escondida {
+  margin-right: -300px;
+}
+
+/* Estilo do botão de toggle posicionado dinamicamente */
+#btn-toggle-sidebar {
+  position: absolute;
+  right: 300px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #eee;
+  border: 1px solid #ddd;
+  border-radius: 5px 0 0 5px;
+  cursor: pointer;
+  padding: 10px 5px;
+  z-index: 10;
+  transition: right 0.3s ease, transform 0.3s ease;
+}
+
+/* Rotaciona a setinha quando esconder */
+#btn-toggle-sidebar.sidebar-escondida {
+  right: 0;
+  transform: translateY(-50%) rotate(180deg);
+}
+
+/* Navegação das Abas */
+.tabs-nav {
+  display: flex;
+  background-color: #e0e0e0;
+  border-bottom: 1px solid #ccc;
+}
+
+/* Botão das abas */
+.tab-btn {
+  flex: 1;
+  padding: 10px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-size: 1.2rem;
+}
+
+/* Destaca a aba que está clicada */
+.tab-btn.ativo {
+  background-color: #f4f4f4;
+  border-bottom: 2px solid #4a90d9;
+}
+
+/* Container do conteúdo */
+.tabs-container {
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+.tab-content {
+  display: none;
+  height: auto;
+}
+
+.tab-content.ativo {
+  display: block;
+}
+
+.node-handle:hover {
+    fill: #4a90d9; /* Inverte a cor ao passar o mouse */
+    stroke: white;
 }
