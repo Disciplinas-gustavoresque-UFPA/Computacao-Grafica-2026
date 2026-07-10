@@ -127,7 +127,7 @@
                         &#9645;
                     </button>
                     <button
-                        id="btn-criar-retangulo"
+                        id="btn-criar-losango"
                         class="btn-ferramenta"
                         data-ferramenta="losango"
                         data-nome="Losango"
@@ -153,6 +153,27 @@
                     >
                         &#9135;
                     </button>
+                    <div id="line-options" class="hidden">
+                        <div class="line-style-controls" aria-label="Estilo da linha">
+                            <button class="btn-line-style ativo" type="button" data-estilo-linha="continua" title="Linha contínua">
+                                <svg viewBox="0 0 36 12" aria-hidden="true" focusable="false">
+                                    <line x1="4" y1="6" x2="32" y2="6" />
+                                </svg>
+                            </button>
+
+                            <button class="btn-line-style" type="button" data-estilo-linha="tracejada" title="Linha tracejada">
+                                <svg viewBox="0 0 36 12" aria-hidden="true" focusable="false">
+                                    <line x1="4" y1="6" x2="32" y2="6" stroke-dasharray="12 6" />
+                                </svg>
+                            </button>
+
+                            <button class="btn-line-style" type="button" data-estilo-linha="pontilhada" title="Linha pontilhada">
+                                <svg viewBox="0 0 36 12" aria-hidden="true" focusable="false">
+                                    <line x1="4" y1="6" x2="32" y2="6" stroke-dasharray="1 6" stroke-linecap="round" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                     <button
                         id="btn-criar-linha-curvada"
                         class="btn-ferramenta"
@@ -222,10 +243,10 @@
                             <path d="m2 22 .414-.414" />
                         </svg>
                     </button>
-                    <button 
+                    <button
                         id="btn-borracha"
-                        class="btn-ferramenta" 
-                        data-ferramenta="borracha" 
+                        class="btn-ferramenta"
+                        data-ferramenta="borracha"
                         data-nome="Borracha"
                         data-tooltip="Borracha (B)"
                     >
@@ -237,10 +258,10 @@
                         </svg>
                     </button>
 
-                    <button 
+                    <button
                         id="btn-lapis"
-                        class="btn-ferramenta" 
-                        data-ferramenta="lapis" 
+                        class="btn-ferramenta"
+                        data-ferramenta="lapis"
                         data-nome="Lápis"
                         data-tooltip="Lápis (P)"
                     >
@@ -261,10 +282,10 @@
                         </svg>
                     </button>
 
-                    <button 
-                        id="btn-zoom-click" 
-                        class="btn-ferramenta" 
-                        data-ferramenta="lupa" 
+                    <button
+                        id="btn-zoom-click"
+                        class="btn-ferramenta"
+                        data-ferramenta="lupa"
                         data-nome="Zoom"
                         data-tooltip="Zoom (Z)"
                     >
@@ -281,7 +302,7 @@
                     </svg>
                 </button>
                 <div id="zoom-options" class="hidden"></div> <!-- Menu de opçoes para a lupa/zoom -->
-                    
+
                 <button class="btn-ferramenta" id="btn-importar-imagem" data-nome="Importar Imagem"
                         data-tooltip="Importar Imagem (Shift+I)">
                     🖼️
@@ -306,7 +327,7 @@
                         <label>Preenchimento:
                             <input type="color" id="cor-preenchimento" value="#4a90d9" />
                         </label>
-                
+
                         <label>Borda:
                             <input type="color" id="cor-borda" value="#1a1a2e" />
                         </label>
