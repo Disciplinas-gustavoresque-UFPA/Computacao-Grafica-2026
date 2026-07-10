@@ -1,6 +1,10 @@
 import { ToolBase } from './ToolBase.js';
 import { criarElementoSVG, obterCoordenadaSVG } from '../utils/svgHelpers.js';
-import { estado, registrarAcaoHistorico } from '../core/StateManager.js';
+import {
+  estado,
+  definirElementosSelecionados,
+  registrarAcaoHistorico
+} from '../core/StateManager.js';
 
 const ESTILOS_LINHA_BEZIER = {
   continua: {},
@@ -20,13 +24,17 @@ export class BezierTool extends ToolBase {
     this.pontos = [];
     this.pathElement = null;
     this.pontoPreview = null;
+
+    this.onKeyDownBound = this.onKeyDown.bind(this);
   }
 
   onAtivar() {
+    window.addEventListener('keydown', this.onKeyDownBound);
     this.svgCanvas.style.cursor = 'crosshair';
   }
 
   onDesativar() {
+    window.removeEventListener('keydown', this.onKeyDownBound);
     this.resetarDesenho();
     this.svgCanvas.style.cursor = 'default';
   }
@@ -70,6 +78,13 @@ export class BezierTool extends ToolBase {
   onMouseUp() {
   }
 
+  onKeyDown(evento) {
+    if (evento.key !== 'Escape') return;
+
+    evento.preventDefault();
+    this.resetarDesenho();
+  }
+
   atualizarPath(pontoPreview = null) {
     if (!this.pathElement) return;
 
@@ -83,9 +98,9 @@ export class BezierTool extends ToolBase {
     }
 
     this.atualizarPath();
-    this.pontos = [];
-    this.pathElement = null;
-    this.pontoPreview = null;
+    const curvaFinal = this.pathElement;
+    this.limparEstadoInterno();
+    definirElementosSelecionados(curvaFinal);
     registrarAcaoHistorico();
   }
 
@@ -116,13 +131,17 @@ export class BezierTool extends ToolBase {
     return ESTILOS_LINHA_BEZIER[estado.estiloLinha] || ESTILOS_LINHA_BEZIER.continua;
   }
 
+  limparEstadoInterno() {
+    this.pontos = [];
+    this.pathElement = null;
+    this.pontoPreview = null;
+  }
+
   resetarDesenho() {
     if (this.pathElement) {
       this.pathElement.remove();
     }
 
-    this.pontos = [];
-    this.pathElement = null;
-    this.pontoPreview = null;
+    this.limparEstadoInterno();
   }
 }
