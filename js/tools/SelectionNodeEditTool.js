@@ -2,7 +2,12 @@ import { ToolBase } from './ToolBase.js';
 import { SelecaoTool } from './SelecaoTool.js';
 import { NodeEditTool } from './NodeEditTool.js';
 import { obterCoordenadaSVG } from '../utils/svgHelpers.js';
-import { estado, atualizarPosicaoSelecaoVisual } from '../core/StateManager.js';
+import { estado, 
+    atualizarPosicaoSelecaoVisual,
+    ocultarSelecaoVisual,
+    redesenharSelecaoVisual,
+    definirElementosSelecionados
+    } from '../core/StateManager.js';
 
 
 export class SelectionNodeEditTool extends ToolBase {
@@ -25,52 +30,62 @@ export class SelectionNodeEditTool extends ToolBase {
         this.mouseDownPos = {x: pt.x, y:pt.y};
         this.isDragging = false;
 
+        if (this.modoAtual === 'selecao') {
+            this.selecaoTool.onMouseDown(evento);
+            return
+        }
+
         if (this._isNodeHandle(target)) {
-            this.modoAtual = 'nodeEdit';
             this.isNodeHit = true;
-            this.nodeEditTool.onMouseDown(evento);
+        } else {
+            this.isNodeHit = false;
+        }
+        this.nodeEditTool.onMouseDown(evento);
+        definirElementosSelecionados([target]);
+        ocultarSelecaoVisual();
+    }
+
+    /**
+   *
+   * @param {MouseEvent} evento - Evento nativo do mouse.
+   */
+    dblclick(evento) {
+        const target = evento.target
+        if (!target || target === this.svgCanvas) {
+            return;
+        }
+        if (this.modoAtual === 'selecao') {
+            this.modoAtual = 'nodeEdit';
+            definirElementosSelecionados([target]);
+            ocultarSelecaoVisual();
+            this._sincronizarOverlayNos();
             return;
         }
         this.modoAtual = 'selecao';
-        this.isNodeHit = false;
-        this.selecaoTool.onMouseDown(evento);
-        this._sincronizarOverlayNos();
+        this.nodeEditTool.limparSelecao();
+        redesenharSelecaoVisual();
     }
 
     onMouseMove(evento) {
         if (this.modoAtual === 'nodeEdit' && this.isNodeHit) {
             this.nodeEditTool.onMouseMove(evento);
-            atualizarPosicaoSelecaoVisual();
             return;
         }
 
-        if (this.modoAtual === 'selecao') {
-            if (this.mouseDownPos && !this.isDragging) {
-                const pt = obterCoordenadaSVG(evento, this.svgCanvas)
-                const dx = pt.x - this.mouseDownPos.x;
-                const dy = pt.y - this.mouseDownPos.y;
-                if (Math.sqrt(dx*dx + dy*dy) > 3)
-                    this.isDragging = true;
-            }
-
-            this.selecaoTool.onMouseMove(evento);
-
-            if (this.nodeEditTool.elementoAlvo) {
-                const tag = this.nodeEditTool.elementoAlvo.tagName.toLowerCase();
-                const shape = this.nodeEditTool.allowedShapes[tag];
-                // Atualiza os handles para acompanhar a movimentação do objeto
-                if (shape) {
-                    shape.sincronizarTodosOsHandles(this.nodeEditTool.elementoAlvo);
-                }
-            }
+        if (this.mouseDownPos && !this.isDragging) {
+            const pt = obterCoordenadaSVG(evento, this.svgCanvas)
+            const dx = pt.x - this.mouseDownPos.x;
+            const dy = pt.y - this.mouseDownPos.y;
+            if (Math.sqrt(dx*dx + dy*dy) > 3)
+                this.isDragging = true;
         }
+        this.selecaoTool.onMouseMove(evento);
     }
 
     onMouseUp(evento) {
         if (this.modoAtual === 'nodeEdit' && this.isNodeHit) {
             this.nodeEditTool.onMouseUp(evento);
             this.isNodeHit = false;
-            this.modoAtual = 'selecao';
             return;
         }
 
@@ -88,7 +103,7 @@ export class SelectionNodeEditTool extends ToolBase {
     onDesativar() {
         this.limparSelecao();
         this.isNodeHit = false;
-        this.modoAtual = 'selecao';
+        this.modoAtual            // this.modoAtual = 'selecao'; = 'selecao';
         this.isDragging = false;
         this.mouseDownPos = null;
 
@@ -105,7 +120,7 @@ export class SelectionNodeEditTool extends ToolBase {
      * Lida com o overlay de edição com nós
      * @private
      */
-    _sincronizarOverlayNos() {
+    _sincronizarOverlayNos(target) {
         const selecionados = estado.elementosSelecionados;
         // Garante que edição dos nós só ocorre quando um elemento é selecionado
         const elementoUnico = selecionados.length === 1 ? selecionados[0] : null;
