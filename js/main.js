@@ -25,6 +25,7 @@ import { RetanguloTool } from './tools/RetanguloTool.js';
 import { TextoTool } from './tools/TextoTool.js';
 import { exportarDesenho } from './utils/exportHelpers.js';
 import { SelectionNodeEditTool } from './tools/SelectionNodeEditTool.js';
+import { NodeEditTool } from './tools/NodeEditTool.js';
 import { Selecao } from './core/Selecao.js';
 import { BorrachaTool } from './tools/BorrachaTool.js';
 import { LinhaTool } from './tools/LinhaTool.js';
@@ -167,6 +168,7 @@ definirGerenciadorSelecao(selecaoVisual);
 const cameraGlobal = new CameraSVG([svgCanvas, overlayCanvas]);
 const instanciasFerramentas = {
   selecao: new SelectionNodeEditTool(svgCanvas),
+  edicaoVertices: new NodeEditTool(svgCanvas),
   retangulo: new RetanguloTool(svgCanvas),
   linha: new LinhaTool(svgCanvas),
   linhaCurvada: new LinhaCurvadaTool(svgCanvas),
