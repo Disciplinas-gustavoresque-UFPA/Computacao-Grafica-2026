@@ -1,5 +1,17 @@
 import { ToolBase } from './ToolBase.js';
 import { criarElementoSVG, obterCoordenadaSVG } from '../utils/svgHelpers.js';
+import { estado, registrarAcaoHistorico } from '../core/StateManager.js';
+
+const ESTILOS_LINHA_BEZIER = {
+  continua: {},
+  tracejada: {
+    'stroke-dasharray': '12 6',
+  },
+  pontilhada: {
+    'stroke-dasharray': '1 6',
+    'stroke-linecap': 'round',
+  },
+};
 
 export class BezierTool extends ToolBase {
   constructor(svgCanvas) {
@@ -30,8 +42,11 @@ export class BezierTool extends ToolBase {
       this.pathElement = criarElementoSVG('path', {
         d: this.criarPathData(),
         fill: 'none',
-        stroke: '#000000',
+        stroke: estado.corBorda,
         'stroke-width': 2,
+        'stroke-linejoin': 'round',
+        'stroke-linecap': 'round',
+        ...this.obterAtributosEstiloLinha(),
       });
 
       this.svgCanvas.appendChild(this.pathElement);
@@ -71,6 +86,7 @@ export class BezierTool extends ToolBase {
     this.pontos = [];
     this.pathElement = null;
     this.pontoPreview = null;
+    registrarAcaoHistorico();
   }
 
   criarPathData(pontoPreview = null) {
@@ -94,6 +110,10 @@ export class BezierTool extends ToolBase {
     }
 
     return pontosPath;
+  }
+
+  obterAtributosEstiloLinha() {
+    return ESTILOS_LINHA_BEZIER[estado.estiloLinha] || ESTILOS_LINHA_BEZIER.continua;
   }
 
   resetarDesenho() {
