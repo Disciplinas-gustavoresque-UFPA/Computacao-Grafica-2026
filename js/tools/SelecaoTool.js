@@ -1,10 +1,10 @@
 import { ToolBase } from './ToolBase.js';
 import { obterCoordenadaSVG } from '../utils/svgHelpers.js';
-import { 
-  estado, 
-  definirElementosSelecionados, 
-  adicionarElementoSelecao, 
-  removerElementoSelecao, 
+import {
+  estado,
+  definirElementosSelecionados,
+  adicionarElementoSelecao,
+  removerElementoSelecao,
   atualizarPosicaoSelecaoVisual,
   registrarAcaoHistorico
 } from '../core/StateManager.js';
@@ -165,17 +165,17 @@ export class SelecaoTool extends ToolBase {
   deletarElementosSelecionados() {
     const elementos = [...estado.elementosSelecionados];
     if (elementos.length === 0) return;
-    
+
 
     elementos.forEach(el => {
       if (el && el.parentNode) {
         el.remove();
       }
     });
-    
+
     // Limpa a seleção
     definirElementosSelecionados([]);
-    
+
     // Registrar a exclusão no histórico
     registrarAcaoHistorico();
   }
@@ -198,7 +198,7 @@ export class SelecaoTool extends ToolBase {
     this.estadoInicialMovimento = estado.elementosSelecionados.map(el => {
       const tag = el.tagName.toLowerCase();
       let x = 0, y = 0;
-      
+
       if (tag === 'rect' || tag === 'text' || tag === 'image') {
         x = parseFloat(el.getAttribute('x') || 0);
         y = parseFloat(el.getAttribute('y') || 0);
@@ -213,7 +213,7 @@ export class SelecaoTool extends ToolBase {
         x = translacao.x;
         y = translacao.y;
       }
-      
+
       return { elemento: el, x, y, tag };
     });
   }
@@ -223,12 +223,12 @@ export class SelecaoTool extends ToolBase {
    */
   _houveMovimentoReal() {
     if (!this.estadoInicialMovimento) return false;
-    
+
     for (const estadoInicial of this.estadoInicialMovimento) {
       const el = estadoInicial.elemento;
       const tag = estadoInicial.tag;
       let xAtual = 0, yAtual = 0;
-      
+
       if (tag === 'rect' || tag === 'text' || tag === 'image') {
         xAtual = parseFloat(el.getAttribute('x') || 0);
         yAtual = parseFloat(el.getAttribute('y') || 0);
@@ -243,12 +243,12 @@ export class SelecaoTool extends ToolBase {
         xAtual = translacao.x;
         yAtual = translacao.y;
       }
-      
+
       if (xAtual !== estadoInicial.x || yAtual !== estadoInicial.y) {
         return true;
       }
     }
-    
+
     return false;
   }
 
@@ -283,7 +283,7 @@ export class SelecaoTool extends ToolBase {
       }
       atual = atual.parentNode;
     }
-    
+
     return null;
   }
 
