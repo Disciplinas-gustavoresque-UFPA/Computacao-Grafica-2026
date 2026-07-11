@@ -161,13 +161,13 @@ const observer = new MutationObserver((mutations) => {
 observer.observe(svgCanvas, { attributes: true, attributeFilter: ['viewBox'] });
 
 // Inicializar a classe de seleção visual
-const selecaoVisual = new Selecao(overlayCanvas);
+const selecaoVisual = new Selecao(overlayCanvas, svgCanvas);
 definirGerenciadorSelecao(selecaoVisual);
 
 // Instâncias das ferramentas disponíveis com todas as implementações da main
 const cameraGlobal = new CameraSVG([svgCanvas, overlayCanvas]);
 const instanciasFerramentas = {
-  selecao: new SelecaoTool(svgCanvas),
+  selecao: new SelecaoTool(svgCanvas, selecaoVisual),
   edicaoVertices: new NodeEditTool(svgCanvas),
   retangulo: new RetanguloTool(svgCanvas),
   linha: new LinhaTool(svgCanvas),

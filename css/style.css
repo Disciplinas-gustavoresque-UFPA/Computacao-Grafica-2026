@@ -341,6 +341,15 @@ body {
     stroke: white;
 }
 
+.skew-handle {
+    cursor: ew-resize;
+}
+
+.skew-handle:hover {
+    fill: #4a90d9; /* Inverte a cor ao passar o mouse */
+    stroke: white;
+}
+
 #zoom-options {
   position: absolute;
   background: var(--cor-fundo-barra);
