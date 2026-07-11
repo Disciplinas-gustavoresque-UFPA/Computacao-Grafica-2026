@@ -1,9 +1,8 @@
 import { criarElementoSVG, converterCoordenadaClienteParaSVG } from '../utils/svgHelpers.js';
 
 export class Selecao {
-  constructor(overlaySvg, canvasSvg) {
+  constructor(overlaySvg) {
     this.overlaySvg = overlaySvg;
-    this.canvasSvg = canvasSvg;
     this.bordaSelecao = null;
     this.grupoAlcas = null;
     this.alcaSkewX = null;
@@ -66,12 +65,16 @@ export class Selecao {
 
   /**
    * Cria (uma única vez) o grupo e as alças de cisalhamento (skew X e Y).
-   * Precisa viver dentro do #canvas real (não do overlay, que tem
-   * pointer-events:none e não recebe os listeners globais de mouse).
+   * Precisa viver no overlay (não no #canvas real): o #canvas é fotografado
+   * inteiro pelo HistoryManager a cada ação (svgCanvas.innerHTML), então
+   * qualquer elemento de UI colocado lá acaba "gravado" no undo/redo e vira
+   * órfão quando o innerHTML é substituído. As alças só recebem clique porque
+   * o grupo tem pointer-events:all, mesmo o overlay como um todo tendo
+   * pointer-events:none (ver main.js).
    * @private
    */
   _criarAlcasSkew() {
-    if (this.alcaSkewX || !this.canvasSvg) return;
+    if (this.alcaSkewX) return;
 
     this.grupoAlcas = criarElementoSVG('g', {
       id: 'selecao-alcas',
@@ -100,7 +103,7 @@ export class Selecao {
 
     this.grupoAlcas.appendChild(this.alcaSkewX);
     this.grupoAlcas.appendChild(this.alcaSkewY);
-    this.canvasSvg.appendChild(this.grupoAlcas);
+    this.overlaySvg.appendChild(this.grupoAlcas);
   }
 
   /**

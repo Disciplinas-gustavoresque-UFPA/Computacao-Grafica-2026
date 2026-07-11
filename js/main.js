@@ -161,7 +161,7 @@ const observer = new MutationObserver((mutations) => {
 observer.observe(svgCanvas, { attributes: true, attributeFilter: ['viewBox'] });
 
 // Inicializar a classe de seleção visual
-const selecaoVisual = new Selecao(overlayCanvas, svgCanvas);
+const selecaoVisual = new Selecao(overlayCanvas);
 definirGerenciadorSelecao(selecaoVisual);
 
 // Instâncias das ferramentas disponíveis com todas as implementações da main
@@ -263,6 +263,27 @@ svgCanvas.addEventListener('mousedown', (evento) => {
 svgCanvas.addEventListener('mousemove', (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseMove(evento);
+  }
+});
+
+// O overlay tem pointer-events:none (para não bloquear cliques no canvas),
+// exceto nos elementos de UI que o próprio Selecao habilita explicitamente
+// (ex: alças de skew) — por isso precisa dos mesmos listeners delegados.
+overlayCanvas.addEventListener('mousedown', (evento) => {
+  if (estado.ferramentaAtual) {
+    estado.ferramentaAtual.onMouseDown(evento);
+  }
+});
+
+overlayCanvas.addEventListener('mousemove', (evento) => {
+  if (estado.ferramentaAtual) {
+    estado.ferramentaAtual.onMouseMove(evento);
+  }
+});
+
+overlayCanvas.addEventListener('mouseup', (evento) => {
+  if (estado.ferramentaAtual) {
+    estado.ferramentaAtual.onMouseUp(evento);
   }
 });
 
