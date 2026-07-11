@@ -12,7 +12,6 @@ import {
   definirFerramenta,
   definirCorPreenchimento,
   definirCorBorda,
-  definirEstiloLinha,
   definirGerenciadorSelecao,
   definirElementosSelecionados,
   definirGerenciadorHistorico,
@@ -62,7 +61,6 @@ const btnImportarImagem = document.getElementById('btn-importar-imagem');
 const inputImagem = document.getElementById('input-imagem');
 const inputCorPreenchimento = document.getElementById('cor-preenchimento');
 const inputCorBorda = document.getElementById('cor-borda');
-const botoesEstiloLinha = document.querySelectorAll('.btn-line-style');
 const nomeFerramenta = document.getElementById('nome-ferramenta');
 const btnExportar = document.getElementById('btn-exportar');
 const exportFormat = document.getElementById('export-format');
@@ -205,18 +203,7 @@ function atualizarBotaoAtivo(nomeDaFerramenta) {
 botoesFerramenta.forEach((btn) => {
   btn.addEventListener('click', () => {
     const ferramentaId = btn.getAttribute('data-ferramenta');
-    if (!ferramentaId) return;
-
     const ferramentaInstancia = instanciasFerramentas[ferramentaId] || null;
-
-    if (
-      ferramentaId === 'linha' &&
-      estado.ferramentaAtual === ferramentaInstancia &&
-      typeof ferramentaInstancia.openPanel === 'function'
-    ) {
-      ferramentaInstancia.openPanel();
-      return;
-    }
 
     definirFerramenta(ferramentaInstancia);
     atualizarBotaoAtivo(ferramentaId);
@@ -243,20 +230,6 @@ inputCorBorda.addEventListener('input', () => {
   });
 });
 
-function atualizarBotaoEstiloLinhaAtivo(estiloLinha) {
-  botoesEstiloLinha.forEach((btn) => {
-    btn.classList.toggle('ativo', btn.dataset.estiloLinha === estiloLinha);
-  });
-}
-
-botoesEstiloLinha.forEach((btn) => {
-  btn.addEventListener('click', () => {
-    const estiloLinha = btn.dataset.estiloLinha;
-    definirEstiloLinha(estiloLinha);
-    atualizarBotaoEstiloLinhaAtivo(estiloLinha);
-  });
-});
-
 // Atualizar os inputs da sidebar quando o usuário selecionar um objeto
 // Usamos um MutationObserver ou interceptamos cliques no Canvas para capturar a seleção.
 svgCanvas.addEventListener('mouseup', (evento) => {
@@ -266,10 +239,10 @@ svgCanvas.addEventListener('mouseup', (evento) => {
 
   // Verifica se a ferramenta de seleção acabou de selecionar um elemento
   // Se houver um elemento selecionado, sincroniza a sidebar com as cores dele
-  const primeiroSelecionado = estado.elementosSelecionados[0];
-  if (primeiroSelecionado) {
-    const corPreenchimentoAtual = primeiroSelecionado.getAttribute('fill') || '#ffffff';
-    const corBordaAtual = primeiroSelecionado.getAttribute('stroke') || '#000000';
+  const elementoParaSincronizar = estado.elementosSelecionados[0] || null;
+  if (elementoParaSincronizar) {
+    const corPreenchimentoAtual = elementoParaSincronizar.getAttribute('fill') || '#ffffff';
+    const corBordaAtual = elementoParaSincronizar.getAttribute('stroke') || '#000000';
 
     // Atualiza o valor visual dos inputs para bater com o objeto selecionado
     inputCorPreenchimento.value = corPreenchimentoAtual;
@@ -304,7 +277,6 @@ svgCanvas.addEventListener('contextmenu', (e) => {
 // Inicializa os valores dos inputs com os valores padrão do estado
 inputCorPreenchimento.value = estado.corPreenchimento;
 inputCorBorda.value = estado.corBorda;
-atualizarBotaoEstiloLinhaAtivo(estado.estiloLinha);
 
 // Exportar / Salvar desenho
 btnExportar.addEventListener('click', () => {
@@ -406,7 +378,7 @@ window.addEventListener("keydown", (e) => {
     "c" : "linhaCurvada",
     "p" : "poligono",
     "t" : "texto",
-    "i" : "Conta-gotas"
+    "i" : "conta-gotas"
   }
 
   const teclaPressionada = e.key.toLowerCase();

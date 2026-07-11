@@ -68,6 +68,7 @@ export class SelecaoTool extends ToolBase {
     const pt = obterCoordenadaSVG(evento, this.svgCanvas);
     const target = evento.target;
     const isShift = evento.shiftKey;
+    const isCtrl = evento.ctrlKey || evento.metaKey;
 
     const allowedTags = ['rect', 'text', 'image', 'circle', 'ellipse', 'g', 'path', 'line', 'lapis'];
     const tag = target.tagName ? target.tagName.toLowerCase() : '';
@@ -76,28 +77,32 @@ export class SelecaoTool extends ToolBase {
     const elementoAlvo = this._buscarElementoValido(target, allowedTags);
 
     if (elementoAlvo) {
-      if (isShift) {
-        // Alterna seleção com Shift
-        if (estado.elementosSelecionados.includes(elementoAlvo)) {
-          removerElementoSelecao(elementoAlvo);
-        } else {
-          adicionarElementoSelecao(elementoAlvo);
-        }
-      } else {
-        if (!estado.elementosSelecionados.includes(elementoAlvo)) {
-          definirElementosSelecionados([elementoAlvo]);
-        }
-      }
+      this._aplicarSelecaoComModificador(elementoAlvo, isShift, isCtrl);
 
       if (estado.elementosSelecionados.length > 0) {
         this.isDragging = true;
         this._calcularOffsets(pt);
         this._salvarEstadoInicialMovimento();
       }
-    } else {
-      if (!isShift) {
-        this.limparSelecao();
+    } else if (!isShift && !isCtrl) {
+      this.limparSelecao();
+    }
+  }
+
+  _aplicarSelecaoComModificador(elementoAlvo, isShift, isCtrl) {
+    const usaModificador = isShift || isCtrl;
+
+    if (!usaModificador) {
+      if (!estado.elementosSelecionados.includes(elementoAlvo)) {
+        definirElementosSelecionados([elementoAlvo]);
       }
+      return;
+    }
+
+    if (estado.elementosSelecionados.includes(elementoAlvo)) {
+      removerElementoSelecao(elementoAlvo);
+    } else {
+      adicionarElementoSelecao(elementoAlvo);
     }
   }
 
