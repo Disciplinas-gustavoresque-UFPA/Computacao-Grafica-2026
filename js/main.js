@@ -132,6 +132,8 @@ const canvasContainer = document.createElement('div');
 canvasContainer.style.position = 'relative';
 canvasContainer.style.width = '100%';
 canvasContainer.style.height = '100%';
+canvasContainer.style.paddingTop = '20px';
+canvasContainer.style.paddingLeft = '20px';
 
 // Encapsulando o svg original
 svgCanvas.parentNode.insertBefore(canvasContainer, svgCanvas);
