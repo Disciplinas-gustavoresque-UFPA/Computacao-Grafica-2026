@@ -39,6 +39,7 @@ import { duplicarElemento } from './utils/duplicateHelpers.js';
 import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
 import { SideBar } from './core/SideBar.js';
 import { PincelTool } from './tools/PincelTool.js';
+import {definirEspessuraLapis} from "./core/StateManager.js";
 import { CameraSVG } from './core/CameraSVG.js';
 import { obterCoordenadaSVG } from './utils/svgHelpers.js';
 import { HistoryManager } from './core/HistoryManager.js';
