@@ -24,7 +24,7 @@ export class Lapis extends ToolBase {
         this.path = criarElementoSVG("path", {
             d: this.d,
             stroke: estado?.corBorda || "black",
-            "stroke-width": 2,
+            "stroke-width": estado.espessuraLapis,
             fill: "none",
             "stroke-linecap": "round",
             "stroke-linejoin": "round"
