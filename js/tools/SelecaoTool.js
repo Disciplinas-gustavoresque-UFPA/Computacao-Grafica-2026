@@ -1,10 +1,10 @@
 import { ToolBase } from './ToolBase.js';
 import { obterCoordenadaSVG } from '../utils/svgHelpers.js';
-import { 
-  estado, 
-  definirElementosSelecionados, 
-  adicionarElementoSelecao, 
-  removerElementoSelecao, 
+import {
+  estado,
+  definirElementosSelecionados,
+  adicionarElementoSelecao,
+  removerElementoSelecao,
   atualizarPosicaoSelecaoVisual,
   registrarAcaoHistorico
 } from '../core/StateManager.js';
@@ -84,36 +84,41 @@ export class SelecaoTool extends ToolBase {
     const pt = obterCoordenadaSVG(evento, this.svgCanvas);
     const target = evento.target;
     const isShift = evento.shiftKey;
+    const isCtrl = evento.ctrlKey || evento.metaKey;
 
-    const allowedTags = ['rect', 'text', 'image', 'circle', 'ellipse', 'g', 'path', 'line', 'lapis'];
+    const allowedTags = ['rect', 'text', 'image', 'circle', 'ellipse', 'g', 'path', 'line', 'lapis', 'polygon'];
     const tag = target.tagName ? target.tagName.toLowerCase() : '';
 
     // Verifica se o clique foi em um elemento válido dentro do canvas
     const elementoAlvo = this._buscarElementoValido(target, allowedTags);
 
     if (elementoAlvo) {
-      if (isShift) {
-        // Alterna seleção com Shift
-        if (estado.elementosSelecionados.includes(elementoAlvo)) {
-          removerElementoSelecao(elementoAlvo);
-        } else {
-          adicionarElementoSelecao(elementoAlvo);
-        }
-      } else {
-        if (!estado.elementosSelecionados.includes(elementoAlvo)) {
-          definirElementosSelecionados([elementoAlvo]);
-        }
-      }
+      this._aplicarSelecaoComModificador(elementoAlvo, isShift, isCtrl);
 
       if (estado.elementosSelecionados.length > 0) {
         this.isDragging = true;
         this._calcularOffsets(pt);
         this._salvarEstadoInicialMovimento();
       }
-    } else {
-      if (!isShift) {
-        this.limparSelecao();
+    } else if (!isShift && !isCtrl) {
+      this.limparSelecao();
+    }
+  }
+
+  _aplicarSelecaoComModificador(elementoAlvo, isShift, isCtrl) {
+    const usaModificador = isShift || isCtrl;
+
+    if (!usaModificador) {
+      if (!estado.elementosSelecionados.includes(elementoAlvo)) {
+        definirElementosSelecionados([elementoAlvo]);
       }
+      return;
+    }
+
+    if (estado.elementosSelecionados.includes(elementoAlvo)) {
+      removerElementoSelecao(elementoAlvo);
+    } else {
+      adicionarElementoSelecao(elementoAlvo);
     }
   }
 
@@ -135,6 +140,18 @@ export class SelecaoTool extends ToolBase {
       if (tag === 'rect' || tag === 'text' || tag === 'image') {
         el.setAttribute('x', String(novoX));
         el.setAttribute('y', String(novoY));
+      } else if (tag === 'polygon') {
+        // Losango armazenado como <polygon> com atributos x,y,width,height e points
+        el.setAttribute('x', String(novoX));
+        el.setAttribute('y', String(novoY));
+
+        const w = parseFloat(el.getAttribute('width') || 0);
+        const h = parseFloat(el.getAttribute('height') || 0);
+        const centroX = novoX + w / 2;
+        const centroY = novoY + h / 2;
+        const novosPontos = `${centroX},${novoY} ${novoX + w},${centroY} ${centroX},${novoY + h} ${novoX},${centroY}`;
+        
+        el.setAttribute('points', novosPontos);
       } else if (tag === 'circle' || tag === 'ellipse') {
         el.setAttribute('cx', String(novoX));
         el.setAttribute('cy', String(novoY));
@@ -176,17 +193,17 @@ export class SelecaoTool extends ToolBase {
   deletarElementosSelecionados() {
     const elementos = [...estado.elementosSelecionados];
     if (elementos.length === 0) return;
-    
+
 
     elementos.forEach(el => {
       if (el && el.parentNode) {
         el.remove();
       }
     });
-    
+
     // Limpa a seleção
     definirElementosSelecionados([]);
-    
+
     // Registrar a exclusão no histórico
     registrarAcaoHistorico();
   }
@@ -209,8 +226,11 @@ export class SelecaoTool extends ToolBase {
     this.estadoInicialMovimento = estado.elementosSelecionados.map(el => {
       const tag = el.tagName.toLowerCase();
       let x = 0, y = 0;
-      
+
       if (tag === 'rect' || tag === 'text' || tag === 'image') {
+        x = parseFloat(el.getAttribute('x') || 0);
+        y = parseFloat(el.getAttribute('y') || 0);
+      } else if (tag === 'polygon') {
         x = parseFloat(el.getAttribute('x') || 0);
         y = parseFloat(el.getAttribute('y') || 0);
       } else if (tag === 'circle' || tag === 'ellipse') {
@@ -224,7 +244,7 @@ export class SelecaoTool extends ToolBase {
         x = translacao.x;
         y = translacao.y;
       }
-      
+
       return { elemento: el, x, y, tag };
     });
   }
@@ -234,13 +254,16 @@ export class SelecaoTool extends ToolBase {
    */
   _houveMovimentoReal() {
     if (!this.estadoInicialMovimento) return false;
-    
+
     for (const estadoInicial of this.estadoInicialMovimento) {
       const el = estadoInicial.elemento;
       const tag = estadoInicial.tag;
       let xAtual = 0, yAtual = 0;
-      
+
       if (tag === 'rect' || tag === 'text' || tag === 'image') {
+        xAtual = parseFloat(el.getAttribute('x') || 0);
+        yAtual = parseFloat(el.getAttribute('y') || 0);
+      } else if (tag === 'polygon') {
         xAtual = parseFloat(el.getAttribute('x') || 0);
         yAtual = parseFloat(el.getAttribute('y') || 0);
       } else if (tag === 'circle' || tag === 'ellipse') {
@@ -254,12 +277,12 @@ export class SelecaoTool extends ToolBase {
         xAtual = translacao.x;
         yAtual = translacao.y;
       }
-      
+
       if (xAtual !== estadoInicial.x || yAtual !== estadoInicial.y) {
         return true;
       }
     }
-    
+
     return false;
   }
 
@@ -294,7 +317,7 @@ export class SelecaoTool extends ToolBase {
       }
       atual = atual.parentNode;
     }
-    
+
     return null;
   }
 
@@ -307,6 +330,9 @@ export class SelecaoTool extends ToolBase {
       let elX = 0, elY = 0;
 
       if (tag === 'rect' || tag === 'text' || tag === 'image') {
+        elX = parseFloat(el.getAttribute('x') || 0);
+        elY = parseFloat(el.getAttribute('y') || 0);
+      } else if (tag === 'polygon') {
         elX = parseFloat(el.getAttribute('x') || 0);
         elY = parseFloat(el.getAttribute('y') || 0);
       } else if (tag === 'circle' || tag === 'ellipse') {
