@@ -43,6 +43,7 @@ import { PincelTool } from './tools/PincelTool.js';
 import { CameraSVG } from './core/CameraSVG.js';
 import { obterCoordenadaSVG } from './utils/svgHelpers.js';
 import { HistoryManager } from './core/HistoryManager.js';
+import { LosangoTool } from './tools/LosangoTool.js';
 import { agruparElementos, desagruparElementos } from './core/GroupManager.js';
 
 const svgCanvas = document.getElementById('canvas');
@@ -183,6 +184,7 @@ const instanciasFerramentas = {
   texto: new TextoTool(svgCanvas),
   borracha: new BorrachaTool(svgCanvas),
   lapis: new Lapis(svgCanvas),
+  losango: new LosangoTool(svgCanvas),
   pincel: new PincelTool(svgCanvas),
 };
 
@@ -408,7 +410,8 @@ window.addEventListener("keydown", (e) => {
     "c" : "linhaCurvada",
     "p" : "poligono",
     "t" : "texto",
-    "i" : "Conta-gotas"
+    "i" : "Conta-gotas",
+    "g": "losango",
   }
 
   const teclaPressionada = e.key.toLowerCase();
