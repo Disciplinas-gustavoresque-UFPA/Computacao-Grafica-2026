@@ -67,6 +67,7 @@ const botoesEstiloLinha = document.querySelectorAll('.btn-line-style');
 const nomeFerramenta = document.getElementById('nome-ferramenta');
 const btnExportar = document.getElementById('btn-exportar');
 const exportFormat = document.getElementById('export-format');
+const inputEspessuraLapis =  document.getElementById("espessura-lapis");
 
 // Botões de histórico
 const btnDesfazer = document.getElementById('btn-desfazer');
@@ -311,6 +312,14 @@ atualizarBotaoEstiloLinhaAtivo(estado.estiloLinha);
 btnExportar.addEventListener('click', () => {
   const formato = exportFormat.value || 'png';
   exportarDesenho(svgCanvas, formato);
+});
+
+const valorEspessura =
+    document.getElementById("valor-espessura-lapis");
+
+inputEspessuraLapis.addEventListener("input", (e) => {
+    definirEspessuraLapis(e.target.value);
+    valorEspessura.textContent = e.target.value;
 });
 
 // --- Controle de Camadas (Z-Index) ---
