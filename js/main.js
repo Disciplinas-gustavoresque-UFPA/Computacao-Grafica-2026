@@ -31,6 +31,7 @@ import { BorrachaTool } from './tools/BorrachaTool.js';
 import { NodeEditTool } from './tools/NodeEditTool.js';
 import { LinhaTool } from './tools/LinhaTool.js';
 import { LinhaCurvadaTool } from './tools/LinhaCurvadaTool.js';
+import { BezierTool } from './tools/BezierTool.js';
 import { ElipseTool } from './tools/ElipseTool.js';
 import { LupaTool } from './tools/LupaTool.js';
 import { inicializarImportadorImagem } from './tools/ImageImporter.js';
@@ -175,6 +176,7 @@ const instanciasFerramentas = {
   retangulo: new RetanguloTool(svgCanvas),
   linha: new LinhaTool(svgCanvas),
   linhaCurvada: new LinhaCurvadaTool(svgCanvas),
+  bezier: new BezierTool(svgCanvas),
   poligono: new PoligonoPolilinhaTool(svgCanvas),
   elipse: new ElipseTool(svgCanvas),
   "Conta-gotas": new ColorPickerTool(svgCanvas),
@@ -413,7 +415,9 @@ window.addEventListener("keydown", (e) => {
   }
 
   const teclaPressionada = e.key.toLowerCase();
-  const ferramentaAlvo = mapaTeclas[teclaPressionada];
+  const ferramentaAlvo = e.shiftKey && teclaPressionada === 'c'
+    ? 'bezier'
+    : mapaTeclas[teclaPressionada];
 
   if (ferramentaAlvo) {
     e.preventDefault();

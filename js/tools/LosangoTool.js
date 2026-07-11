@@ -71,7 +71,7 @@ export class LosangoTool extends ToolBase {
     // Finaliza a operação de desenho
     this.isDrawing = false;
     this.losnElement = null;
-    
+
     // Integração com o History Manager
     registrarAcaoHistorico();
   }

@@ -134,7 +134,7 @@ export class SelecaoTool extends ToolBase {
         const centroX = novoX + w / 2;
         const centroY = novoY + h / 2;
         const novosPontos = `${centroX},${novoY} ${novoX + w},${centroY} ${centroX},${novoY + h} ${novoX},${centroY}`;
-        
+
         el.setAttribute('points', novosPontos);
       } else if (tag === 'circle' || tag === 'ellipse') {
         el.setAttribute('cx', String(novoX));

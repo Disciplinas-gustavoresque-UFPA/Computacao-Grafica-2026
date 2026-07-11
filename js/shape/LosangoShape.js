@@ -52,10 +52,10 @@ export class LosangoShape extends ShapeBase {
 
             const centroX = nx + nw / 2;
             const centroY = ny + nh / 2;
-            
+
             const novosPontos = `${centroX},${ny} ${nx + nw},${centroY} ${centroX},${ny + nh} ${nx},${centroY}`;
             targetElement.setAttribute('points', novosPontos);
-            
+
             // Sincroniza os nodes (vértices)
             this.sincronizarTodosOsHandles(targetElement);
         }
