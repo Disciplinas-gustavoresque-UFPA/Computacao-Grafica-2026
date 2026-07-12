@@ -31,6 +31,7 @@ import { BorrachaTool } from './tools/BorrachaTool.js';
 import { NodeEditTool } from './tools/NodeEditTool.js';
 import { LinhaTool } from './tools/LinhaTool.js';
 import { LinhaCurvadaTool } from './tools/LinhaCurvadaTool.js';
+import { BezierTool } from './tools/BezierTool.js';
 import { ElipseTool } from './tools/ElipseTool.js';
 import { LupaTool } from './tools/LupaTool.js';
 import { inicializarImportadorImagem } from './tools/ImageImporter.js';
@@ -42,6 +43,7 @@ import { PincelTool } from './tools/PincelTool.js';
 import { CameraSVG } from './core/CameraSVG.js';
 import { obterCoordenadaSVG } from './utils/svgHelpers.js';
 import { HistoryManager } from './core/HistoryManager.js';
+import { LosangoTool } from './tools/LosangoTool.js';
 import { agruparElementos, desagruparElementos } from './core/GroupManager.js';
 
 const svgCanvas = document.getElementById('canvas');
@@ -174,6 +176,7 @@ const instanciasFerramentas = {
   retangulo: new RetanguloTool(svgCanvas),
   linha: new LinhaTool(svgCanvas),
   linhaCurvada: new LinhaCurvadaTool(svgCanvas),
+  bezier: new BezierTool(svgCanvas),
   poligono: new PoligonoPolilinhaTool(svgCanvas),
   elipse: new ElipseTool(svgCanvas),
   "Conta-gotas": new ColorPickerTool(svgCanvas),
@@ -181,6 +184,7 @@ const instanciasFerramentas = {
   texto: new TextoTool(svgCanvas),
   borracha: new BorrachaTool(svgCanvas),
   lapis: new Lapis(svgCanvas),
+  losango: new LosangoTool(svgCanvas),
   pincel: new PincelTool(svgCanvas),
 };
 
@@ -406,11 +410,14 @@ window.addEventListener("keydown", (e) => {
     "c" : "linhaCurvada",
     "p" : "poligono",
     "t" : "texto",
-    "i" : "Conta-gotas"
+    "i" : "Conta-gotas",
+    "g": "losango",
   }
 
   const teclaPressionada = e.key.toLowerCase();
-  const ferramentaAlvo = mapaTeclas[teclaPressionada];
+  const ferramentaAlvo = e.shiftKey && teclaPressionada === 'c'
+    ? 'bezier'
+    : mapaTeclas[teclaPressionada];
 
   if (ferramentaAlvo) {
     e.preventDefault();
