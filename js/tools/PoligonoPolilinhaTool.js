@@ -1,6 +1,7 @@
 import { ToolBase } from "./ToolBase.js";
 import { criarElementoSVG, obterCoordenadaSVG } from '../utils/svgHelpers.js';
 import { estado } from '../core/StateManager.js';
+import { registrarAcaoHistorico } from '../core/StateManager.js';
 
 export class PoligonoPolilinhaTool extends ToolBase {
     constructor(svgCanvas) {
@@ -138,7 +139,7 @@ export class PoligonoPolilinhaTool extends ToolBase {
         });
 
         this.svgCanvas.appendChild(poligonoFinal);
-
+        registrarAcaoHistorico();
         // Limpa o estado interno para o próximo desenho
         this.polylineElement = null;
         this.vertices = [];
