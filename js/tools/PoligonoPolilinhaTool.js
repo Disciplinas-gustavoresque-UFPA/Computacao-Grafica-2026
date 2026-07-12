@@ -135,6 +135,7 @@ export class PoligonoPolilinhaTool extends ToolBase {
             points: this.formatarPoints(),
             stroke: estado.corBorda,
             'stroke-width': 2,
+            'data-shape': 'poligono',
             fill: estado.corPreenchimento || 'transparent'
         });
 

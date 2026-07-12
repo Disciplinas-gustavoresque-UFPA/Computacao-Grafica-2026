@@ -124,19 +124,24 @@ export class SelecaoTool extends ToolBase {
       if (tag === 'rect' || tag === 'text' || tag === 'image') {
         el.setAttribute('x', String(novoX));
         el.setAttribute('y', String(novoY));
-      } else if (tag === 'polygon') {
-        // Losango armazenado como <polygon> com atributos x,y,width,height e points
-        el.setAttribute('x', String(novoX));
-        el.setAttribute('y', String(novoY));
+      } else if (tag === 'polygon' && el.dataset.shape === 'losango') {
+    // Código atual do losango
+    el.setAttribute('x', String(novoX));
+    el.setAttribute('y', String(novoY));
 
-        const w = parseFloat(el.getAttribute('width') || 0);
-        const h = parseFloat(el.getAttribute('height') || 0);
-        const centroX = novoX + w / 2;
-        const centroY = novoY + h / 2;
-        const novosPontos = `${centroX},${novoY} ${novoX + w},${centroY} ${centroX},${novoY + h} ${novoX},${centroY}`;
+    const w = parseFloat(el.getAttribute('width') || 0);
+    const h = parseFloat(el.getAttribute('height') || 0);
 
-        el.setAttribute('points', novosPontos);
-      } else if (tag === 'circle' || tag === 'ellipse') {
+    const centroX = novoX + w / 2;
+    const centroY = novoY + h / 2;
+
+    const novosPontos =
+        `${centroX},${novoY} ${novoX + w},${centroY} ${centroX},${novoY + h} ${novoX},${centroY}`;
+
+    el.setAttribute('points', novosPontos);
+      }else if (tag === 'polygon' && el.dataset.shape === 'poligono') {
+        this._definirTranslacao(el, novoX, novoY);
+      }else if (tag === 'circle' || tag === 'ellipse') {
         el.setAttribute('cx', String(novoX));
         el.setAttribute('cy', String(novoY));
       } else if (tag === 'line') {
@@ -215,15 +220,21 @@ export class SelecaoTool extends ToolBase {
         x = parseFloat(el.getAttribute('x') || 0);
         y = parseFloat(el.getAttribute('y') || 0);
       } else if (tag === 'polygon') {
+        if (el.dataset.shape === 'losango') {
         x = parseFloat(el.getAttribute('x') || 0);
         y = parseFloat(el.getAttribute('y') || 0);
+      } else {
+        const translacao = this._obterTranslacao(el);
+        x = translacao.x;
+        y = translacao.y;
+      }
       } else if (tag === 'circle' || tag === 'ellipse') {
         x = parseFloat(el.getAttribute('cx') || 0);
         y = parseFloat(el.getAttribute('cy') || 0);
       } else if (tag === 'line') {
         x = parseFloat(el.getAttribute('x1') || 0);
         y = parseFloat(el.getAttribute('y1') || 0);
-      } else if (tag === 'path' || tag === 'g' || tag === 'polygon') {
+      } else if (tag === 'path' || tag === 'g') {
         const translacao = this._obterTranslacao(el);
         x = translacao.x;
         y = translacao.y;
@@ -247,9 +258,16 @@ export class SelecaoTool extends ToolBase {
       if (tag === 'rect' || tag === 'text' || tag === 'image') {
         xAtual = parseFloat(el.getAttribute('x') || 0);
         yAtual = parseFloat(el.getAttribute('y') || 0);
-      } else if (tag === 'polygon') {
-        xAtual = parseFloat(el.getAttribute('x') || 0);
-        yAtual = parseFloat(el.getAttribute('y') || 0);
+      } 
+      else if (tag === 'polygon') {
+          if (el.dataset.shape === 'losango') {
+          xAtual = parseFloat(el.getAttribute('x') || 0);
+          yAtual = parseFloat(el.getAttribute('y') || 0);
+        } else {
+          const translacao = this._obterTranslacao(el);
+          xAtual = translacao.x;
+          yAtual = translacao.y;
+        }
       } else if (tag === 'circle' || tag === 'ellipse') {
         xAtual = parseFloat(el.getAttribute('cx') || 0);
         yAtual = parseFloat(el.getAttribute('cy') || 0);
@@ -257,9 +275,8 @@ export class SelecaoTool extends ToolBase {
         xAtual = parseFloat(el.getAttribute('x1') || 0);
         yAtual = parseFloat(el.getAttribute('y1') || 0);
       } else if (tag === 'path' || tag === 'g') {
-        const translacao = this._obterTranslacao(el);
-        xAtual = translacao.x;
-        yAtual = translacao.y;
+        xAtual = parseFloat(el.getAttribute('data-x') || 0);
+        yAtual = parseFloat(el.getAttribute('data-y') || 0);
       }
 
       if (xAtual !== estadoInicial.x || yAtual !== estadoInicial.y) {
@@ -316,16 +333,21 @@ export class SelecaoTool extends ToolBase {
       if (tag === 'rect' || tag === 'text' || tag === 'image') {
         elX = parseFloat(el.getAttribute('x') || 0);
         elY = parseFloat(el.getAttribute('y') || 0);
-      } else if (tag === 'polygon') {
+      }else if (tag === 'polygon') {
+        if (el.dataset.shape === 'losango') {
         elX = parseFloat(el.getAttribute('x') || 0);
         elY = parseFloat(el.getAttribute('y') || 0);
-      } else if (tag === 'circle' || tag === 'ellipse') {
+      } else {
+        const translacao = this._obterTranslacao(el);
+        elX = translacao.x;
+        elY = translacao.y;
+      }} else if (tag === 'circle' || tag === 'ellipse') {
         elX = parseFloat(el.getAttribute('cx') || 0);
         elY = parseFloat(el.getAttribute('cy') || 0);
       } else if (tag === 'line') {
         elX = parseFloat(el.getAttribute('x1') || 0);
         elY = parseFloat(el.getAttribute('y1') || 0);
-      } else if (tag === 'path' || tag === 'g' || tag == 'polygon') {
+      } else if (tag === 'path' || tag === 'g') {
         // Usa a leitura nativa em vez do atributo 'data-x'
         const translacao = this._obterTranslacao(el);
         elX = translacao.x;
