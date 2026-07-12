@@ -7,7 +7,7 @@ import {
 } from '../core/StateManager.js';
 
 const VOLTAS_ESPIRAL = 4;
-const PONTOS_POR_VOLTA = 28;
+const SEGMENTOS_POR_VOLTA = 8;
 const RAIO_MINIMO = 4;
 
 const ESTILOS_LINHA_ESPIRAL = {
@@ -98,14 +98,7 @@ export class EspiralTool extends ToolBase {
 
     if (raio < RAIO_MINIMO) return '';
 
-    const pontos = this.gerarPontosEspiral(centro, raio);
-    if (pontos.length === 0) return '';
-
-    const [inicio, ...restante] = pontos;
-    return restante.reduce(
-      (pathData, ponto) => `${pathData} L ${ponto.x} ${ponto.y}`,
-      `M ${inicio.x} ${inicio.y}`
-    );
+    return this.criarPathDataCurvo(centro, raio);
   }
 
   calcularRaio(centro, pontoAtual) {
@@ -115,23 +108,61 @@ export class EspiralTool extends ToolBase {
     return Math.sqrt(dx * dx + dy * dy);
   }
 
-  gerarPontosEspiral(centro, raioFinal) {
-    const totalPontos = VOLTAS_ESPIRAL * PONTOS_POR_VOLTA;
+  criarPathDataCurvo(centro, raioFinal) {
+    const totalSegmentos = VOLTAS_ESPIRAL * SEGMENTOS_POR_VOLTA;
     const anguloFinal = VOLTAS_ESPIRAL * Math.PI * 2;
-    const pontos = [];
+    const incrementoAngulo = anguloFinal / totalSegmentos;
+    const inicio = this.calcularPontoEspiral(centro, raioFinal, 0, anguloFinal);
+    let pathData = `M ${this.formatarPonto(inicio)}`;
 
-    for (let indice = 0; indice <= totalPontos; indice += 1) {
-      const progresso = indice / totalPontos;
-      const angulo = progresso * anguloFinal;
-      const raioAtual = progresso * raioFinal;
+    for (let indice = 1; indice <= totalSegmentos; indice += 1) {
+      const anguloAnterior = (indice - 1) * incrementoAngulo;
+      const anguloAtual = indice * incrementoAngulo;
+      const pontoAnterior = this.calcularPontoEspiral(centro, raioFinal, anguloAnterior, anguloFinal);
+      const pontoAtual = this.calcularPontoEspiral(centro, raioFinal, anguloAtual, anguloFinal);
+      const tangenteAnterior = this.calcularTangenteEspiral(raioFinal, anguloAnterior, anguloFinal);
+      const tangenteAtual = this.calcularTangenteEspiral(raioFinal, anguloAtual, anguloFinal);
+      const fatorControle = incrementoAngulo / 3;
+      const controle1 = {
+        x: pontoAnterior.x + tangenteAnterior.x * fatorControle,
+        y: pontoAnterior.y + tangenteAnterior.y * fatorControle,
+      };
+      const controle2 = {
+        x: pontoAtual.x - tangenteAtual.x * fatorControle,
+        y: pontoAtual.y - tangenteAtual.y * fatorControle,
+      };
 
-      pontos.push({
-        x: centro.x + Math.cos(angulo) * raioAtual,
-        y: centro.y + Math.sin(angulo) * raioAtual,
-      });
+      pathData += ` C ${this.formatarPonto(controle1)} ${this.formatarPonto(controle2)} ${this.formatarPonto(pontoAtual)}`;
     }
 
-    return pontos;
+    return pathData;
+  }
+
+  calcularPontoEspiral(centro, raioFinal, angulo, anguloFinal) {
+    const raioAtual = (angulo / anguloFinal) * raioFinal;
+
+    return {
+      x: centro.x + Math.cos(angulo) * raioAtual,
+      y: centro.y + Math.sin(angulo) * raioAtual,
+    };
+  }
+
+  calcularTangenteEspiral(raioFinal, angulo, anguloFinal) {
+    const crescimentoRaio = raioFinal / anguloFinal;
+    const raioAtual = crescimentoRaio * angulo;
+
+    return {
+      x: crescimentoRaio * Math.cos(angulo) - raioAtual * Math.sin(angulo),
+      y: crescimentoRaio * Math.sin(angulo) + raioAtual * Math.cos(angulo),
+    };
+  }
+
+  formatarPonto(ponto) {
+    return `${this.formatarNumero(ponto.x)} ${this.formatarNumero(ponto.y)}`;
+  }
+
+  formatarNumero(valor) {
+    return Number(valor.toFixed(2));
   }
 
   obterAtributosEstiloLinha() {
