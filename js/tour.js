@@ -40,6 +40,20 @@ const driverObj = window.driver.js.driver({
             }
         },
         {
+            element: "#btn-criar-linha-curvada",
+            popover: {
+                title: 'Linha Curvada',
+                description: 'Desenhe linhas curvas entre dois pontos.'
+            }
+        },
+        {
+            element: "#btn-criar-polilinha",
+            popover: {
+                title: 'Polilinha',
+                description: 'Desenhe linhas conectadas entre vários pontos.'
+            }
+        },
+        {
             element: '#btn-criar-texto',
             popover: {
                 title: 'Texto',
@@ -58,6 +72,20 @@ const driverObj = window.driver.js.driver({
             popover: {
                 title: 'Borracha',
                 description: 'Remove objetos ou partes do desenho.'
+            }
+        },
+        {
+            element: "#btn-lapis",
+            popover: {
+                title: 'Lápis',
+                description: 'Desenhe linhas retas entre dois pontos.'
+            }
+        },
+        {
+            element: "#btn-pincel",
+            popover: {
+                title: 'Pincel',
+                description: 'Pinte com diferentes espessuras e cores.'
             }
         },
         {
