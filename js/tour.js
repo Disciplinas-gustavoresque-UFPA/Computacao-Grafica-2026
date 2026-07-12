@@ -24,7 +24,13 @@ const driverObj = window.driver.js.driver({
                 description: 'Clique nesta ferramenta e depois na área de desenho para criar retângulos.'
             }
         },
-        
+        {
+            element: '#btn-criar-losango',
+            popover: {
+                title: 'Losango',
+                description: 'Clique nesta ferramenta e depois na área de desenho para criar losangos.'
+            }
+        },
         {
             element: '#btn-criar-elipse',
             popover: {
@@ -44,6 +50,13 @@ const driverObj = window.driver.js.driver({
             popover: {
                 title: 'Linha Curvada',
                 description: 'Desenhe linhas curvas entre dois pontos.'
+            }
+        },
+        {
+            element: "#btn-criar-bezier",
+            popover: {
+                title: 'Curva de Bézier',
+                description: 'Desenhe curvas suaves entre dois pontos.'
             }
         },
         {
