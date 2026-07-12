@@ -2,6 +2,9 @@ import { ToolBase } from './ToolBase.js';
 import { obterCoordenadaSVG, criarElementoSVG } from '../utils/svgHelpers.js';
 import { RetanguloShape } from '../shape/RetanguloShape.js';
 import { ElipseShape } from '../shape/ElipseShape.js';
+import { LinhaShape } from '../shape/LinhaShape.js';
+import { PoligonoPolilinhaShape } from '../shape/PoligonoPolilinhaShape.js';
+import { BezierShape } from '../shape/BezierShape.js';
 
 /**
  * NodeEditTool
@@ -20,6 +23,10 @@ export class NodeEditTool extends ToolBase {
             'rect': new RetanguloShape(svgCanvas),
             'ellipse': new ElipseShape(svgCanvas),
             'image': new RetanguloShape(svgCanvas), // Image possui as mesmas propriedades de retangulos
+            'line': new LinhaShape(svgCanvas),
+            'polygon': new PoligonoPolilinhaShape(svgCanvas),
+            'polyline': new PoligonoPolilinhaShape(svgCanvas),
+            'path': new BezierShape(svgCanvas),
         }
     }
 
