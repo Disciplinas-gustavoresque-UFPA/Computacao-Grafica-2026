@@ -1,4 +1,6 @@
 import { ToolBase } from './ToolBase.js';
+import { criarElementoSVG, obterCoordenadaSVG } from '../utils/svgHelpers.js';
+import { estado } from '../core/StateManager.js';
 
 const VOLTAS_ESPIRAL = 4;
 const PONTOS_POR_VOLTA = 28;
@@ -22,16 +24,43 @@ export class EspiralTool extends ToolBase {
     this.svgCanvas.style.cursor = 'default';
   }
 
-  onMouseDown() {
-    // A lógica de início da espiral será implementada em uma etapa posterior.
+  onMouseDown(evento) {
+    if (evento.detail > 1) return;
+
+    this.isDrawing = true;
+    this.centro = obterCoordenadaSVG(evento, this.svgCanvas);
+    this.pathElement = criarElementoSVG('path', {
+      d: '',
+      fill: 'none',
+      stroke: estado.corBorda,
+      'stroke-width': 2,
+      'stroke-linejoin': 'round',
+      'stroke-linecap': 'round',
+    });
+
+    this.svgCanvas.appendChild(this.pathElement);
   }
 
-  onMouseMove() {
-    // A pré-visualização da espiral será implementada em uma etapa posterior.
+  onMouseMove(evento) {
+    if (!this.isDrawing || !this.pathElement || !this.centro) return;
+
+    const pontoAtual = obterCoordenadaSVG(evento, this.svgCanvas);
+    this.pathElement.setAttribute('d', this.criarPathData(this.centro, pontoAtual));
   }
 
-  onMouseUp() {
-    // A finalização da espiral será implementada em uma etapa posterior.
+  onMouseUp(evento) {
+    if (!this.isDrawing || !this.pathElement || !this.centro) return;
+
+    const pontoFinal = obterCoordenadaSVG(evento, this.svgCanvas);
+    const pathData = this.criarPathData(this.centro, pontoFinal);
+
+    if (!pathData) {
+      this.resetarDesenho();
+      return;
+    }
+
+    this.pathElement.setAttribute('d', pathData);
+    this.limparEstadoInterno();
   }
 
   criarPathData(centro, pontoAtual) {
@@ -80,6 +109,10 @@ export class EspiralTool extends ToolBase {
       this.pathElement.remove();
     }
 
+    this.limparEstadoInterno();
+  }
+
+  limparEstadoInterno() {
     this.isDrawing = false;
     this.centro = null;
     this.pathElement = null;
