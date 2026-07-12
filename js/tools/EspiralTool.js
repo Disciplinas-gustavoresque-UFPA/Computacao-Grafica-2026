@@ -6,6 +6,17 @@ const VOLTAS_ESPIRAL = 4;
 const PONTOS_POR_VOLTA = 28;
 const RAIO_MINIMO = 4;
 
+const ESTILOS_LINHA_ESPIRAL = {
+  continua: {},
+  tracejada: {
+    'stroke-dasharray': '12 6',
+  },
+  pontilhada: {
+    'stroke-dasharray': '1 6',
+    'stroke-linecap': 'round',
+  },
+};
+
 export class EspiralTool extends ToolBase {
   constructor(svgCanvas) {
     super();
@@ -36,6 +47,7 @@ export class EspiralTool extends ToolBase {
       'stroke-width': 2,
       'stroke-linejoin': 'round',
       'stroke-linecap': 'round',
+      ...this.obterAtributosEstiloLinha(),
     });
 
     this.svgCanvas.appendChild(this.pathElement);
@@ -102,6 +114,10 @@ export class EspiralTool extends ToolBase {
     }
 
     return pontos;
+  }
+
+  obterAtributosEstiloLinha() {
+    return ESTILOS_LINHA_ESPIRAL[estado.estiloLinha] || ESTILOS_LINHA_ESPIRAL.continua;
   }
 
   resetarDesenho() {
