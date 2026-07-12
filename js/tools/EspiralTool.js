@@ -1,6 +1,10 @@
 import { ToolBase } from './ToolBase.js';
 import { criarElementoSVG, obterCoordenadaSVG } from '../utils/svgHelpers.js';
-import { estado } from '../core/StateManager.js';
+import {
+  estado,
+  definirElementosSelecionados,
+  registrarAcaoHistorico
+} from '../core/StateManager.js';
 
 const VOLTAS_ESPIRAL = 4;
 const PONTOS_POR_VOLTA = 28;
@@ -72,7 +76,10 @@ export class EspiralTool extends ToolBase {
     }
 
     this.pathElement.setAttribute('d', pathData);
+    const espiralFinal = this.pathElement;
     this.limparEstadoInterno();
+    definirElementosSelecionados(espiralFinal);
+    registrarAcaoHistorico();
   }
 
   criarPathData(centro, pontoAtual) {
