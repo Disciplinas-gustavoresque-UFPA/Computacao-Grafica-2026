@@ -28,13 +28,17 @@ export class EspiralTool extends ToolBase {
     this.isDrawing = false;
     this.centro = null;
     this.pathElement = null;
+
+    this.onKeyDownBound = this.onKeyDown.bind(this);
   }
 
   onAtivar() {
+    window.addEventListener('keydown', this.onKeyDownBound);
     this.svgCanvas.style.cursor = 'crosshair';
   }
 
   onDesativar() {
+    window.removeEventListener('keydown', this.onKeyDownBound);
     this.resetarDesenho();
     this.svgCanvas.style.cursor = 'default';
   }
@@ -80,6 +84,13 @@ export class EspiralTool extends ToolBase {
     this.limparEstadoInterno();
     definirElementosSelecionados(espiralFinal);
     registrarAcaoHistorico();
+  }
+
+  onKeyDown(evento) {
+    if (evento.key !== 'Escape') return;
+
+    evento.preventDefault();
+    this.resetarDesenho();
   }
 
   criarPathData(centro, pontoAtual) {
