@@ -395,7 +395,7 @@ body {
   color: var(--cor-texto-secundario);
   font-size: 10px;
   font-family: sans-serif;
-  z-index: 6;
+  z-index: 1;
   pointer-events: none;
   overflow: hidden;
 }
