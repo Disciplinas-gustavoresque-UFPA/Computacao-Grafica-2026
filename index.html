@@ -15,19 +15,19 @@
         <nav class="menu-opcoes">
             <button id="btn-novo-doc" class="btn-menu">Criar novo documento</button>
 
-                <div class="grupo-opcao">
-                    <label for="select-tamanho" class="propriedade-label">Tamanho da página:</label>
-                    <div class="select-wrapper">
-                        <select id="select-tamanho" class="select-format">
-                            <option value="livre" selected>Livre</option>
-                            <option value="a4">A4 (800x1131)</option>
-                            <option value="a3">A3 (1131x1600)</option>
-                        </select>
-                        <svg class="select-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                            <path d="M7 10l5 5 5-5z" />
-                        </svg>
-                    </div>
+            <div class="grupo-opcao">
+                <label for="select-tamanho" class="propriedade-label">Tamanho da página:</label>
+                <div class="select-wrapper">
+                    <select id="select-tamanho" class="select-format">
+                        <option value="livre" selected>Livre</option>
+                        <option value="a4">A4 (800x1131)</option>
+                        <option value="a3">A3 (1131x1600)</option>
+                    </select>
+                    <svg class="select-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path d="M7 10l5 5 5-5z" />
+                    </svg>
                 </div>
+            </div>
 
             <button id="btn-abrir-arq" class="btn-menu">Abrir arquivo</button>
             <button id="btn-modelos" class="btn-menu">Modelos (templates)</button>
@@ -42,21 +42,23 @@
             <span id="ferramenta-atual-label">Ferramenta:
                 <strong id="nome-ferramenta">Nenhuma selecionada</strong></span>
 
-                <!-- Botões de Desfazer/Refazer -->
-                <div class="history-controls">
-                    <button id="btn-desfazer" class="btn-history" title="Desfazer (Ctrl+Z)">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M3 7v6h6"/>
-                            <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/>
-                        </svg>
-                    </button>
-                    <button id="btn-refazer" class="btn-history" title="Refazer (Ctrl+Y / Ctrl+Shift+Z)">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 7v6h-6"/>
-                            <path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13"/>
-                        </svg>
-                    </button>
-                </div>
+            <!-- Botões de Desfazer/Refazer -->
+            <div class="history-controls">
+                <button id="btn-desfazer" class="btn-history" title="Desfazer (Ctrl+Z)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M3 7v6h6" />
+                        <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13" />
+                    </svg>
+                </button>
+                <button id="btn-refazer" class="btn-history" title="Refazer (Ctrl+Y / Ctrl+Shift+Z)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 7v6h-6" />
+                        <path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13" />
+                    </svg>
+                </button>
+            </div>
 
             <!-- Controle de Camadas -->
             <div class="layer-controls">
@@ -64,6 +66,20 @@
                 <button id="btn-step-backward" title="Recuar" class="btn-layer">⏪</button>
                 <button id="btn-step-forward" title="Avançar" class="btn-layer">⏩</button>
                 <button id="btn-bring-to-front" title="Trazer para a Frente" class="btn-layer">⏭</button>
+            </div>
+            
+            <!-- Botões de Espelhamento -->
+            <button id="btn-flip-horizontal" class="btn-layer" title="Espelhar Horizontal">
+                ↔
+            </button>
+
+            <button id="btn-flip-vertical" class="btn-layer" title="Espelhar Vertical">
+                ↕
+            </button>
+
+            <!-- Controle de Visualização (Réguas de medida) -->
+            <div class="view-controls">
+                <button id="btn-toggle-regua" title="Mostrar/Ocultar Réguas" class="btn-layer">📏</button>
             </div>
 
             <!-- Botão de exportar/descarregar desenho -->
@@ -96,99 +112,63 @@
 
         </header>
 
-            <div id="workspace">
-                <!-- Barra Lateral: botões das ferramentas de desenho -->
-                <aside id="barra-ferramentas">
-                    <button
-                        id="btn-selecionar"
-                        class="btn-ferramenta"
-                        data-ferramenta="selecao"
-                        data-nome="Seleção"
-                        data-tooltip="Seleção (S)"
-                    >
-                        &#9654;
-                    </button>
-                    <button
-                        id="btn-edicao-vertices"
-                        class="btn-ferramenta"
-                        data-ferramenta="edicaoVertices"
-                        data-nome="Edição de Vértices"
-                        data-tooltip="Edição de Vértices (V)"
-                    >
-                        &#9688;
-                    </button>
-                    <button
-                        id="btn-criar-retangulo"
-                        class="btn-ferramenta"
-                        data-ferramenta="retangulo"
-                        data-nome="Retângulo"
-                        data-tooltip="Retângulo (R)"
-                    >
-                        &#9645;
-                    </button>
-                    <button
-                        id="btn-criar-elipse"
-                        class="btn-ferramenta"
-                        data-ferramenta="elipse"
-                        data-nome="Elipse"
-                        data-tooltip="Elipse (E)"
-                    >
-                        &#9711;
-                    </button>
-                    <button
-                        id="btn-criar-linha"
-                        class="btn-ferramenta"
-                        data-ferramenta="linha"
-                        data-nome="Linha"
-                        data-tooltip="Linha (L)"
-                    >
-                        &#9135;
-                    </button>
-                    <div id="line-options" class="hidden">
-                        <div class="line-style-controls" aria-label="Estilo da linha">
-                            <button class="btn-line-style ativo" type="button" data-estilo-linha="continua" title="Linha contínua">
-                                <svg viewBox="0 0 36 12" aria-hidden="true" focusable="false">
-                                    <line x1="4" y1="6" x2="32" y2="6" />
-                                </svg>
-                            </button>
+        <div id="workspace">
+            <!-- Barra Lateral: botões das ferramentas de desenho -->
+            <aside id="barra-ferramentas">
+                <button id="btn-selecionar" class="btn-ferramenta" data-ferramenta="selecao" data-nome="Seleção" data-tooltip="Seleção (S)">
+                    &#9654;
+                </button>
+                <button id="btn-edicao-vertices" class="btn-ferramenta" data-ferramenta="edicaoVertices" data-nome="Edição de Vértices" data-tooltip="Edição de Vértices (V)">
+                    &#9688;
+                </button>
+                <button id="btn-criar-retangulo" class="btn-ferramenta" data-ferramenta="retangulo" data-nome="Retângulo" data-tooltip="Retângulo (R)">
+                    &#9645;
+                </button>
+                <button id="btn-criar-losango" class="btn-ferramenta" data-ferramenta="losango" data-nome="Losango" data-tooltip="Losango (G)">
+                    &#9671;
+                </button>
+                <button id="btn-criar-elipse" class="btn-ferramenta" data-ferramenta="elipse" data-nome="Elipse" data-tooltip="Elipse (E)">
+                    &#9711;
+                </button>
+                <button id="btn-criar-linha" class="btn-ferramenta" data-ferramenta="linha" data-nome="Linha" data-tooltip="Linha (L)">
+                    &#9135;
+                </button>
+                <div id="line-options" class="hidden">
+                    <div class="line-style-controls" aria-label="Estilo da linha">
+                        <button class="btn-line-style ativo" type="button" data-estilo-linha="continua" title="Linha contínua">
+                            <svg viewBox="0 0 36 12" aria-hidden="true" focusable="false">
+                                <line x1="4" y1="6" x2="32" y2="6" />
+                            </svg>
+                        </button>
 
-                            <button class="btn-line-style" type="button" data-estilo-linha="tracejada" title="Linha tracejada">
-                                <svg viewBox="0 0 36 12" aria-hidden="true" focusable="false">
-                                    <line x1="4" y1="6" x2="32" y2="6" stroke-dasharray="12 6" />
-                                </svg>
-                            </button>
+                        <button class="btn-line-style" type="button" data-estilo-linha="tracejada" title="Linha tracejada">
+                            <svg viewBox="0 0 36 12" aria-hidden="true" focusable="false">
+                                <line x1="4" y1="6" x2="32" y2="6" stroke-dasharray="12 6" />
+                            </svg>
+                        </button>
 
-                            <button class="btn-line-style" type="button" data-estilo-linha="pontilhada" title="Linha pontilhada">
-                                <svg viewBox="0 0 36 12" aria-hidden="true" focusable="false">
-                                    <line x1="4" y1="6" x2="32" y2="6" stroke-dasharray="1 6" stroke-linecap="round" />
-                                </svg>
-                            </button>
-                        </div>
+                        <button class="btn-line-style" type="button" data-estilo-linha="pontilhada" title="Linha pontilhada">
+                            <svg viewBox="0 0 36 12" aria-hidden="true" focusable="false">
+                                <line x1="4" y1="6" x2="32" y2="6" stroke-dasharray="1 6" stroke-linecap="round" />
+                            </svg>
+                        </button>
                     </div>
-                    <button
-                        id="btn-criar-linha-curvada"
-                        class="btn-ferramenta"
-                        data-ferramenta="linhaCurvada"
-                        data-nome="Linha Curvada"
-                        data-tooltip="Linha Curvada (C)"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            aria-hidden="true"
-                            focusable="false"
-                        >
-                            <path d="M4 18C8 4 16 4 20 18" />
-                        </svg>
-                    </button>
-                    <button 
+                </div>
+                <button id="btn-criar-linha-curvada" class="btn-ferramenta" data-ferramenta="linhaCurvada" data-nome="Linha Curvada" data-tooltip="Linha Curvada (C)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        aria-hidden="true" focusable="false">
+                        <path d="M4 18C8 4 16 4 20 18" />
+                    </svg>
+                </button>
+                <button id="btn-criar-bezier" class="btn-ferramenta" data-ferramenta="bezier" data-nome="Bézier Cúbica" data-tooltip="Bézier Cúbica (Shift+C)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        aria-hidden="true" focusable="false">
+                        <path d="M4 18C7 6 17 6 20 18" />
+                        <circle cx="7" cy="6" r="1.5" />
+                        <circle cx="17" cy="6" r="1.5" />
+                    </svg>
+                </button>
+                <button 
                         id="btn-criar-cubo" 
                         class="btn-ferramenta" 
                         data-ferramenta="cubo" 
@@ -197,102 +177,43 @@
                     > 
                         &#129482; 
                     </button>
-                    <button
-                        id="btn-criar-polilinha"
-                        class="btn-ferramenta"
-                        data-ferramenta="poligono"
-                        data-nome="Polígono / Polilinha"
-                        data-tooltip="Polígono / Polilinha (G)"
-                    >
-                        &bowtie;
-                    </button>
-                    <button
-                        id="btn-criar-texto"
-                        class="btn-ferramenta"
-                        data-ferramenta="texto"
-                        data-nome="Texto"
-                        data-tooltip="Texto (T)"
-                    >
-                        T
-                    </button>
-                    <button
-                        id="btn-pintar"
-                        class="btn-ferramenta"
-                        data-ferramenta="Conta-gotas"
-                        data-nome="Conta-gotas"
-                        data-tooltip="Conta-gotas (I)"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            class="lucide lucide-pipette-icon lucide-pipette"
-                        >
-                            <path
-                                d="m12 9-8.414 8.414A2 2 0 0 0 3 18.828v1.344a2 2 0 0 1-.586 1.414A2 2 0 0 1 3.828 21h1.344a2 2 0 0 0 1.414-.586L15 12"
-                            />
-                            <path
-                                d="m18 9 .4.4a1 1 0 1 1-3 3l-3.8-3.8a1 1 0 1 1 3-3l.4.4 3.4-3.4a1 1 0 1 1 3 3z"
-                            />
-                            <path d="m2 22 .414-.414" />
-                        </svg>
-                    </button>
-                    <button
-                        id="btn-borracha"
-                        class="btn-ferramenta"
-                        data-ferramenta="borracha"
-                        data-nome="Borracha"
-                        data-tooltip="Borracha (B)"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                        viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20 20H7L3 16L14 5L21 12L13 20"/>
-                        </svg>
-                    </button>
+                <button id="btn-criar-polilinha" class="btn-ferramenta" data-ferramenta="poligono" data-nome="Polígono / Polilinha" data-tooltip="Polígono / Polilinha (G)">
+                    &bowtie;
+                </button>
+                <button id="btn-criar-texto" class="btn-ferramenta" data-ferramenta="texto" data-nome="Texto" data-tooltip="Texto (T)">
+                    T
+                </button>
+                <button id="btn-pintar" class="btn-ferramenta" data-ferramenta="Conta-gotas" data-nome="Conta-gotas" data-tooltip="Conta-gotas (I)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-pipette-icon lucide-pipette">
+                        <path d="m12 9-8.414 8.414A2 2 0 0 0 3 18.828v1.344a2 2 0 0 1-.586 1.414A2 2 0 0 1 3.828 21h1.344a2 2 0 0 0 1.414-.586L15 12" />
+                        <path d="m18 9 .4.4a1 1 0 1 1-3 3l-3.8-3.8a1 1 0 1 1 3-3l.4.4 3.4-3.4a1 1 0 1 1 3 3z" />
+                        <path d="m2 22 .414-.414" />
+                    </svg>
+                </button>
+                <button id="btn-borracha" class="btn-ferramenta" data-ferramenta="borracha" data-nome="Borracha" data-tooltip="Borracha (B)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M20 20H7L3 16L14 5L21 12L13 20" />
+                    </svg>
+                </button>
 
-                    <button
-                        id="btn-lapis"
-                        class="btn-ferramenta"
-                        data-ferramenta="lapis"
-                        data-nome="Lápis"
-                        data-tooltip="Lápis (P)"
-                    >
-                        &#128393;
-                    </button>
+                <button id="btn-lapis" class="btn-ferramenta" data-ferramenta="lapis" data-nome="Lápis" data-tooltip="Lápis (P)">
+                    &#128393;
+                </button>
 
-                    <button
-                        id="btn-pincel"
-                        class="btn-ferramenta"
-                        data-ferramenta="pincel"
-                        data-nome="Pincel"
-                        data-tooltip="Pincel dinâmico"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round">
-                            <line x1="18" y1="2" x2="9" y2="11"/>
-                            <path d="M6 14 L9 11 L13 15 L10 18 Z"/>
-                            <path d="M10 18 Q8 21 6 22 Q7 20 6 14"/>
-                        </svg>
-                    </button>
+                <button id="btn-pincel" class="btn-ferramenta" data-ferramenta="pincel" data-nome="Pincel" data-tooltip="Pincel dinâmico">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"
+                        stroke-linecap="round">
+                        <line x1="18" y1="2" x2="9" y2="11" />
+                        <path d="M6 14 L9 11 L13 15 L10 18 Z" />
+                        <path d="M10 18 Q8 21 6 22 Q7 20 6 14" />
+                    </svg>
+                </button>
 
-                    <button
-                        id="btn-zoom-click"
-                        class="btn-ferramenta"
-                        data-ferramenta="lupa"
-                        data-nome="Zoom"
-                        data-tooltip="Zoom (Z)"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
-                          viewBox="0 0 24 24" fill="none"
-                          stroke="currentColor" stroke-width="2"
-                          stroke-linecap="round" stroke-linejoin="round">
+                <button id="btn-zoom-click" class="btn-ferramenta" data-ferramenta="lupa" data-nome="Zoom" data-tooltip="Zoom (Z)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
 
                         <!-- lente -->
                         <circle cx="11" cy="11" r="7"></circle>
@@ -303,8 +224,7 @@
                 </button>
                 <div id="zoom-options" class="hidden"></div> <!-- Menu de opçoes para a lupa/zoom -->
 
-                <button class="btn-ferramenta" id="btn-importar-imagem" data-nome="Importar Imagem"
-                        data-tooltip="Importar Imagem (Shift+I)">
+                <button class="btn-ferramenta" id="btn-importar-imagem" data-nome="Importar Imagem" data-tooltip="Importar Imagem (Shift+I)">
                     🖼️
                 </button>
 
@@ -353,4 +273,5 @@
     </script>
 
 </body>
+
 </html>
