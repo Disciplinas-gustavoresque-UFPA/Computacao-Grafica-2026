@@ -1,7 +1,9 @@
 import { ToolBase } from './ToolBase.js';
-import { obterCoordenadaSVG, criarElementoSVG } from '../utils/svgHelpers.js';
+import { obterCoordenadaSVG } from '../utils/svgHelpers.js';
 import { RetanguloShape } from '../shape/RetanguloShape.js';
 import { ElipseShape } from '../shape/ElipseShape.js';
+import { LinhaCurvadaShape } from '../shape/LinhaCurvadaShape.js';
+import { registrarAcaoHistorico } from '../core/StateManager.js';
 
 /**
  * NodeEditTool
@@ -20,21 +22,37 @@ export class NodeEditTool extends ToolBase {
             'rect': new RetanguloShape(svgCanvas),
             'ellipse': new ElipseShape(svgCanvas),
             'image': new RetanguloShape(svgCanvas), // Image possui as mesmas propriedades de retangulos
+            'linhaCurvada': new LinhaCurvadaShape(svgCanvas),
         }
+    }
+
+    obterTipoEditavel(elemento) {
+        if (!elemento || !elemento.tagName) return null;
+
+        const tag = elemento.tagName.toLowerCase();
+
+        if (tag === 'path') {
+            return elemento.dataset && elemento.dataset.tipoLinha === 'linhaCurvada'
+                ? 'linhaCurvada'
+                : null;
+        }
+
+        return Object.prototype.hasOwnProperty.call(this.allowedShapes, tag) ? tag : null;
     }
 
     /**
      * Executado ao clicar em um elemento.
      */
     onMouseDown(evento) {
-        const pt = obterCoordenadaSVG(evento, this.svgCanvas);
         const target = evento.target;
-        let shape = this.elementoAlvo ? this.allowedShapes[this.elementoAlvo.tagName] : null;
+        const tipoAtual = this.elementoAlvo ? this.obterTipoEditavel(this.elementoAlvo) : null;
+        let shape = tipoAtual ? this.allowedShapes[tipoAtual] : null;
 
         // Verifica se o clique foi em um handle de nó
         if (shape && shape.grupoOverlay && shape.grupoOverlay.contains(target)) {
             this.isDraggingNode = true;
             this.activeNodeId = target.getAttribute('data-node-id');
+            shape.activeNodeId = this.activeNodeId;
             
             // Impede que o evento selecione outros elementos abaixo
             evento.stopPropagation();
@@ -42,14 +60,14 @@ export class NodeEditTool extends ToolBase {
         }
 
         this.limparSelecao();
-        const tag = target.tagName ? target.tagName.toLowerCase() : '';
-        let newShape = this.allowedShapes[tag];
+        const tipo = this.obterTipoEditavel(target);
+        let newShape = tipo ? this.allowedShapes[tipo] : null;
 
         // Se o clique não foi no canvas vazio e for um elemento permitido
         if (
             target !== this.svgCanvas &&
             target.parentNode === this.svgCanvas &&
-            Object.keys(this.allowedShapes).includes(tag)
+            tipo
         ) {
             // Verifica se há algo selecionado no estado global
             this.elementoAlvo = target;
@@ -67,17 +85,23 @@ export class NodeEditTool extends ToolBase {
 
         const coordenadas = obterCoordenadaSVG(evento, this.svgCanvas);
 
-        // No onMouseMove de NodeEditTool.js altere para:
-        const tag = this.elementoAlvo.tagName.toLowerCase();
-        const shape = this.allowedShapes[tag];
+        const tipo = this.obterTipoEditavel(this.elementoAlvo);
+        const shape = this.allowedShapes[tipo];
+        shape.activeNodeId = this.activeNodeId;
         shape.atualizarPosicaoHandle(coordenadas);
         shape.atualizarForma(coordenadas, this.elementoAlvo, this.activeNodeId);
     }
 
-    //Finaliza o arraste
+    //Finaliza o arraste e salva o estado da edição (Memento) via HistoryManager
     onMouseUp() {
+        const estavaEditandoNo = this.isDraggingNode;
+
         this.isDraggingNode = false;
         this.activeNodeId = null;
+
+        if (estavaEditandoNo) {
+            registrarAcaoHistorico();
+        }
     }
 
     // Limpa os elementos de interface ao trocar de ferramenta.
@@ -86,8 +110,8 @@ export class NodeEditTool extends ToolBase {
     }
 
     limparSelecao() {
-        const tag = this.elementoAlvo ? this.elementoAlvo.tagName : '';
-        if (tag) this.allowedShapes[tag].removeOverlay();
+        const tipo = this.elementoAlvo ? this.obterTipoEditavel(this.elementoAlvo) : null;
+        if (tipo) this.allowedShapes[tipo].removeOverlay();
         this.elementoAlvo = null;
       }
     
