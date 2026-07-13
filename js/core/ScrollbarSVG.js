@@ -213,8 +213,8 @@ export class ScrollbarSVG {
     // ── Vertical ──
     const ratioY    = (vb.y - cv.y) / cv.height;
     const ratioH    = vb.height / cv.height;
-    const thumbTop  = ratioY * trackH;
     const thumbH2   = Math.max(ratioH * trackH, 20);
+    const thumbTop  = Math.min(ratioY * trackH, trackH - thumbH2);
 
     this.thumbV.style.top    = `${thumbTop}px`;
     this.thumbV.style.height = `${thumbH2}px`;
