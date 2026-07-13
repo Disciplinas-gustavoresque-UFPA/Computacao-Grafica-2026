@@ -18,7 +18,8 @@ import {
   definirGerenciadorHistorico,
   desfazerAcao,
   refazerAcao,
-  registrarAcaoHistorico
+  registrarAcaoHistorico,
+  atualizarPosicaoSelecaoVisual
 } from './core/StateManager.js';
 import { ColorPickerTool } from './tools/ColorPickerTool.js';
 import { Lapis } from './tools/LapisTool.js';
@@ -46,6 +47,7 @@ import { HistoryManager } from './core/HistoryManager.js';
 import { Regua } from './core/Regua.js';
 import { LosangoTool } from './tools/LosangoTool.js';
 import { agruparElementos, desagruparElementos } from './core/GroupManager.js';
+import { espelharHorizontal, espelharVertical } from "./utils/flipHelpers.js";
 
 const svgCanvas = document.getElementById('canvas');
 
@@ -373,6 +375,32 @@ btnSendToBack.addEventListener('click', () => moverCamada('fundo'));
 btnStepBackward.addEventListener('click', () => moverCamada('recuar'));
 btnStepForward.addEventListener('click', () => moverCamada('avancar'));
 btnBringToFront.addEventListener('click', () => moverCamada('frente'));
+
+// --- Configurar Espelhamento ---
+const btnFlipHorizontal = document.getElementById('btn-flip-horizontal');
+const btnFlipVertical = document.getElementById('btn-flip-vertical');
+
+btnFlipHorizontal.addEventListener("click", () => {
+
+    estado.elementosSelecionados.forEach(el => {
+        espelharHorizontal(el);
+    });
+
+    atualizarPosicaoSelecaoVisual();
+    registrarAcaoHistorico();
+
+});
+
+btnFlipVertical.addEventListener("click", () => {
+
+    estado.elementosSelecionados.forEach(el => {
+        espelharVertical(el);
+    });
+
+    atualizarPosicaoSelecaoVisual();
+    registrarAcaoHistorico();
+
+});
 
 // Atalhos de Teclado (Tool Selection)
 window.addEventListener("keydown", (e) => {

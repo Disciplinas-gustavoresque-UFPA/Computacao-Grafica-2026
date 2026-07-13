@@ -8,6 +8,7 @@ import {
   atualizarPosicaoSelecaoVisual,
   registrarAcaoHistorico
 } from '../core/StateManager.js';
+import { atualizarTransformacao } from '../utils/flipHelpers.js';
 
 /**
  * Ferramenta de Seleção
@@ -124,6 +125,7 @@ export class SelecaoTool extends ToolBase {
       if (tag === 'rect' || tag === 'text' || tag === 'image') {
         el.setAttribute('x', String(novoX));
         el.setAttribute('y', String(novoY));
+        atualizarTransformacao(el);
       } else if (tag === 'polygon' && el.dataset.shape === 'losango') {
     // Código atual do losango
     el.setAttribute('x', String(novoX));
@@ -139,11 +141,15 @@ export class SelecaoTool extends ToolBase {
         `${centroX},${novoY} ${novoX + w},${centroY} ${centroX},${novoY + h} ${novoX},${centroY}`;
 
     el.setAttribute('points', novosPontos);
+
+    atualizarTransformacao(el);
       }else if (tag === 'polygon' && el.dataset.shape === 'poligono') {
         this._definirTranslacao(el, novoX, novoY);
+        atualizarTransformacao(el);
       }else if (tag === 'circle' || tag === 'ellipse') {
         el.setAttribute('cx', String(novoX));
         el.setAttribute('cy', String(novoY));
+        atualizarTransformacao(el);
       } else if (tag === 'line') {
           // Exemplo simplificado para linha (move mantendo comprimento)
           const dx = novoX - parseFloat(el.getAttribute('x1') || 0);
@@ -155,6 +161,7 @@ export class SelecaoTool extends ToolBase {
       } else if (tag === 'path' || tag === 'g' || tag == 'polygon') {
         // Aplica a translação nativa em vez de escrever string template
         this._definirTranslacao(el, novoX, novoY);
+        atualizarTransformacao(el);
       }
     });
 
