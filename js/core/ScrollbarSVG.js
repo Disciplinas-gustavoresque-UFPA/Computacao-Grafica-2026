@@ -204,8 +204,8 @@ export class ScrollbarSVG {
     // ── Horizontal ──
     const ratioX    = (vb.x - cv.x) / cv.width;
     const ratioW    = vb.width / cv.width;
-    const thumbLeft = ratioX * trackW;
     const thumbW    = Math.max(ratioW * trackW, 20);
+    const thumbLeft = Math.min(ratioX * trackW, trackW - thumbW);
 
     this.thumbH.style.left  = `${thumbLeft}px`;
     this.thumbH.style.width = `${thumbW}px`;
