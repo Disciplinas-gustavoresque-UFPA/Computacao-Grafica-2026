@@ -21,9 +21,15 @@ export const estado = {
   estiloLinha: 'continua',
   interfaceAtual: 'inicio', // Nova flag para sabermos onde o usuário está
   elementosSelecionados: [],
+  espessuraLapis: 2,
 };
 
 let gerenciadorSelecaoVisual = null;
+
+
+export function definirEspessuraLapis(espessura) {
+  estado.espessuraLapis = Number(espessura);
+}
 
 export function definirGerenciadorSelecao(selecao) {
   gerenciadorSelecaoVisual = selecao;
