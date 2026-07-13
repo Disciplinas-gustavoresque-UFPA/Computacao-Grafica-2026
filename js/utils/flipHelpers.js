@@ -15,24 +15,56 @@ function numero(elemento, atributo) {
 
 export function atualizarTransformacao(elemento) {
 
-    const { cx, cy } = obterCentro(elemento);
-
     const flipH = elemento.dataset.flipH === "true";
     const flipV = elemento.dataset.flipV === "true";
 
-    const scaleX = flipH ? -1 : 1;
-    const scaleY = flipV ? -1 : 1;
+    // Preserva o que já existe na transformList antes de reescrever o atributo:
+    // a translação de movimento (primeiro item translate, mantido no índice 0
+    // pela SelecaoTool) e a matriz de cisalhamento (último item, aplicada sobre
+    // a geometria local). Reconstruir só a partir dos data-attributes de flip
+    // zerava o arrasto de path/g/polygon e apagava o skew ao mover.
+    let tx = 0, ty = 0;
+    let temTranslacao = false;
+    let matrizSkew = null;
 
-    const tx = parseFloat(elemento.dataset.translateX || 0);
-    const ty = parseFloat(elemento.dataset.translateY || 0);
+    const lista = elemento.transform.baseVal;
+    for (let i = 0; i < lista.numberOfItems; i++) {
+        const item = lista.getItem(i);
+        if (!temTranslacao && item.type === SVGTransform.SVG_TRANSFORM_TRANSLATE) {
+            tx = item.matrix.e;
+            ty = item.matrix.f;
+            temTranslacao = true;
+        } else if (!matrizSkew && item.type === SVGTransform.SVG_TRANSFORM_MATRIX) {
+            matrizSkew = item.matrix;
+        }
+    }
 
-    elemento.setAttribute(
-        "transform",
-        `translate(${tx}, ${ty})
-         translate(${cx}, ${cy})
-         scale(${scaleX}, ${scaleY})
-         translate(${-cx}, ${-cy})`
-    );
+    const partes = [];
+
+    // Com flip ou skew presentes, a translação entra mesmo zerada, para o
+    // primeiro item translate continuar sendo o de movimento.
+    if (tx !== 0 || ty !== 0 || flipH || flipV || matrizSkew) {
+        partes.push(`translate(${tx}, ${ty})`);
+    }
+
+    if (flipH || flipV) {
+        const { cx, cy } = obterCentro(elemento);
+        const scaleX = flipH ? -1 : 1;
+        const scaleY = flipV ? -1 : 1;
+        partes.push(`translate(${cx}, ${cy}) scale(${scaleX}, ${scaleY}) translate(${-cx}, ${-cy})`);
+    }
+
+    if (matrizSkew) {
+        const m = matrizSkew;
+        partes.push(`matrix(${m.a}, ${m.b}, ${m.c}, ${m.d}, ${m.e}, ${m.f})`);
+    }
+
+    if (partes.length === 0) {
+        elemento.removeAttribute("transform");
+        return;
+    }
+
+    elemento.setAttribute("transform", partes.join(" "));
 }
 
 function alternarEspelhamentoHorizontal(elemento) {

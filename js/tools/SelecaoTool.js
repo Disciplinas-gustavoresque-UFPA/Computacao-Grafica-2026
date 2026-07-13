@@ -459,8 +459,11 @@ export class SelecaoTool extends ToolBase {
         xAtual = parseFloat(el.getAttribute('x1') || 0);
         yAtual = parseFloat(el.getAttribute('y1') || 0);
       } else if (tag === 'path' || tag === 'g') {
-        xAtual = parseFloat(el.getAttribute('data-x') || 0);
-        yAtual = parseFloat(el.getAttribute('data-y') || 0);
+        // Mesma leitura de _salvarEstadoInicialMovimento: a posição desses
+        // elementos vive na translação nativa, não em data-x/data-y.
+        const translacao = this._obterTranslacao(el);
+        xAtual = translacao.x;
+        yAtual = translacao.y;
       }
 
       if (xAtual !== estadoInicial.x || yAtual !== estadoInicial.y) {
