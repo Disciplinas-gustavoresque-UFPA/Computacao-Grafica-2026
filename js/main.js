@@ -42,6 +42,7 @@ import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
 import { SideBar } from './core/SideBar.js';
 import { PincelTool } from './tools/PincelTool.js';
 import { CameraSVG } from './core/CameraSVG.js';
+import { ScrollbarSVG } from './core/ScrollbarSVG.js';
 import { obterCoordenadaSVG } from './utils/svgHelpers.js';
 import { HistoryManager } from './core/HistoryManager.js';
 import { Regua } from './core/Regua.js';
@@ -186,8 +187,9 @@ definirGerenciadorSelecao(selecaoVisual);
 
 // Instâncias das ferramentas disponíveis com todas as implementações da main
 const cameraGlobal = new CameraSVG([svgCanvas, overlayCanvas]);
+const scrollbar = new ScrollbarSVG(canvasContainer, svgCanvas, cameraGlobal);
 const instanciasFerramentas = {
-  selecao: new SelecaoTool(svgCanvas),
+  selecao: new SelecaoTool(svgCanvas, selecaoVisual),
   edicaoVertices: new NodeEditTool(svgCanvas),
   retangulo: new RetanguloTool(svgCanvas),
   linha: new LinhaTool(svgCanvas),
@@ -212,14 +214,16 @@ const instanciasFerramentas = {
  * @param {string} nomeDaFerramenta - Identificador da ferramenta ativa.
  */
 function atualizarBotaoAtivo(nomeDaFerramenta) {
+  let btnAtivo = null;
   botoesFerramenta.forEach((btn) => {
     if (btn.getAttribute('data-ferramenta') === nomeDaFerramenta) {
       btn.classList.add('ativo');
+      btnAtivo = btn;
     } else {
       btn.classList.remove('ativo');
     }
   });
-  nomeFerramenta.textContent = nomeDaFerramenta || 'Nenhuma';
+  nomeFerramenta.textContent = btnAtivo?.dataset.nome || 'Nenhuma';
 }
 
 // --- Barra de Ferramentas & Modos ---
@@ -351,6 +355,27 @@ svgCanvas.addEventListener('mousedown', (evento) => {
 svgCanvas.addEventListener('mousemove', (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseMove(evento);
+  }
+});
+
+// O overlay tem pointer-events:none (para não bloquear cliques no canvas),
+// exceto nos elementos de UI que o próprio Selecao habilita explicitamente
+// (ex: alças de skew) — por isso precisa dos mesmos listeners delegados.
+overlayCanvas.addEventListener('mousedown', (evento) => {
+  if (estado.ferramentaAtual) {
+    estado.ferramentaAtual.onMouseDown(evento);
+  }
+});
+
+overlayCanvas.addEventListener('mousemove', (evento) => {
+  if (estado.ferramentaAtual) {
+    estado.ferramentaAtual.onMouseMove(evento);
+  }
+});
+
+overlayCanvas.addEventListener('mouseup', (evento) => {
+  if (estado.ferramentaAtual) {
+    estado.ferramentaAtual.onMouseUp(evento);
   }
 });
 
@@ -551,4 +576,5 @@ svgCanvas.addEventListener('wheel', (e) => {
     : 1 - fator;  // scroll para cima  = zoom in
 
   cameraGlobal.zoom(escala, coords.x, coords.y);
+  scrollbar.atualizar();
 }, { passive: false });
