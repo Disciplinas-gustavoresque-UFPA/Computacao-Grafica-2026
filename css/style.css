@@ -423,7 +423,7 @@ body {
   background-color: var(--cor-fundo-barra);
   border-right: 1px solid var(--cor-borda-ui);
   border-bottom: 1px solid var(--cor-borda-ui);
-  z-index: 7;
+  z-index: 2;
 }
 
 .regua-marcador {
