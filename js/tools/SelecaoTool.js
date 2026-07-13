@@ -195,7 +195,13 @@ export class SelecaoTool extends ToolBase {
     const tag = target.tagName ? target.tagName.toLowerCase() : '';
 
     // Verifica se o clique foi em um elemento válido dentro do canvas
-    const elementoAlvo = this._buscarElementoValido(target, allowedTags);
+    let elementoAlvo = this._buscarElementoValido(target, allowedTags);
+
+    // Fallback: se nada foi encontrado diretamente, tenta encontrar uma
+    // linha próxima ao clique (área de seleção maior que a espessura visual)
+    if (!elementoAlvo) {
+      elementoAlvo = this._buscarLinhaProxima(pt);
+    }
 
     if (elementoAlvo) {
       this._aplicarSelecaoComModificador(elementoAlvo, isShift, isCtrl);
@@ -471,18 +477,8 @@ export class SelecaoTool extends ToolBase {
   _buscarElementoValido(target, allowedTags) {
     if (target === this.svgCanvas || target.id === 'canvas') return null;
 
-    // Em vez de usar closest(), vamos subir na árvore e salvar o grupo mais ALTO (externo)
-    let grupoMaisExterno = null;
-    let atualBuscaGrupo = target;
-
-    while (atualBuscaGrupo && atualBuscaGrupo !== this.svgCanvas) {
-      if (atualBuscaGrupo.tagName && atualBuscaGrupo.tagName.toLowerCase() === 'g') {
-        grupoMaisExterno = atualBuscaGrupo; // Atualiza a variável toda vez que achar um <g>
-      }
-      atualBuscaGrupo = atualBuscaGrupo.parentNode;
-    }
-
     // Se o elemento pertence a um ou mais grupos, seleciona o "Grupo Mestre" (o mais externo)
+    const grupoMaisExterno = this._encontrarGrupoExterno(target);
     if (grupoMaisExterno) {
       return grupoMaisExterno;
     }
@@ -498,6 +494,104 @@ export class SelecaoTool extends ToolBase {
     }
 
     return null;
+  }
+
+  /**
+   * Sobe na árvore a partir de um elemento e retorna o <g> mais externo
+   * (o "grupo mestre") ao qual ele pertence, se houver algum.
+   * @private
+   */
+  _encontrarGrupoExterno(elemento) {
+    let grupoMaisExterno = null;
+    let atual = elemento;
+
+    while (atual && atual !== this.svgCanvas) {
+      if (atual.tagName && atual.tagName.toLowerCase() === 'g') {
+        grupoMaisExterno = atual; // Atualiza a variável toda vez que achar um <g>
+      }
+      atual = atual.parentNode;
+    }
+
+    return grupoMaisExterno;
+  }
+
+  /**
+   * Fallback de seleção para linhas: como o hit-test nativo do SVG considera
+   * apenas a espessura real do traço (stroke-width), linhas finas são muito
+   * difíceis de clicar. Este método calcula a distância do ponto clicado até
+   * cada segmento de linha do canvas e, se estiver dentro de uma tolerância
+   * (a própria espessura da linha + uma margem extra em pixels de tela,
+   * convertida para o espaço do SVG considerando o zoom atual), considera
+   * a linha como alvo válido — sem alterar a espessura/estilo renderizado.
+   * @private
+   */
+  _buscarLinhaProxima(pt) {
+    const TOLERANCIA_EXTRA_PX = 6;
+    const escala = this._obterEscalaSVG();
+    const toleranciaExtra = TOLERANCIA_EXTRA_PX * escala;
+
+    let linhaMaisProxima = null;
+    let menorDistancia = Infinity;
+
+    const linhas = this.svgCanvas.querySelectorAll('line');
+
+    linhas.forEach((linha) => {
+      const x1 = parseFloat(linha.getAttribute('x1')) || 0;
+      const y1 = parseFloat(linha.getAttribute('y1')) || 0;
+      const x2 = parseFloat(linha.getAttribute('x2')) || 0;
+      const y2 = parseFloat(linha.getAttribute('y2')) || 0;
+
+      const distancia = this._distanciaPontoSegmento(pt.x, pt.y, x1, y1, x2, y2);
+
+      const espessura = parseFloat(linha.getAttribute('stroke-width')) || 1;
+      const raioClicavel = espessura / 2 + toleranciaExtra;
+
+      if (distancia <= raioClicavel && distancia < menorDistancia) {
+        menorDistancia = distancia;
+        linhaMaisProxima = linha;
+      }
+    });
+
+    if (!linhaMaisProxima) return null;
+
+    // Se a linha encontrada pertence a um grupo, seleciona o grupo mestre
+    const grupoMaisExterno = this._encontrarGrupoExterno(linhaMaisProxima);
+    return grupoMaisExterno || linhaMaisProxima;
+  }
+
+  /**
+   * Calcula a menor distância entre um ponto (px, py) e um segmento de reta
+   * definido por (x1, y1) - (x2, y2).
+   * @private
+   */
+  _distanciaPontoSegmento(px, py, x1, y1, x2, y2) {
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const comprimentoQuadrado = dx * dx + dy * dy;
+
+    let t = comprimentoQuadrado === 0
+      ? 0
+      : ((px - x1) * dx + (py - y1) * dy) / comprimentoQuadrado;
+    t = Math.max(0, Math.min(1, t));
+
+    const projX = x1 + t * dx;
+    const projY = y1 + t * dy;
+
+    return Math.hypot(px - projX, py - projY);
+  }
+
+  /**
+   * Retorna o fator de escala atual entre o espaço do SVG (viewBox) e os
+   * pixels de tela, para que a tolerância extra de clique se mantenha
+   * visualmente consistente em qualquer nível de zoom.
+   * @private
+   */
+  _obterEscalaSVG() {
+    const viewBox = this.svgCanvas.viewBox && this.svgCanvas.viewBox.baseVal;
+    if (viewBox && viewBox.width && this.svgCanvas.clientWidth) {
+      return viewBox.width / this.svgCanvas.clientWidth;
+    }
+    return 1;
   }
 
   /**
