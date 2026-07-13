@@ -395,7 +395,7 @@ body {
   color: var(--cor-texto-secundario);
   font-size: 10px;
   font-family: sans-serif;
-  z-index: 6;
+  z-index: 1;
   pointer-events: none;
   overflow: hidden;
 }
@@ -423,7 +423,7 @@ body {
   background-color: var(--cor-fundo-barra);
   border-right: 1px solid var(--cor-borda-ui);
   border-bottom: 1px solid var(--cor-borda-ui);
-  z-index: 7;
+  z-index: 2;
 }
 
 .regua-marcador {
@@ -471,6 +471,7 @@ body {
   border-radius: var(--raio-borda);
   flex-direction: column;
   gap: 4px;
+  z-index: 20;
 }
 
 #zoom-options.hidden,
