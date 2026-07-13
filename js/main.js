@@ -18,7 +18,8 @@ import {
   definirGerenciadorHistorico,
   desfazerAcao,
   refazerAcao,
-  registrarAcaoHistorico
+  registrarAcaoHistorico,
+  atualizarPosicaoSelecaoVisual
 } from './core/StateManager.js';
 import { ColorPickerTool } from './tools/ColorPickerTool.js';
 import { Lapis } from './tools/LapisTool.js';
@@ -31,6 +32,7 @@ import { BorrachaTool } from './tools/BorrachaTool.js';
 import { NodeEditTool } from './tools/NodeEditTool.js';
 import { LinhaTool } from './tools/LinhaTool.js';
 import { LinhaCurvadaTool } from './tools/LinhaCurvadaTool.js';
+import { BezierTool } from './tools/BezierTool.js';
 import { ElipseTool } from './tools/ElipseTool.js';
 import { LupaTool } from './tools/LupaTool.js';
 import { inicializarImportadorImagem } from './tools/ImageImporter.js';
@@ -40,9 +42,13 @@ import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
 import { SideBar } from './core/SideBar.js';
 import { PincelTool } from './tools/PincelTool.js';
 import { CameraSVG } from './core/CameraSVG.js';
+import { ScrollbarSVG } from './core/ScrollbarSVG.js';
 import { obterCoordenadaSVG } from './utils/svgHelpers.js';
 import { HistoryManager } from './core/HistoryManager.js';
+import { Regua } from './core/Regua.js';
+import { LosangoTool } from './tools/LosangoTool.js';
 import { agruparElementos, desagruparElementos } from './core/GroupManager.js';
+import { espelharHorizontal, espelharVertical } from "./utils/flipHelpers.js";
 
 const svgCanvas = document.getElementById('canvas');
 
@@ -131,6 +137,8 @@ const canvasContainer = document.createElement('div');
 canvasContainer.style.position = 'relative';
 canvasContainer.style.width = '100%';
 canvasContainer.style.height = '100%';
+canvasContainer.style.paddingTop = '20px';
+canvasContainer.style.paddingLeft = '20px';
 
 // Encapsulando o svg original
 svgCanvas.parentNode.insertBefore(canvasContainer, svgCanvas);
@@ -146,6 +154,16 @@ overlayCanvas.style.top = '0';
 overlayCanvas.style.left = '0';
 overlayCanvas.style.pointerEvents = 'none'; // Coordenado com o principal
 canvasContainer.appendChild(overlayCanvas);
+
+// Réguas de medida (em pixels) nas bordas do canvas
+const regua = new Regua(canvasContainer, svgCanvas);
+const btnToggleRegua = document.getElementById('btn-toggle-regua');
+if (btnToggleRegua) {
+  btnToggleRegua.addEventListener('click', () => {
+    const ativa = regua.alternar();
+    btnToggleRegua.classList.toggle('ativo', ativa);
+  });
+}
 
 // Sincronizar viewBox entre canvas principal e overlay quando necessário
 const observer = new MutationObserver((mutations) => {
@@ -168,12 +186,14 @@ definirGerenciadorSelecao(selecaoVisual);
 
 // Instâncias das ferramentas disponíveis com todas as implementações da main
 const cameraGlobal = new CameraSVG([svgCanvas, overlayCanvas]);
+const scrollbar = new ScrollbarSVG(canvasContainer, svgCanvas, cameraGlobal);
 const instanciasFerramentas = {
   selecao: new SelecaoTool(svgCanvas, selecaoVisual),
   edicaoVertices: new NodeEditTool(svgCanvas),
   retangulo: new RetanguloTool(svgCanvas),
   linha: new LinhaTool(svgCanvas),
   linhaCurvada: new LinhaCurvadaTool(svgCanvas),
+  bezier: new BezierTool(svgCanvas),
   poligono: new PoligonoPolilinhaTool(svgCanvas),
   elipse: new ElipseTool(svgCanvas),
   "Conta-gotas": new ColorPickerTool(svgCanvas),
@@ -181,6 +201,7 @@ const instanciasFerramentas = {
   texto: new TextoTool(svgCanvas),
   borracha: new BorrachaTool(svgCanvas),
   lapis: new Lapis(svgCanvas),
+  losango: new LosangoTool(svgCanvas),
   pincel: new PincelTool(svgCanvas),
 };
 
@@ -378,6 +399,32 @@ btnStepBackward.addEventListener('click', () => moverCamada('recuar'));
 btnStepForward.addEventListener('click', () => moverCamada('avancar'));
 btnBringToFront.addEventListener('click', () => moverCamada('frente'));
 
+// --- Configurar Espelhamento ---
+const btnFlipHorizontal = document.getElementById('btn-flip-horizontal');
+const btnFlipVertical = document.getElementById('btn-flip-vertical');
+
+btnFlipHorizontal.addEventListener("click", () => {
+
+    estado.elementosSelecionados.forEach(el => {
+        espelharHorizontal(el);
+    });
+
+    atualizarPosicaoSelecaoVisual();
+    registrarAcaoHistorico();
+
+});
+
+btnFlipVertical.addEventListener("click", () => {
+
+    estado.elementosSelecionados.forEach(el => {
+        espelharVertical(el);
+    });
+
+    atualizarPosicaoSelecaoVisual();
+    registrarAcaoHistorico();
+
+});
+
 // Atalhos de Teclado (Tool Selection)
 window.addEventListener("keydown", (e) => {
   // Prevenção de conflitos
@@ -427,11 +474,14 @@ window.addEventListener("keydown", (e) => {
     "c" : "linhaCurvada",
     "p" : "poligono",
     "t" : "texto",
-    "i" : "Conta-gotas"
+    "i" : "Conta-gotas",
+    "g": "losango",
   }
 
   const teclaPressionada = e.key.toLowerCase();
-  const ferramentaAlvo = mapaTeclas[teclaPressionada];
+  const ferramentaAlvo = e.shiftKey && teclaPressionada === 'c'
+    ? 'bezier'
+    : mapaTeclas[teclaPressionada];
 
   if (ferramentaAlvo) {
     e.preventDefault();
@@ -482,4 +532,5 @@ svgCanvas.addEventListener('wheel', (e) => {
     : 1 - fator;  // scroll para cima  = zoom in
 
   cameraGlobal.zoom(escala, coords.x, coords.y);
+  scrollbar.atualizar();
 }, { passive: false });

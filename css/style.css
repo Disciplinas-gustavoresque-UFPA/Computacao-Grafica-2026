@@ -157,6 +157,22 @@ body {
   transform: scale(0.95);
 }
 
+/* Estado "pressionado/ativo" reutilizado pelo botão de réguas */
+.btn-layer.ativo {
+  background-color: rgba(74, 144, 217, 0.35);
+  border-color: var(--cor-destaque);
+  color: var(--cor-destaque);
+}
+
+/* Agrupamento dos controles de visualização (ex: réguas) */
+.view-controls {
+  display: flex;
+  gap: 4px;
+  margin-left: 16px;
+  border-left: 1px solid var(--cor-borda-ui);
+  padding-left: 16px;
+}
+
 /* =========================================================
    Workspace: Barra Lateral + Área de Desenho
    Usa CSS Flexbox para layout horizontal
@@ -370,6 +386,73 @@ body {
   height: 100%;
 }
 
+/* =========================================================
+   Réguas de Medida (bordas do canvas, em pixels do documento)
+   ========================================================= */
+.regua {
+  position: absolute;
+  background-color: rgba(15, 52, 96, 0.9);
+  color: var(--cor-texto-secundario);
+  font-size: 10px;
+  font-family: sans-serif;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.regua-horizontal {
+  top: 0;
+  left: var(--espessura-regua, 20px);
+  right: 0;
+  height: var(--espessura-regua, 20px);
+}
+
+.regua-vertical {
+  top: var(--espessura-regua, 20px);
+  left: 0;
+  bottom: 0;
+  width: var(--espessura-regua, 20px);
+}
+
+.regua-canto {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--espessura-regua, 20px);
+  height: var(--espessura-regua, 20px);
+  background-color: var(--cor-fundo-barra);
+  border-right: 1px solid var(--cor-borda-ui);
+  border-bottom: 1px solid var(--cor-borda-ui);
+  z-index: 2;
+}
+
+.regua-marcador {
+  position: absolute;
+  height: 100%;
+  border-left: 1px solid var(--cor-destaque);
+}
+
+.regua-vertical .regua-marcador {
+  height: auto;
+  width: 100%;
+  border-left: none;
+  border-top: 1px solid var(--cor-destaque);
+}
+
+.regua-rotulo {
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  white-space: nowrap;
+}
+
+.regua-vertical .regua-rotulo {
+  top: 3px;
+  left: 2px;
+  transform-origin: left top;
+  transform: rotate(-90deg);
+}
+
 /* =====================================================
    Menu de Opções da Lupa/Zoom e Node
    ====================================================*/
@@ -397,6 +480,7 @@ body {
   border-radius: var(--raio-borda);
   flex-direction: column;
   gap: 4px;
+  z-index: 20;
 }
 
 #zoom-options.hidden,
