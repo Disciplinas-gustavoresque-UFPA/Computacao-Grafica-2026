@@ -7,27 +7,27 @@
  * Criadas como elementos HTML posicionados sobre as bordas do canvasContainer.
  *
  * - A scrollbar reflete a posição e o tamanho do viewBox atual.
- * - Arrastar o thumb chama camera.pan para mover o viewBox.
+ * - Arrastar o thumb move o viewBox via camera.applyViewBox().
  * - Atualiza automaticamente ao zoom (Ctrl+Scroll ou LupaTool).
+ * - Correção aplicada (carolinalimaal): thumbLeft/thumbTop calculados após
+ *   thumbW/thumbH2 para evitar que o thumb ultrapasse a borda da trilha.
  *
  * Uso:
  *   const sb = new ScrollbarSVG(canvasContainer, svgCanvas, cameraGlobal);
- *   // Para atualizar manualmente (ex: após zoom externo):
- *   sb.atualizar();
+ *   sb.atualizar(); // chame manualmente após zoom externo se necessário
  */
 export class ScrollbarSVG {
   constructor(container, svgCanvas, camera) {
     this.container = container;
-    this.svgCanvas  = svgCanvas;
-    this.camera     = camera;
+    this.svgCanvas = svgCanvas;
+    this.camera    = camera;
 
-    // Tamanho virtual do canvas (área total navegável)
-    // Usa as dimensões iniciais do viewBox * 4 como espaço total
+    // Área total navegável (canvas virtual)
     this.canvasVirtual = {
-      x: -camera.initialViewBox.width,
-      y: -camera.initialViewBox.height,
-      width:  camera.initialViewBox.width  * 4,
-      height: camera.initialViewBox.height * 4,
+      x:      -camera.initialViewBox.width,
+      y:      -camera.initialViewBox.height,
+      width:   camera.initialViewBox.width  * 4,
+      height:  camera.initialViewBox.height * 4,
     };
 
     this._criarScrollbars();
@@ -38,70 +38,79 @@ export class ScrollbarSVG {
   // ─── Criação dos elementos ────────────────────────────────────
 
   _criarScrollbars() {
-    const espessura = 10;
+    const espessura = 12;
 
-    // ── Horizontal ──
+    // Cores do tema do editor
+    const corTrack = '#0f3460';      // --cor-fundo-barra
+    const corThumb = '#4a90d9';      // --cor-destaque
+    const corThumbHover = '#72aaec'; // destaque mais claro no hover
+
+    // ── Track Horizontal ──
     this.trackH = document.createElement('div');
     Object.assign(this.trackH.style, {
-      position: 'absolute',
-      bottom: '0',
-      left: '20px',   // respeita largura da régua
-      right: `${espessura}px`,
-      height: `${espessura}px`,
-      background: 'rgba(0,0,0,0.1)',
-      borderRadius: '4px',
-      zIndex: '10',
-      cursor: 'default',
+      position:     'absolute',
+      bottom:       '0',
+      left:         '20px',
+      right:        `${espessura}px`,
+      height:       `${espessura}px`,
+      background:   corTrack,
+      borderRadius: '6px',
+      zIndex:       '10',
+      cursor:       'default',
     });
 
+    // ── Thumb Horizontal ──
     this.thumbH = document.createElement('div');
     Object.assign(this.thumbH.style, {
-      position: 'absolute',
-      top: '1px',
-      height: `${espessura - 2}px`,
-      background: 'rgba(255,255,255,0.35)',
-      borderRadius: '4px',
-      cursor: 'grab',
-      transition: 'background 0.15s',
+      position:     'absolute',
+      top:          '2px',
+      height:       `${espessura - 4}px`,
+      background:   corThumb,
+      borderRadius: '6px',
+      cursor:       'grab',
+      transition:   'background 0.15s',
+      boxShadow:    '0 1px 4px rgba(0,0,0,0.4)',
     });
     this.thumbH.addEventListener('mouseenter', () => {
-      this.thumbH.style.background = 'rgba(255,255,255,0.6)';
+      this.thumbH.style.background = corThumbHover;
     });
     this.thumbH.addEventListener('mouseleave', () => {
-      this.thumbH.style.background = 'rgba(255,255,255,0.35)';
+      this.thumbH.style.background = corThumb;
     });
     this.trackH.appendChild(this.thumbH);
     this.container.appendChild(this.trackH);
 
-    // ── Vertical ──
+    // ── Track Vertical ──
     this.trackV = document.createElement('div');
     Object.assign(this.trackV.style, {
-      position: 'absolute',
-      right: '0',
-      top: '20px',    // respeita altura da régua
-      bottom: `${espessura}px`,
-      width: `${espessura}px`,
-      background: 'rgba(0,0,0,0.1)',
-      borderRadius: '4px',
-      zIndex: '10',
-      cursor: 'default',
+      position:     'absolute',
+      right:        '0',
+      top:          '20px',
+      bottom:       `${espessura}px`,
+      width:        `${espessura}px`,
+      background:   corTrack,
+      borderRadius: '6px',
+      zIndex:       '10',
+      cursor:       'default',
     });
 
+    // ── Thumb Vertical ──
     this.thumbV = document.createElement('div');
     Object.assign(this.thumbV.style, {
-      position: 'absolute',
-      left: '1px',
-      width: `${espessura - 2}px`,
-      background: 'rgba(255,255,255,0.35)',
-      borderRadius: '4px',
-      cursor: 'grab',
-      transition: 'background 0.15s',
+      position:     'absolute',
+      left:         '2px',
+      width:        `${espessura - 4}px`,
+      background:   corThumb,
+      borderRadius: '6px',
+      cursor:       'grab',
+      transition:   'background 0.15s',
+      boxShadow:    '0 1px 4px rgba(0,0,0,0.4)',
     });
     this.thumbV.addEventListener('mouseenter', () => {
-      this.thumbV.style.background = 'rgba(255,255,255,0.6)';
+      this.thumbV.style.background = corThumbHover;
     });
     this.thumbV.addEventListener('mouseleave', () => {
-      this.thumbV.style.background = 'rgba(255,255,255,0.35)';
+      this.thumbV.style.background = corThumb;
     });
     this.trackV.appendChild(this.thumbV);
     this.container.appendChild(this.trackV);
@@ -117,11 +126,10 @@ export class ScrollbarSVG {
     let startX, startVBX;
 
     const onMove = (e) => {
-      const dx = e.clientX - startX;
+      const dx     = e.clientX - startX;
       const trackW = this.trackH.clientWidth;
-      const cv = this.canvasVirtual;
+      const cv     = this.canvasVirtual;
 
-      // converte pixels de drag → unidades SVG
       const ratio = cv.width / trackW;
       const novoX = Math.min(
         Math.max(startVBX + dx * ratio, cv.x),
@@ -155,9 +163,9 @@ export class ScrollbarSVG {
     let startY, startVBY;
 
     const onMove = (e) => {
-      const dy = e.clientY - startY;
+      const dy     = e.clientY - startY;
       const trackH = this.trackV.clientHeight;
-      const cv = this.canvasVirtual;
+      const cv     = this.canvasVirtual;
 
       const ratio = cv.height / trackH;
       const novoY = Math.min(
@@ -192,32 +200,32 @@ export class ScrollbarSVG {
     const vb = this.camera.viewBox;
     const cv = this.canvasVirtual;
 
-    // expande canvas virtual se viewBox sair dos limites
-    if (vb.x < cv.x) { cv.x = vb.x - 50; cv.width += (cv.x - vb.x + 50); }
-    if (vb.y < cv.y) { cv.y = vb.y - 50; cv.height += (cv.y - vb.y + 50); }
+    // Expande canvas virtual se viewBox sair dos limites
+    if (vb.x < cv.x) { cv.width += cv.x - vb.x + 50; cv.x = vb.x - 50; }
+    if (vb.y < cv.y) { cv.height += cv.y - vb.y + 50; cv.y = vb.y - 50; }
     if (vb.x + vb.width  > cv.x + cv.width)  cv.width  = vb.x + vb.width  - cv.x + 50;
     if (vb.y + vb.height > cv.y + cv.height) cv.height = vb.y + vb.height - cv.y + 50;
 
     const trackW = this.trackH.clientWidth;
     const trackH = this.trackV.clientHeight;
 
-    // ── Horizontal ──
-    const ratioX    = (vb.x - cv.x) / cv.width;
-    const ratioW    = vb.width / cv.width;
-    const thumbLeft = ratioX * trackW;
+    // ── Horizontal (correção carolinalimaal: thumbW antes de thumbLeft) ──
+    const ratioX = (vb.x - cv.x) / cv.width;
+    const ratioW = vb.width / cv.width;
     const thumbW    = Math.max(ratioW * trackW, 20);
+    const thumbLeft = Math.min(ratioX * trackW, trackW - thumbW);
 
-    this.thumbH.style.left  = `${thumbLeft}px`;
     this.thumbH.style.width = `${thumbW}px`;
+    this.thumbH.style.left  = `${thumbLeft}px`;
 
-    // ── Vertical ──
-    const ratioY    = (vb.y - cv.y) / cv.height;
-    const ratioH    = vb.height / cv.height;
-    const thumbTop  = ratioY * trackH;
-    const thumbH2   = Math.max(ratioH * trackH, 20);
+    // ── Vertical (correção carolinalimaal: thumbH2 antes de thumbTop) ──
+    const ratioY = (vb.y - cv.y) / cv.height;
+    const ratioH = vb.height / cv.height;
+    const thumbH2  = Math.max(ratioH * trackH, 20);
+    const thumbTop = Math.min(ratioY * trackH, trackH - thumbH2);
 
-    this.thumbV.style.top    = `${thumbTop}px`;
     this.thumbV.style.height = `${thumbH2}px`;
+    this.thumbV.style.top    = `${thumbTop}px`;
   }
 
   // ─── Observa mudanças no viewBox do SVG ──────────────────────
@@ -225,7 +233,7 @@ export class ScrollbarSVG {
   _observarViewBox() {
     const observer = new MutationObserver(() => this.atualizar());
     observer.observe(this.svgCanvas, {
-      attributes: true,
+      attributes:      true,
       attributeFilter: ['viewBox'],
     });
   }
