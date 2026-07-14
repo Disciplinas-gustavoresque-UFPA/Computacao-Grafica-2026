@@ -34,6 +34,7 @@ import { LinhaTool } from './tools/LinhaTool.js';
 import { LinhaCurvadaTool } from './tools/LinhaCurvadaTool.js';
 import { BezierTool } from './tools/BezierTool.js';
 import { ElipseTool } from './tools/ElipseTool.js';
+import { EspiralTool } from './tools/EspiralTool.js';
 import { LupaTool } from './tools/LupaTool.js';
 import { inicializarImportadorImagem } from './tools/ImageImporter.js';
 import { inicializarMenuInicial } from './core/UIManager.js';
@@ -41,6 +42,7 @@ import { duplicarElemento } from './utils/duplicateHelpers.js';
 import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
 import { SideBar } from './core/SideBar.js';
 import { PincelTool } from './tools/PincelTool.js';
+import {definirEspessuraLapis} from "./core/StateManager.js";
 import { CameraSVG } from './core/CameraSVG.js';
 import { ScrollbarSVG } from './core/ScrollbarSVG.js';
 import { obterCoordenadaSVG } from './utils/svgHelpers.js';
@@ -72,6 +74,7 @@ const botoesEstiloLinha = document.querySelectorAll('.btn-line-style');
 const nomeFerramenta = document.getElementById('nome-ferramenta');
 const btnExportar = document.getElementById('btn-exportar');
 const exportFormat = document.getElementById('export-format');
+const inputEspessuraLapis =  document.getElementById("espessura-lapis");
 
 // Botões de histórico
 const btnDesfazer = document.getElementById('btn-desfazer');
@@ -204,6 +207,7 @@ const instanciasFerramentas = {
   bezier: new BezierTool(svgCanvas),
   poligono: new PoligonoPolilinhaTool(svgCanvas),
   elipse: new ElipseTool(svgCanvas),
+  espiral: new EspiralTool(svgCanvas),
   "Conta-gotas": new ColorPickerTool(svgCanvas),
   lupa: new LupaTool(svgCanvas, overlayCanvas, cameraGlobal),
   texto: new TextoTool(svgCanvas),
@@ -423,6 +427,14 @@ btnExportar.addEventListener('click', () => {
   exportarDesenho(svgCanvas, formato);
 });
 
+const valorEspessura =
+    document.getElementById("valor-espessura-lapis");
+
+inputEspessuraLapis.addEventListener("input", (e) => {
+    definirEspessuraLapis(e.target.value);
+    valorEspessura.textContent = e.target.value;
+});
+
 // --- Controle de Camadas (Z-Index) ---
 const btnSendToBack = document.getElementById('btn-send-to-back');
 const btnStepBackward = document.getElementById('btn-step-backward');
@@ -550,6 +562,8 @@ window.addEventListener("keydown", (e) => {
   const teclaPressionada = e.key.toLowerCase();
   const ferramentaAlvo = e.shiftKey && teclaPressionada === 'c'
     ? 'bezier'
+    : e.shiftKey && teclaPressionada === 'e'
+      ? 'espiral'
     : mapaTeclas[teclaPressionada];
 
   if (ferramentaAlvo) {
