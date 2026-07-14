@@ -10,6 +10,7 @@
  * e conecta cada controle ao seu comportamento via event listeners.
  */
 
+import { registrarAcaoHistorico } from "../core/StateManager.js";
 import { criarMenuContexto } from "./builder.js";
 import { sincronizarControles, normalizarHex } from "./sync.js";
 import {
@@ -97,6 +98,12 @@ export function inicializarMenuContexto(svgCanvas) {
     sliderRx,
     valorRx,
   };
+
+  // --- Função auxiliar de registro ---
+  function executarComHistorico(callback) {
+    callback();
+    registrarAcaoHistorico();
+  }
 
   // --- Ciclo de vida do menu ---
 
@@ -239,55 +246,57 @@ export function inicializarMenuContexto(svgCanvas) {
 
   // --- Listeners: ORDEM ---
 
-  btnFrente.addEventListener("click", () => {
-    if (!elementoAtual) return;
-    
-    ordenarElemento(elementoAtual, svgCanvas, "frente");
-    fecharMenuContexto();
-  });
+    btnFrente.addEventListener("click", () => executarComHistorico(() => {
+      if (!elementoAtual) return;
 
-  btnFundo.addEventListener("click", () => {
-    if (!elementoAtual) return;
-
-    ordenarElemento(elementoAtual, svgCanvas, "fundo");
-    fecharMenuContexto();
-  });
-
-  // --- Listeners: AÇÕES ---
-
-  btnDuplicar.addEventListener("click", () => {
-    if (!elementoAtual) return;
-    
-    const clone = elementoAtual.cloneNode(true);
-    aplicarOffsetDuplicado(clone);
-    svgCanvas.appendChild(clone);
-    fecharMenuContexto();
-  });
-
-  btnCopiarEstilos.addEventListener("click", () => {
-    if (!elementoAtual) return;
-    estilosCopiados = copiarEstilos(elementoAtual);
-    fecharMenuContexto();
-  });
-
-  btnColarEstilos.addEventListener("click", () => {
-    if (!elementoAtual || !estilosCopiados) return;
-    colarEstilos(elementoAtual, estilosCopiados);
-    fecharMenuContexto();
-  });
-
-  btnExcluir.addEventListener("click", () => {
-    if (!elementoAtual) return;
-    if (btnExcluir.classList.contains("menu-contexto__deletar--confirmando")) {
-      elementoAtual.remove();
-      elementoAtual = null;
+      ordenarElemento(elementoAtual, svgCanvas, "frente");
       fecharMenuContexto();
-    } else {
-      btnExcluir.textContent = "Confirmar?";
-      btnExcluir.classList.add("menu-contexto__deletar--confirmando");
-      timerConfirmacao = setTimeout(resetarBotaoExcluir, 3000);
-    }
-  });
+    }));
+
+    btnFundo.addEventListener("click", () => executarComHistorico(() => {
+      if (!elementoAtual) return;
+
+      ordenarElemento(elementoAtual, svgCanvas, "fundo");
+      fecharMenuContexto();
+    }));
+
+    // --- Listeners: AÇÕES ---
+
+    btnDuplicar.addEventListener("click", () => executarComHistorico(() => {
+      if (!elementoAtual) return;
+
+      const clone = elementoAtual.cloneNode(true);
+      aplicarOffsetDuplicado(clone);
+      svgCanvas.appendChild(clone);
+      fecharMenuContexto();
+    }));
+
+    btnCopiarEstilos.addEventListener("click", () => {
+      if (!elementoAtual) return;
+      estilosCopiados = copiarEstilos(elementoAtual);
+      fecharMenuContexto();
+    });
+
+    btnColarEstilos.addEventListener("click", () => executarComHistorico(() => {
+      if (!elementoAtual || !estilosCopiados) return;
+      colarEstilos(elementoAtual, estilosCopiados);
+      fecharMenuContexto();
+    }));
+
+    btnExcluir.addEventListener("click", () => {
+      if (!elementoAtual) return;
+      if (btnExcluir.classList.contains("menu-contexto__deletar--confirmando")) {
+        executarComHistorico(() => {
+          elementoAtual.remove();
+          elementoAtual = null;
+          fecharMenuContexto();
+        });
+      } else {
+        btnExcluir.textContent = "Confirmar?";
+        btnExcluir.classList.add("menu-contexto__deletar--confirmando");
+        timerConfirmacao = setTimeout(resetarBotaoExcluir, 3000);
+      }
+    });
 
   // --- Listeners: GLOBAIS ---
 
