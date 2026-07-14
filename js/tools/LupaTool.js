@@ -7,12 +7,12 @@ import { CameraSVG } from '../core/CameraSVG.js';
                   LupaTool
 ============================================ */
 export class LupaTool extends ToolBase {
-  constructor(svg, overlaySvg) {
+  constructor(svg, overlaySvg, camera = null) {
     super();
 
     this.svg = svg;
     this.overlaySvg = overlaySvg;
-    this.camera = new CameraSVG([svg,overlaySvg]);
+    this.camera = camera || new CameraSVG([svg, overlaySvg]);
 
     this.modo = 'click'; // zoom padrão do inkscape
 
@@ -49,6 +49,10 @@ export class LupaTool extends ToolBase {
     const btnDrag = document.getElementById('btn-drag');
     if (!btnDrag) return;
     btnDrag.classList.toggle('ativo', this.modo === 'drag');
+
+    const nomeEl = document.getElementById('nome-ferramenta');
+    if (nomeEl) 
+      nomeEl.textContent = this.modo === 'drag' ? 'Zoom por Seleção' : 'Zoom';
   }
 
 
@@ -71,7 +75,8 @@ export class LupaTool extends ToolBase {
     panel.innerHTML = `
       <button
         id="btn-drag"
-        title="Zoom por seleção">
+        class="btn-ferramenta"
+        data-tooltip="Zoom por Seleção (Shift+Z)">
 
         <svg 
           xmlns="http://www.w3.org/2000/svg"

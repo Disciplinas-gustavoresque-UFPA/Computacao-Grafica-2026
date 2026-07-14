@@ -1,3 +1,4 @@
+// js/core/CameraSVG.js
 
 /* ============================================
                   CameraSVG
@@ -11,6 +12,10 @@ export class CameraSVG {
     const mainSVG = this.svgs[0]; 
     const hasViewBox = mainSVG.hasAttribute('viewBox');
 
+    // Fallback: Evita valores zerados quando inicializado em display:none
+    const fallbackWidth = mainSVG.clientWidth || 800;
+    const fallbackHeight = mainSVG.clientHeight || 600;
+
     if (hasViewBox) {
 
       // Guarda valores base do viewbox atual (x,y,width,height)
@@ -20,8 +25,8 @@ export class CameraSVG {
       this.viewBox = {
         x: vb.width ? vb.x : 0,
         y: vb.height ? vb.y : 0,
-        width: vb.width || mainSVG.clientWidth,
-        height: vb.height || mainSVG.clientHeight
+        width: vb.width || fallbackWidth,
+        height: vb.height || fallbackHeight
       };
 
     } else {
@@ -30,8 +35,8 @@ export class CameraSVG {
       this.viewBox = {
         x: 0,
         y: 0,
-        width: mainSVG.clientWidth,
-        height: mainSVG.clientHeight
+        width: fallbackWidth,
+        height: fallbackHeight
       };
       
     }
@@ -45,6 +50,10 @@ export class CameraSVG {
   // Aproxima o viewBox atual no SVG (aplica o "zoom")
   applyViewBox() {
     const { x, y, width, height } = this.viewBox;
+
+    // Proteção crucial: previne aplicação de viewBox que gera Matriz CTM singular
+    if (width === 0 || height === 0) return;
+
     const viewBoxValue = `${x} ${y} ${width} ${height}`;
 
     // aplica em todos os SVGs

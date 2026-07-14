@@ -8,21 +8,29 @@
  * - ferramentaAtual {ToolBase|null} - Instância da ferramenta de desenho ativa.
  * - corPreenchimento {string}       - Cor de preenchimento dos elementos (formato hex).
  * - corBorda {string}               - Cor da borda/stroke dos elementos (formato hex).
+ * - estiloLinha {string}            - Estilo visual usado pela ferramenta de linha.
  * - elementosSelecionados {SVGElement[]} - Elementos SVG atualmente selecionados.
  * - interfaceAtual {string}         - Flag para sabermos a tela onde o usuário está.
  */
 
-/** @type {{ ferramentaAtual: import('../tools/ToolBase.js').ToolBase|null, corPreenchimento: string, corBorda: string, elementosSelecionados: SVGElement[], interfaceAtual: string }} */
+/** @type {{ ferramentaAtual: import('../tools/ToolBase.js').ToolBase|null, corPreenchimento: string, corBorda: string, estiloLinha: string, elementosSelecionados: SVGElement[], interfaceAtual: string }} */
 export const estado = {
   ferramentaAtual: null,
   corPreenchimento: '#4a90d9',
   corBorda: '#1a1a2e',
+  estiloLinha: 'continua',
   interfaceAtual: 'inicio', // Nova flag para sabermos onde o usuário está
   elementosSelecionados: [],
+  espessuraLapis: 2,
 };
 
 let gerenciadorSelecaoVisual = null;
 let callbackPainelAlinhamento = null;
+
+
+export function definirEspessuraLapis(espessura) {
+  estado.espessuraLapis = Number(espessura);
+}
 
 export function definirGerenciadorSelecao(selecao) {
   gerenciadorSelecaoVisual = selecao;
@@ -86,6 +94,10 @@ export function definirCorBorda(cor) {
   estado.corBorda = cor;
 }
 
+export function definirEstiloLinha(estilo) {
+  estado.estiloLinha = estilo;
+}
+
 /**
  * Define os elementos SVG atualmente selecionados.
  *
@@ -144,4 +156,34 @@ export function removerElementoSelecao(elemento) {
 
 export function definirInterface(novaInterface) {
   estado.interfaceAtual = novaInterface;
+}
+
+let gerenciadorHistorico = null;
+
+/**
+ * Injeta a instância do HistoryManager no estado global.
+ * Chamado apenas uma vez pelo main.js.
+ */
+export function definirGerenciadorHistorico(manager) {
+  gerenciadorHistorico = manager;
+}
+
+/**
+ * Função global para as ferramentas avisarem que o canvas foi alterado.
+ */
+export function registrarAcaoHistorico() {
+  if (gerenciadorHistorico) {
+    gerenciadorHistorico.salvarEstado();
+  }
+}
+
+/**
+ * Funções para os atalhos de teclado (Ctrl+Z / Ctrl+Y) chamarem.
+ */
+export function desfazerAcao() {
+  if (gerenciadorHistorico) gerenciadorHistorico.desfazer();
+}
+
+export function refazerAcao() {
+  if (gerenciadorHistorico) gerenciadorHistorico.refazer();
 }
