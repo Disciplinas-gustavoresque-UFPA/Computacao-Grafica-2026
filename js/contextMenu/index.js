@@ -10,7 +10,7 @@
  * e conecta cada controle ao seu comportamento via event listeners.
  */
 
-import { registrarAcaoHistorico } from "../core/StateManager.js";
+import { registrarAcaoHistorico, definirElementosSelecionados } from "../core/StateManager.js";
 import { criarMenuContexto } from "./builder.js";
 import { sincronizarControles, normalizarHex } from "./sync.js";
 import {
@@ -288,6 +288,7 @@ export function inicializarMenuContexto(svgCanvas) {
       if (btnExcluir.classList.contains("menu-contexto__deletar--confirmando")) {
         executarComHistorico(() => {
           elementoAtual.remove();
+          definirElementosSelecionados(null);
           elementoAtual = null;
           fecharMenuContexto();
         });
