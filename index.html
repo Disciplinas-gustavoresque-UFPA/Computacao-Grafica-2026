@@ -67,6 +67,15 @@
                 <button id="btn-step-forward" title="Avançar" class="btn-layer">⏩</button>
                 <button id="btn-bring-to-front" title="Trazer para a Frente" class="btn-layer">⏭</button>
             </div>
+            
+            <!-- Botões de Espelhamento -->
+            <button id="btn-flip-horizontal" class="btn-layer" title="Espelhar Horizontal">
+                ↔
+            </button>
+
+            <button id="btn-flip-vertical" class="btn-layer" title="Espelhar Vertical">
+                ↕
+            </button>
 
             <!-- Controle de Visualização (Réguas de medida) -->
             <div class="view-controls">
@@ -239,7 +248,18 @@
 
                     <div id="tab-camadas" class="tab-content"></div>
                 </div>
+                 <label> Espessura do Lápis: 
+            <input
+                type="range"
+                id="espessura-lapis"
+                min="1"
+                max="100"
+                value="2">
+
+            <span id="valor-espessura-lapis">2</span> px
+        </label>
             </aside>
+            
         </div><!-- /#workspace -->
     </div><!-- /#app -->
 
