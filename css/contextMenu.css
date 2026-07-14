@@ -57,6 +57,10 @@
   gap: 4px;
 }
 
+.menu-contexto__grupo[hidden] {
+    display: none !important;
+}
+
 .menu-contexto__label {
   font-size: 11px;
   color: var(--cor-texto-secundario);
