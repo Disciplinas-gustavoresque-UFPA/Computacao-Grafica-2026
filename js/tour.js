@@ -118,14 +118,14 @@ const driverObj = window.driver.js.driver({
             element: "#btn-lapis",
             popover: {
                 title: 'Lápis',
-                description: 'Desenhe linhas retas entre dois pontos.'
+                description: 'Desenhe de forma livre.'
             }
         },
         {
             element: "#btn-pincel",
             popover: {
                 title: 'Pincel',
-                description: 'Pinte com diferentes espessuras e cores.'
+                description: 'Pinte como quiser no projeto.'
             }
         },
         {
