@@ -754,7 +754,7 @@ body {
     stroke: white;
 }
 
-.color-picker-group {
+.color-control-group {
     display: flex;
     align-items: center;
     gap: 8px;
