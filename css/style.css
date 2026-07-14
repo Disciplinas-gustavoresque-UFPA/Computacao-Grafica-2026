@@ -406,6 +406,8 @@ body {
   align-items: center;
   justify-content: center;
   padding: 24px;
+  position: relative;
+  z-index: 1;
 }
 
 #canvas {
