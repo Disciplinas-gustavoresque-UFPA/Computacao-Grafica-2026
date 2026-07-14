@@ -111,7 +111,7 @@ const driverObj = window.driver.js.driver({
             element: '#btn-borracha',
             popover: {
                 title: 'Borracha',
-                description: 'Remove objetos ou partes do desenho.'
+                description: 'Remove objetos do desenho.'
             }
         },
         {

@@ -30,8 +30,12 @@ export class LinhaTool extends ToolBase {
       x2: pt.x, y2: pt.y,
       stroke: estado.corBorda,
       'stroke-width': 2,
+
+    'pointer-events': 'stroke',
+    'vector-effect': 'non-scaling-stroke',
       ...this.obterAtributosEstiloLinha()
     });
+    this.lineElement.setAttribute("stroke-linecap", "round");
     this.svgCanvas.appendChild(this.lineElement);
   }
 
