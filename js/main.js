@@ -105,7 +105,7 @@ function atualizarBotoesHistorico() {
 
     if (btnRefazer) {
         btnRefazer.disabled = !podeRefazer;
-        btnRefazer.title = podeRefazer ? 'Refazer (Ctrl+Y)' : 'Nada para refazer';
+        btnRefazer.title = podeRefazer ? 'Refazer (Ctrl+Y / Ctrl+Shift+Z)' : 'Nada para refazer';
     }
 }
 
@@ -410,9 +410,7 @@ svgCanvas.addEventListener('mousemove', (evento) => {
   }
 });
 
-// O overlay tem pointer-events:none (para não bloquear cliques no canvas),
-// exceto nos elementos de UI que o próprio Selecao habilita explicitamente
-// (ex: alças de skew) — por isso precisa dos mesmos listeners delegados.
+// O overlay tem pointer-events:none, exceto nos elementos de UI habilitados de forma explícita
 overlayCanvas.addEventListener('mousedown', (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseDown(evento);
@@ -466,7 +464,6 @@ function moverCamada(acao) {
   const elementos = estado.elementosSelecionados;
   if (!elementos || elementos.length === 0) return;
 
-  // Move o primeiro elemento selecionado (para simplicidade)
   const el = elementos[0];
   if (!el) return;
 
@@ -570,6 +567,18 @@ window.addEventListener("keydown", (e) => {
     "t" : "texto",
     "i" : "Conta-gotas",
     "g" : "losango",
+  };
+
+  // --- LÓGICA DE DELEÇÃO CORRIGIDA ---
+  if (e.key === "Delete" || e.key === "Backspace") {
+    if (estado.elementosSelecionados && estado.elementosSelecionados.length > 0) {
+      estado.elementosSelecionados.forEach(el => el.remove());
+      definirElementosSelecionados([]); 
+      atualizarPosicaoSelecaoVisual(); 
+      registrarAcaoHistorico(); 
+      atualizarBotoesHistorico();
+    }
+    return;
   }
 
   const teclaPressionada = e.key.toLowerCase();
