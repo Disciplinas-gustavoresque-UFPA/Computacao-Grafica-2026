@@ -810,3 +810,65 @@ body {
     transform: scale(1.05);
     border-color: var(--cor-destaque);
 }
+
+.line-tool-group {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+/*
+ * Mantém o botão principal com o mesmo tamanho
+ * dos demais botões da barra.
+ */
+.line-tool-group > .btn-ferramenta {
+  flex: 0 0 auto;
+}
+
+#line-options {
+  position: absolute;
+
+  /*
+   * Posiciona o painel sempre à direita do botão.
+   */
+  left: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+
+  z-index: 10000;
+
+  padding: 6px;
+  border-radius: 6px;
+
+  /*
+   * Impede alterações no espaço ocupado pela barra.
+   */
+  width: max-content;
+  min-width: max-content;
+}
+
+#line-options.hidden {
+  display: none !important;
+}
+
+.line-style-controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  width: max-content;
+}
+
+.btn-line-style {
+  width: 42px;
+  height: 34px;
+  flex: 0 0 42px;
+  padding: 4px;
+}
+
+.btn-line-style svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
