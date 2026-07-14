@@ -132,6 +132,14 @@ if (btnRefazer) {
     });
 }
 
+// Novos botões de "Nenhum"
+const btnPreenchimentoNenhum = document.getElementById('btn-preenchimento-nenhum');
+const btnBordaNenhum = document.getElementById('btn-borda-nenhum');
+
+// Novos Sliders de opacidade
+const sliderOpacidadePreenchimento = document.getElementById('opacity-preenchimento');
+const sliderOpacidadeBorda = document.getElementById('opacity-borda');
+
 // Wrapper para sincronizar perfeitamente as coordenadas do #canvas com o #overlay-canvas
 const canvasContainer = document.createElement('div');
 canvasContainer.style.position = 'relative';
@@ -287,21 +295,80 @@ svgCanvas.addEventListener('mouseup', (evento) => {
     estado.ferramentaAtual.onMouseUp(evento);
   }
 
-  // Verifica se a ferramenta de seleção acabou de selecionar um elemento
-  // Se houver um elemento selecionado, sincroniza a sidebar com as cores dele
   const primeiroSelecionado = estado.elementosSelecionados[0];
   if (primeiroSelecionado) {
     const corPreenchimentoAtual = primeiroSelecionado.getAttribute('fill') || '#ffffff';
     const corBordaAtual = primeiroSelecionado.getAttribute('stroke') || '#000000';
+    
+    // Captura as opacidades existentes (padrão é 1 se não houver atributo)
+    const opacidadePreenchimentoAtual = primeiroSelecionado.getAttribute('fill-opacity') || '1';
+    const opacidadeBordaAtual = primeiroSelecionado.getAttribute('stroke-opacity') || '1';
 
-    // Atualiza o valor visual dos inputs para bater com o objeto selecionado
-    inputCorPreenchimento.value = corPreenchimentoAtual;
-    inputCorBorda.value = corBordaAtual;
+    // Só atualizamos os seletores visuais do HTML se o valor do SVG for uma cor hexadecimal válida.
+    if (corPreenchimentoAtual !== 'none' && corPreenchimentoAtual.startsWith('#')) {
+      inputCorPreenchimento.value = corPreenchimentoAtual;
+    }
+    if (corBordaAtual !== 'none' && corBordaAtual.startsWith('#')) {
+      inputCorBorda.value = corBordaAtual;
+    }
+
+    // Atualiza visualmente os Sliders de Opacidade na UI
+    sliderOpacidadePreenchimento.value = opacidadePreenchimentoAtual;
+    sliderOpacidadeBorda.value = opacidadeBordaAtual;
 
     // Atualiza também os valores armazenados no StateManager para consistência
     definirCorPreenchimento(corPreenchimentoAtual);
     definirCorBorda(corBordaAtual);
   }
+});
+
+btnPreenchimentoNenhum.addEventListener('click', () => {
+  definirCorPreenchimento('none');
+  
+  estado.elementosSelecionados.forEach(el => {
+    el.setAttribute('fill', 'none');
+  });
+  
+  registrarAcaoHistorico();
+  atualizarBotoesHistorico();
+});
+
+btnBordaNenhum.addEventListener('click', () => {
+  definirCorBorda('none');
+  
+  estado.elementosSelecionados.forEach(el => {
+    el.setAttribute('stroke', 'none');
+  });
+  
+  registrarAcaoHistorico();
+  atualizarBotoesHistorico();
+});
+
+sliderOpacidadePreenchimento.addEventListener('input', () => {
+  const valor = sliderOpacidadePreenchimento.value;
+  
+  estado.elementosSelecionados.forEach(el => {
+    el.setAttribute('fill-opacity', valor);
+  });
+});
+
+sliderOpacidadePreenchimento.addEventListener('change', () => {
+  // Salva no histórico apenas quando o usuário soltar o slider
+  registrarAcaoHistorico();
+  atualizarBotoesHistorico();
+});
+
+sliderOpacidadeBorda.addEventListener('input', () => {
+  const valor = sliderOpacidadeBorda.value;
+  
+  estado.elementosSelecionados.forEach(el => {
+    el.setAttribute('stroke-opacity', valor);
+  });
+});
+
+sliderOpacidadeBorda.addEventListener('change', () => {
+  registrarAcaoHistorico();
+  atualizarBotoesHistorico();
 });
 
 // Event listeners globais do SVG (delegados para a ferramenta ativa)

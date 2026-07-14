@@ -753,3 +753,26 @@ body {
     fill: #4a90d9; /* Inverte a cor ao passar o mouse */
     stroke: white;
 }
+
+.color-picker-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.btn-color-none {
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--cor-borda-ui);
+    border-radius: var(--raio-borda);
+    background: linear-gradient(45deg, transparent 45%, #ff4a4a 45%, #ff4a4a 55%, transparent 55%), #ffffff;
+    cursor: pointer;
+    font-size: 0; 
+    transition: transform 0.1s;
+}
+
+.btn-color-none:hover {
+    transform: scale(1.05);
+    border-color: var(--cor-destaque);
+}
