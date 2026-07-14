@@ -405,6 +405,7 @@ window.addEventListener("keydown", (e) => {
     "b" : "borracha",
     "v" : "edicaoVertices",
     "z" : "lupa",
+    "d" : "pincel",
   }
 
   const ferramentaAlvo = mapaTeclas[teclaPressionada];
