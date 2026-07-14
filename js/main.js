@@ -20,8 +20,7 @@ import {
   refazerAcao,
   registrarAcaoHistorico,
   atualizarPosicaoSelecaoVisual
-}
-from './core/StateManager.js';
+} from './core/StateManager.js';
 import { ColorPickerTool } from './tools/ColorPickerTool.js';
 import { Lapis } from './tools/LapisTool.js';
 import { RetanguloTool } from './tools/RetanguloTool.js';
@@ -43,7 +42,7 @@ import { duplicarElemento } from './utils/duplicateHelpers.js';
 import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
 import { SideBar } from './core/SideBar.js';
 import { PincelTool } from './tools/PincelTool.js';
-import {definirEspessuraLapis} from "./core/StateManager.js";
+import { definirEspessuraLapis } from "./core/StateManager.js";
 import { CameraSVG } from './core/CameraSVG.js';
 import { ScrollbarSVG } from './core/ScrollbarSVG.js';
 import { obterCoordenadaSVG } from './utils/svgHelpers.js';
@@ -75,7 +74,7 @@ const botoesEstiloLinha = document.querySelectorAll('.btn-line-style');
 const nomeFerramenta = document.getElementById('nome-ferramenta');
 const btnExportar = document.getElementById('btn-exportar');
 const exportFormat = document.getElementById('export-format');
-const inputEspessuraLapis =  document.getElementById("espessura-lapis");
+const inputEspessuraLapis = document.getElementById("espessura-lapis");
 
 // Botões de histórico
 const btnDesfazer = document.getElementById('btn-desfazer');
@@ -95,7 +94,7 @@ function atualizarBotoesHistorico() {
 
     if (btnRefazer) {
         btnRefazer.disabled = !podeRefazer;
-        btnRefazer.title = podeRefazer ? 'Refazer (Ctrl+Y)' : 'Nada para refazer';
+        btnRefazer.title = podeRefazer ? 'Refazer (Ctrl+Y / Ctrl+Shift+Z)' : 'Nada para refazer';
     }
 }
 
@@ -294,7 +293,6 @@ botoesEstiloLinha.forEach((btn) => {
 });
 
 // Atualizar os inputs da sidebar quando o usuário selecionar um objeto
-// Usamos um MutationObserver ou interceptamos cliques no Canvas para capturar a seleção.
 svgCanvas.addEventListener('mouseup', (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseUp(evento);
@@ -389,9 +387,7 @@ svgCanvas.addEventListener('mousemove', (evento) => {
   }
 });
 
-// O overlay tem pointer-events:none (para não bloquear cliques no canvas),
-// exceto nos elementos de UI que o próprio Selecao habilita explicitamente
-// (ex: alças de skew) — por isso precisa dos mesmos listeners delegados.
+// O overlay tem pointer-events:none, exceto nos elementos de UI habilitados de forma explícita
 overlayCanvas.addEventListener('mousedown', (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseDown(evento);
@@ -428,8 +424,7 @@ btnExportar.addEventListener('click', () => {
   exportarDesenho(svgCanvas, formato);
 });
 
-const valorEspessura =
-    document.getElementById("valor-espessura-lapis");
+const valorEspessura = document.getElementById("valor-espessura-lapis");
 
 inputEspessuraLapis.addEventListener("input", (e) => {
     definirEspessuraLapis(e.target.value);
@@ -446,7 +441,6 @@ function moverCamada(acao) {
   const elementos = estado.elementosSelecionados;
   if (!elementos || elementos.length === 0) return;
 
-  // Move o primeiro elemento selecionado (para simplicidade)
   const el = elementos[0];
   if (!el) return;
 
@@ -486,48 +480,40 @@ const btnFlipHorizontal = document.getElementById('btn-flip-horizontal');
 const btnFlipVertical = document.getElementById('btn-flip-vertical');
 
 btnFlipHorizontal.addEventListener("click", () => {
-
     estado.elementosSelecionados.forEach(el => {
         espelharHorizontal(el);
     });
-
     atualizarPosicaoSelecaoVisual();
     registrarAcaoHistorico();
-
 });
 
 btnFlipVertical.addEventListener("click", () => {
-
     estado.elementosSelecionados.forEach(el => {
         espelharVertical(el);
     });
-
     atualizarPosicaoSelecaoVisual();
     registrarAcaoHistorico();
-
 });
 
 // Atalhos de Teclado (Tool Selection)
 window.addEventListener("keydown", (e) => {
   // Prevenção de conflitos
-  // Verifica se o usuário está focado em um campo de texto ou input de cor.
   const elementoAtivo = document.activeElement;
   const tagAtiva = elementoAtivo.tagName.toLocaleLowerCase();
 
-  // Se o foco estiver em um input, textArea, select ou contentEditable, ignora o atalho.
   if (["input", "textarea", "select"].includes(tagAtiva) || elementoAtivo.isContentEditable)
     return;
 
   // Atalhos de teclado para o histórico
-  if (e.ctrlKey || e.metaKey) { // metaKey é o Cmd do Mac
+  if (e.ctrlKey || e.metaKey) {
     if (e.key.toLowerCase() === 'g') {
-      e.preventDefault(); // Impede o navegador de tentar buscar (find)
+      e.preventDefault();
       if (e.shiftKey) {
         desagruparElementos();
       } else {
         agruparElementos();
       }
-      atualizarBotoesHistorico(); // Sincroniza a interface de histórico
+      atualizarBotoesHistorico();
       return;
     }
     if (e.key.toLowerCase() === 'z') {
@@ -557,19 +543,20 @@ window.addEventListener("keydown", (e) => {
     "p" : "poligono",
     "t" : "texto",
     "i" : "Conta-gotas",
-    "g": "losango",
-  }
-    if (e.key === "Delete" || e.key === "Backspace") {
+    "g" : "losango",
+  };
+
+  // --- LÓGICA DE DELEÇÃO CORRIGIDA ---
+  if (e.key === "Delete" || e.key === "Backspace") {
     if (estado.elementosSelecionados && estado.elementosSelecionados.length > 0) {
       estado.elementosSelecionados.forEach(el => el.remove());
-      definirElementosSelecionados(null);
-    } else if (estado.elementoSelecionado) {
-      estado.elementoSelecionado.remove();
+      definirElementosSelecionados([]); 
+      atualizarPosicaoSelecaoVisual(); 
+      registrarAcaoHistorico(); 
+      atualizarBotoesHistorico();
     }
+    return;
   }
-
-  const teclaPressionada = e.key.toLowerCase();
-  const ferramentaAlvo = mapaTeclas[teclaPressionada];
 
   const teclaPressionada = e.key.toLowerCase();
   const ferramentaAlvo = e.shiftKey && teclaPressionada === 'c'
