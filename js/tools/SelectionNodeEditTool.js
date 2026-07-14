@@ -103,7 +103,7 @@ export class SelectionNodeEditTool extends ToolBase {
     onDesativar() {
         this.limparSelecao();
         this.isNodeHit = false;
-        this.modoAtual            // this.modoAtual = 'selecao'; = 'selecao';
+        this.modoAtual = 'selecao';
         this.isDragging = false;
         this.mouseDownPos = null;
 
