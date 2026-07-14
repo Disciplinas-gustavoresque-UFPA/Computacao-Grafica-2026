@@ -77,6 +77,43 @@ body {
   padding: 2px;
 }
 
+.line-style-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-line-style {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 28px;
+  border: 1px solid var(--cor-borda-ui);
+  border-radius: var(--raio-borda);
+  background: transparent;
+  color: var(--cor-texto-secundario);
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.btn-line-style svg {
+  width: 32px;
+  height: 12px;
+}
+
+.btn-line-style line {
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.btn-line-style:hover,
+.btn-line-style.ativo {
+  background-color: rgba(74, 144, 217, 0.2);
+  border-color: var(--cor-destaque);
+  color: var(--cor-destaque);
+}
+
 #ferramenta-atual-label {
   margin-left: auto;
   font-size: 12px;
@@ -108,6 +145,7 @@ body {
   cursor: pointer;
   font-size: 12px;
   transition: all 0.2s;
+  position: relative;
 }
 
 .btn-layer:hover {
@@ -118,6 +156,22 @@ body {
 
 .btn-layer:active {
   transform: scale(0.95);
+}
+
+/* Estado "pressionado/ativo" reutilizado pelo botão de réguas */
+.btn-layer.ativo {
+  background-color: rgba(74, 144, 217, 0.35);
+  border-color: var(--cor-destaque);
+  color: var(--cor-destaque);
+}
+
+/* Agrupamento dos controles de visualização (ex: réguas) */
+.view-controls {
+  display: flex;
+  gap: 4px;
+  margin-left: 16px;
+  border-left: 1px solid var(--cor-borda-ui);
+  padding-left: 16px;
 }
 
 /* =========================================================
@@ -169,6 +223,8 @@ body {
   font-weight: 500;
 
   cursor: pointer;
+
+  position: relative;
 
   transition:
     background-color 0.2s ease,
@@ -229,12 +285,11 @@ body {
   box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.25);
 }
 
-.btn-ferramenta[data-tooltip]::after {
+/* Tooltip customizado (data-tooltip) — base compartilhada por
+   sidebar e topbar; cada grupo só sobrescreve o posicionamento. */
+[data-tooltip]::after {
   content: attr(data-tooltip);
   position: absolute;
-  left: calc(100% + 10px);
-  top: 50%;
-  transform: translateY(-50%) translateX(-4px);
   background-color: var(--cor-fundo-painel);
   color: var(--cor-texto);
   border: 1px solid var(--cor-destaque);
@@ -244,16 +299,45 @@ body {
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
-  transition:
-    opacity 0.15s ease,
-    transform 0.15s ease;
-  z-index: 100;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 1000;
+}
+
+[data-tooltip]:hover::after {
+  opacity: 1;
+}
+
+/* Sidebar: tooltip exibido à direita do botão */
+.btn-ferramenta[data-tooltip]::after {
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%) translateX(-4px);
 }
 
 .btn-ferramenta[data-tooltip]:hover::after {
-  opacity: 1;
   transform: translateY(-50%) translateX(0);
 }
+
+/* Topbar (desfazer/refazer, camadas, exportar, menu e ajuda):
+   tooltip exibido abaixo do botão */
+.btn-history[data-tooltip]::after,
+.btn-layer[data-tooltip]::after,
+.btn-exportar[data-tooltip]::after,
+.btn-menu[data-tooltip]::after,
+.btn-ajuda[data-tooltip]::after {
+  left: 50%;
+  top: calc(100% + 8px);
+  transform: translateX(-50%) translateY(-4px);
+}
+
+.btn-history[data-tooltip]:hover::after,
+.btn-layer[data-tooltip]:hover::after,
+.btn-exportar[data-tooltip]:hover::after,
+.btn-menu[data-tooltip]:hover::after,
+.btn-ajuda[data-tooltip]:hover::after {
+  transform: translateX(-50%) translateY(0);
+}
+
 
 /* =========================================================
    Área Exportação
@@ -324,6 +408,8 @@ body {
   align-items: center;
   justify-content: center;
   padding: 24px;
+  position: relative;
+  z-index: 1;
 }
 
 #canvas {
@@ -336,6 +422,73 @@ body {
   height: 100%;
 }
 
+/* =========================================================
+   Réguas de Medida (bordas do canvas, em pixels do documento)
+   ========================================================= */
+.regua {
+  position: absolute;
+  background-color: rgba(15, 52, 96, 0.9);
+  color: var(--cor-texto-secundario);
+  font-size: 10px;
+  font-family: sans-serif;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.regua-horizontal {
+  top: 0;
+  left: var(--espessura-regua, 20px);
+  right: 0;
+  height: var(--espessura-regua, 20px);
+}
+
+.regua-vertical {
+  top: var(--espessura-regua, 20px);
+  left: 0;
+  bottom: 0;
+  width: var(--espessura-regua, 20px);
+}
+
+.regua-canto {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--espessura-regua, 20px);
+  height: var(--espessura-regua, 20px);
+  background-color: var(--cor-fundo-barra);
+  border-right: 1px solid var(--cor-borda-ui);
+  border-bottom: 1px solid var(--cor-borda-ui);
+  z-index: 2;
+}
+
+.regua-marcador {
+  position: absolute;
+  height: 100%;
+  border-left: 1px solid var(--cor-destaque);
+}
+
+.regua-vertical .regua-marcador {
+  height: auto;
+  width: 100%;
+  border-left: none;
+  border-top: 1px solid var(--cor-destaque);
+}
+
+.regua-rotulo {
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  white-space: nowrap;
+}
+
+.regua-vertical .regua-rotulo {
+  top: 3px;
+  left: 2px;
+  transform-origin: left top;
+  transform: rotate(-90deg);
+}
+
 /* =====================================================
    Menu de Opções da Lupa/Zoom e Node
    ====================================================*/
@@ -344,7 +497,17 @@ body {
   stroke: white;
 }
 
-#zoom-options {
+.skew-handle {
+    cursor: ew-resize;
+}
+
+.skew-handle:hover {
+    fill: #4a90d9; /* Inverte a cor ao passar o mouse */
+    stroke: white;
+}
+
+#zoom-options,
+#line-options {
   position: absolute;
   background: var(--cor-fundo-barra);
   border: 1px solid var(--cor-borda-ui);
@@ -353,17 +516,21 @@ body {
   border-radius: var(--raio-borda);
   flex-direction: column;
   gap: 4px;
+  z-index: 20;
 }
 
-#zoom-options.hidden {
+#zoom-options.hidden,
+#line-options.hidden {
   display: none;
 }
 
-#zoom-options:not(.hidden) {
+#zoom-options:not(.hidden),
+#line-options:not(.hidden) {
   display: flex;
 }
 
-#zoom-options button {
+#zoom-options button,
+#line-options .btn-line-style {
   background-color: #4a90d9;
   width: 36px;
   height: 36px;
@@ -371,13 +538,26 @@ body {
   border-radius: var(--raio-borda);
 }
 
-#zoom-options button:hover {
+#zoom-options button:hover,
+#line-options .btn-line-style:hover {
   border-color: var(--cor-destaque);
 }
 
-#zoom-options button.ativo {
+#zoom-options button.ativo,
+#line-options .btn-line-style.ativo {
   background: rgba(0, 38, 255, 0.35);
   border-color: var(--cor-destaque);
+}
+
+#line-options .line-style-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+#line-options .btn-line-style svg {
+  width: 28px;
+  height: 12px;
 }
 
 #zoom-indicator {
@@ -453,6 +633,7 @@ body {
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: inherit;
+  position: relative;
 }
 
 .btn-menu:hover {
@@ -483,16 +664,17 @@ body {
 }
 
 .btn-history {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: 1px solid var(--cor-borda-ui);
-  color: var(--cor-texto-secundario);
-  border-radius: var(--raio-borda);
-  padding: 6px 10px;
-  cursor: pointer;
-  transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid var(--cor-borda-ui);
+    color: var(--cor-texto-secundario);
+    border-radius: var(--raio-borda);
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
 }
 
 .btn-history:hover {
@@ -610,6 +792,91 @@ body {
 .node-handle:hover {
   fill: #4a90d9; /* Inverte a cor ao passar o mouse */
   stroke: white;
+}
+
+.color-control-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.btn-color-none {
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--cor-borda-ui);
+    border-radius: var(--raio-borda);
+    background: linear-gradient(45deg, transparent 45%, #ff4a4a 45%, #ff4a4a 55%, transparent 55%), #ffffff;
+    cursor: pointer;
+    font-size: 0; 
+    transition: transform 0.1s;
+}
+
+.btn-color-none:hover {
+    transform: scale(1.05);
+    border-color: var(--cor-destaque);
+}
+
+.line-tool-group {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+/*
+ * Mantém o botão principal com o mesmo tamanho
+ * dos demais botões da barra.
+ */
+.line-tool-group > .btn-ferramenta {
+  flex: 0 0 auto;
+}
+
+#line-options {
+  position: absolute;
+
+  /*
+   * Posiciona o painel sempre à direita do botão.
+   */
+  left: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+
+  z-index: 10000;
+
+  padding: 6px;
+  border-radius: 6px;
+
+  /*
+   * Impede alterações no espaço ocupado pela barra.
+   */
+  width: max-content;
+  min-width: max-content;
+}
+
+#line-options.hidden {
+  display: none !important;
+}
+
+.line-style-controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  width: max-content;
+}
+
+.btn-line-style {
+  width: 42px;
+  height: 34px;
+  flex: 0 0 42px;
+  padding: 4px;
+}
+
+.btn-line-style svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 /* =========================================================
