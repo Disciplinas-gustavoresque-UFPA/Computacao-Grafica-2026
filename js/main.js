@@ -601,6 +601,21 @@ btnImportarImagem.addEventListener('click', () => {
 
 inicializarImportadorImagem(svgCanvas, inputImagem);
 
+// --- Inicialização do ImageTracer ---
+const tracerManager = new ImageTracerManager(svgCanvas, inputImagem);
+
+// Assiste a aba do Tracer para atualizar a lista de imagens quando ela for ativada
+const tabTracer = document.getElementById('tab-tracer');
+if (tabTracer) {
+    const observerTab = new MutationObserver(() => {
+        // Verifica se a classe 'ativo' foi adicionada pela SideBar.js
+        if (tabTracer.classList.contains('ativo')) {
+            tracerManager.atualizarLista();
+        }
+    });
+    observerTab.observe(tabTracer, { attributes: true, attributeFilter: ['class'] });
+}
+
 // Inicializar o estado dos botões de histórico
 atualizarBotoesHistorico();
 
