@@ -168,6 +168,13 @@
                         <circle cx="17" cy="6" r="1.5" />
                     </svg>
                 </button>
+                <button id="btn-criar-espiral" class="btn-ferramenta" data-ferramenta="espiral" data-nome="Espiral" data-tooltip="Espiral (Shift+E)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        aria-hidden="true" focusable="false">
+                        <path d="M12 12m-1.5 0a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0 -3 0" />
+                        <path d="M12 12c3 0 4.5 2.2 3.2 4.4C13.6 19.2 8 18.8 6.2 15.2C3.8 10.5 8.2 5.5 13.4 6.2C18.8 6.9 21.4 12.4 19 17.2" />
+                    </svg>
+                </button>
                 <button id="btn-criar-polilinha" class="btn-ferramenta" data-ferramenta="poligono" data-nome="Polígono / Polilinha" data-tooltip="Polígono / Polilinha (G)">
                     &bowtie;
                 </button>
@@ -248,16 +255,16 @@
 
                     <div id="tab-camadas" class="tab-content"></div>
                 </div>
-                 <label> Espessura do Lápis:
-            <input
-                type="range"
-                id="espessura-lapis"
-                min="1"
-                max="100"
-                value="2">
+                <label> Espessura do Lápis:
+                    <input
+                        type="range"
+                        id="espessura-lapis"
+                        min="1"
+                        max="100"
+                        value="2">
 
-            <span id="valor-espessura-lapis">2</span> px
-        </label>
+                    <span id="valor-espessura-lapis">2</span> px
+                </label>
             </aside>
 
         </div><!-- /#workspace -->
