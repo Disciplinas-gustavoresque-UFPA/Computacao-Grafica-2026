@@ -218,6 +218,9 @@ function atualizarVisibilidadePainelAlinhamento(qtd) {
 }
 definirCallbackPainelAlinhamento(atualizarVisibilidadePainelAlinhamento);
 
+// Menu de contexto simples em utilitário
+inicializarMenuContexto(svgCanvas);
+
 // Instâncias das ferramentas disponíveis com todas as implementações da main
 const cameraGlobal = new CameraSVG([svgCanvas, overlayCanvas]);
 const scrollbar = new ScrollbarSVG(canvasContainer, svgCanvas, cameraGlobal);
