@@ -633,3 +633,18 @@ svgCanvas.addEventListener('wheel', (e) => {
   cameraGlobal.zoom(escala, coords.x, coords.y);
   scrollbar.atualizar();
 }, { passive: false });
+
+// Observa o canvas para atualizar o Tracer automaticamente quando uma imagem for adicionada ou removida
+const observerCanvas = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+        if (mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0) {
+            // Verifica se a aba do tracer está aberta no momento
+            if (tabTracer && tabTracer.classList.contains('ativo')) {
+                tracerManager.atualizarLista();
+            }
+        }
+    });
+});
+
+// Começa a observar a adição/remoção de elementos filhos no svgCanvas
+observerCanvas.observe(svgCanvas, { childList: true });
