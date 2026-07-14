@@ -292,7 +292,28 @@
             </label>
           </div>
 
-          <div id="tab-tracer" class="tab-content">
+          <div id="tab-tracer" class="tab-content" style="height: 100%; box-sizing: border-box;">
+            
+            <!-- Estilos dedicados para a distribuição flexível da aba de vetorização -->
+            <style>
+              #tab-tracer.ativo {
+                display: flex !important;
+                flex-direction: column;
+                height: 100%;
+              }
+              #tracer-conteudo {
+                display: flex;
+                flex-direction: column;
+                flex: 1;
+                min-height: 0; /* Permite o encolhimento correto e scroll interno */
+              }
+              #btn-tracer-aplicar {
+                margin-top: auto; /* Empurra o botão rigidamente para o fim da aba */
+                margin-bottom: 10px;
+                width: 100%;
+              }
+            </style>
+
             <h3>Vetorizar Imagem</h3>
             
             <!-- Estado vazio: Nenhuma imagem -->
@@ -324,8 +345,8 @@
                     </svg>
                 </div>
 
-                <!-- Painel de Configurações Avançadas (Exibido apenas em modo 'custom') -->
-                <div id="tracer-advanced-panel" style="display: none; border-top: 1px solid #ddd; padding-top: 10px; margin-bottom: 15px; max-height: 280px; overflow-y: auto;">
+                <!-- Painel de Configurações Avançadas (Ocupa o espaço restante e rola internamente) -->
+                <div id="tracer-advanced-panel" style="display: none; border-top: 1px solid #ddd; padding-top: 10px; margin-bottom: 15px; flex: 1; min-height: 0; overflow-y: auto; padding-right: 5px;">
                     
                     <h4 style="margin: 5px 0; font-size: 0.9em; color: #4a90d9; text-transform: uppercase; letter-spacing: 0.5px;">Paleta de Cores</h4>
                     <div style="margin-bottom: 10px;">
