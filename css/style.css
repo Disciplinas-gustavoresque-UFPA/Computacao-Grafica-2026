@@ -145,6 +145,7 @@ body {
   cursor: pointer;
   font-size: 12px;
   transition: all 0.2s;
+  position: relative;
 }
 
 .btn-layer:hover {
@@ -223,6 +224,8 @@ body {
 
   cursor: pointer;
 
+  position: relative;
+
   transition:
     background-color .2s ease,
     border-color .2s ease,
@@ -279,12 +282,11 @@ body {
   box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.25);
 }
 
-.btn-ferramenta[data-tooltip]::after {
+/* Tooltip customizado (data-tooltip) — base compartilhada por
+   sidebar e topbar; cada grupo só sobrescreve o posicionamento. */
+[data-tooltip]::after {
   content: attr(data-tooltip);
   position: absolute;
-  left: calc(100% + 10px);
-  top: 50%;
-  transform: translateY(-50%) translateX(-4px);
   background-color: var(--cor-fundo-painel);
   color: var(--cor-texto);
   border: 1px solid var(--cor-destaque);
@@ -295,12 +297,42 @@ body {
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.15s ease, transform 0.15s ease;
-  z-index: 100;
+  z-index: 1000;
+}
+
+[data-tooltip]:hover::after {
+  opacity: 1;
+}
+
+/* Sidebar: tooltip exibido à direita do botão */
+.btn-ferramenta[data-tooltip]::after {
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%) translateX(-4px);
 }
 
 .btn-ferramenta[data-tooltip]:hover::after {
-  opacity: 1;
   transform: translateY(-50%) translateX(0);
+}
+
+/* Topbar (desfazer/refazer, camadas, exportar, menu e ajuda):
+   tooltip exibido abaixo do botão */
+.btn-history[data-tooltip]::after,
+.btn-layer[data-tooltip]::after,
+.btn-exportar[data-tooltip]::after,
+.btn-menu[data-tooltip]::after,
+.btn-ajuda[data-tooltip]::after {
+  left: 50%;
+  top: calc(100% + 8px);
+  transform: translateX(-50%) translateY(-4px);
+}
+
+.btn-history[data-tooltip]:hover::after,
+.btn-layer[data-tooltip]:hover::after,
+.btn-exportar[data-tooltip]:hover::after,
+.btn-menu[data-tooltip]:hover::after,
+.btn-ajuda[data-tooltip]:hover::after {
+  transform: translateX(-50%) translateY(0);
 }
 
 
@@ -597,6 +629,7 @@ body {
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: inherit;
+  position: relative;
 }
 
 .btn-menu:hover {
@@ -637,6 +670,7 @@ body {
     padding: 6px 10px;
     cursor: pointer;
     transition: all 0.2s ease;
+    position: relative;
 }
 
 .btn-history:hover {
