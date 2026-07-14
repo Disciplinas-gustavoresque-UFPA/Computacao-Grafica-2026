@@ -40,6 +40,7 @@ import { inicializarImportadorImagem } from './tools/ImageImporter.js';
 import { inicializarMenuInicial } from './core/UIManager.js';
 import { duplicarElemento } from './utils/duplicateHelpers.js';
 import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
+import { inicializarMenuContexto } from './contextMenu/index.js';
 import { SideBar } from './core/SideBar.js';
 import { PincelTool } from './tools/PincelTool.js';
 import { definirEspessuraLapis } from "./core/StateManager.js";
@@ -194,6 +195,9 @@ observer.observe(svgCanvas, { attributes: true, attributeFilter: ['viewBox'] });
 // Inicializar a classe de seleção visual
 const selecaoVisual = new Selecao(overlayCanvas);
 definirGerenciadorSelecao(selecaoVisual);
+
+// Menu de contexto simples em utilitário
+inicializarMenuContexto(svgCanvas);
 
 // Instâncias das ferramentas disponíveis com todas as implementações da main
 const cameraGlobal = new CameraSVG([svgCanvas, overlayCanvas]);
