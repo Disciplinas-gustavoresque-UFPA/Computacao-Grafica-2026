@@ -44,13 +44,13 @@
 
       <!-- Botões de Desfazer/Refazer -->
       <div class="history-controls">
-        <button id="btn-desfazer" class="btn-history" title="Desfazer (Ctrl+Z)">
+        <button id="btn-desfazer" class="btn-history" data-tooltip="Desfazer (Ctrl+Z)">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 7v6h6" />
             <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13" />
           </svg>
         </button>
-        <button id="btn-refazer" class="btn-history" title="Refazer (Ctrl+Y / Ctrl+Shift+Z)">
+        <button id="btn-refazer" class="btn-history" data-tooltip="Refazer (Ctrl+Y / Ctrl+Shift+Z)">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 7v6h-6" />
             <path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13" />
@@ -60,15 +60,24 @@
 
       <!-- Controle de Camadas -->
       <div class="layer-controls">
-        <button id="btn-send-to-back" title="Enviar para o Fundo" class="btn-layer">⏮</button>
-        <button id="btn-step-backward" title="Recuar" class="btn-layer">⏪</button>
-        <button id="btn-step-forward" title="Avançar" class="btn-layer">⏩</button>
-        <button id="btn-bring-to-front" title="Trazer para a Frente" class="btn-layer">⏭</button>
+        <button id="btn-send-to-back" data-tooltip="Enviar para o Fundo" class="btn-layer">⏮</button>
+        <button id="btn-step-backward" data-tooltip="Recuar" class="btn-layer">⏪</button>
+        <button id="btn-step-forward" data-tooltip="Avançar" class="btn-layer">⏩</button>
+        <button id="btn-bring-to-front" data-tooltip="Trazer para a Frente" class="btn-layer">⏭</button>
       </div>
+
+      <!-- Botões de Espelhamento -->
+      <button id="btn-flip-horizontal" class="btn-layer" data-tooltip="Espelhar Horizontal">
+        ↔
+      </button>
+
+      <button id="btn-flip-vertical" class="btn-layer" data-tooltip="Espelhar Vertical">
+        ↕
+      </button>
 
       <!-- Controle de Visualização (Réguas de medida) -->
       <div class="view-controls">
-        <button id="btn-toggle-regua" title="Mostrar/Ocultar Réguas" class="btn-layer">📏</button>
+        <button id="btn-toggle-regua" data-tooltip="Mostrar/Ocultar Réguas" class="btn-layer">📏</button>
       </div>
 
       <!-- Botão de exportar/descarregar desenho -->
@@ -89,7 +98,7 @@
           <path d="M7 10l5 5 5-5z" />
         </svg>
       </div>
-      <button class="cssbuttons-io-button" class="btn-exportar" id="btn-exportar" title="Salvar/Exportar desenho">
+      <button class="cssbuttons-io-button btn-exportar" id="btn-exportar" data-tooltip="Salvar/Exportar desenho">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
           <path fill="none" d="M0 0h24v24H0z"></path>
           <path fill="white"
@@ -124,19 +133,19 @@
         </button>
         <div id="line-options" class="hidden">
           <div class="line-style-controls" aria-label="Estilo da linha">
-            <button id="btn-line-continua" class="btn-line-style ativo" type="button" data-estilo-linha="continua" title="Linha contínua">
+            <button class="btn-line-style ativo" type="button" data-estilo-linha="continua" title="Linha contínua">
               <svg viewBox="0 0 36 12" aria-hidden="true" focusable="false">
                 <line x1="4" y1="6" x2="32" y2="6" />
               </svg>
             </button>
 
-            <button id="btn-line-tracejada" class="btn-line-style" type="button" data-estilo-linha="tracejada" title="Linha tracejada">
+            <button class="btn-line-style" type="button" data-estilo-linha="tracejada" title="Linha tracejada">
               <svg viewBox="0 0 36 12" aria-hidden="true" focusable="false">
                 <line x1="4" y1="6" x2="32" y2="6" stroke-dasharray="12 6" />
               </svg>
             </button>
 
-            <button id="btn-line-pontilhada" class="btn-line-style" type="button" data-estilo-linha="pontilhada" title="Linha pontilhada">
+            <button class="btn-line-style" type="button" data-estilo-linha="pontilhada" title="Linha pontilhada">
               <svg viewBox="0 0 36 12" aria-hidden="true" focusable="false">
                 <line x1="4" y1="6" x2="32" y2="6" stroke-dasharray="1 6" stroke-linecap="round" />
               </svg>
@@ -155,6 +164,13 @@
             <path d="M4 18C7 6 17 6 20 18" />
             <circle cx="7" cy="6" r="1.5" />
             <circle cx="17" cy="6" r="1.5" />
+          </svg>
+        </button>
+        <button id="btn-criar-espiral" class="btn-ferramenta" data-ferramenta="espiral" data-nome="Espiral" data-tooltip="Espiral (Shift+E)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            aria-hidden="true" focusable="false">
+            <path d="M12 12m-1.5 0a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0 -3 0" />
+            <path d="M12 12c3 0 4.5 2.2 3.2 4.4C13.6 19.2 8 18.8 6.2 15.2C3.8 10.5 8.2 5.5 13.4 6.2C18.8 6.9 21.4 12.4 19 17.2" />
           </svg>
         </button>
         <button id="btn-criar-polilinha" class="btn-ferramenta" data-ferramenta="poligono" data-nome="Polígono / Polilinha" data-tooltip="Polígono / Polilinha (G)">
@@ -234,7 +250,13 @@
 
           <div id="tab-camadas" class="tab-content"></div>
         </div>
+        <label> Espessura do Lápis:
+          <input type="range" id="espessura-lapis" min="1" max="100" value="2">
+
+          <span id="valor-espessura-lapis">2</span> px
+        </label>
       </aside>
+
     </div><!-- /#workspace -->
   </div><!-- /#app -->
 
@@ -248,16 +270,6 @@
   <script>
     lucide.createIcons();
   </script>
-
-</body>
-
-</html>"https://cdn.jsdelivr.net/npm/driver.js/dist/driver.js.iife.js"></script>
-<script src="js/tour.js"></script>
-
-<script src="https://unpkg.com/lucide@latest"></script>
-<script>
-  lucide.createIcons();
-</script>
 
 </body>
 
