@@ -126,7 +126,7 @@ export function inicializarMenuContexto(svgCanvas) {
 
     const alvo = encontrarElementoSVG(evento.target, svgCanvas);
     if (!alvo) return;
-
+    definirElementosSelecionados(alvo);
     elementoAtual = alvo;
     resetarBotaoExcluir();
     sincronizarControles(elementoAtual, controles);
