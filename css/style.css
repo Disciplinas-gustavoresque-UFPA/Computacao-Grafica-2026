@@ -727,7 +727,7 @@ body {
   position: absolute;
   right: 300px;
   top: 28px;
-  transform: none;
+  transform: rotate(0deg);
   background: var(--cor-fundo-barra);
   border: 1px solid var(--cor-borda-ui);
   color: var(--cor-texto);
