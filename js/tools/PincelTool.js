@@ -1,6 +1,7 @@
 import { ToolBase } from './ToolBase.js';
 import { obterCoordenadaSVG } from '../utils/svgHelpers.js';
 import { estado } from '../core/StateManager.js';
+import { registrarAcaoHistorico } from '../core/StateManager.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -91,5 +92,6 @@ export class PincelTool extends ToolBase {
         this.ultimoTempo    = null;
         this.grupo          = null;
         this.espessuraAtual = this.espessuraMin;
+        registrarAcaoHistorico();
     }
 }
