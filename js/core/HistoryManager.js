@@ -1,4 +1,5 @@
 import { definirElementosSelecionados } from '../core/StateManager.js';
+import { estado } from '../core/StateManager.js';
 import { MementoSVG } from './MementoSVG.js';
 
 export class HistoryManager {
@@ -18,7 +19,7 @@ export class HistoryManager {
     this.#redoStack = [];
 
     // Tira a "foto" do HTML interno atual do canvas
-    const snapshot = new MementoSVG(this.#svgCanvas.innerHTML);
+    const snapshot = new MementoSVG(this.#obterConteudoSvgLimpo());
 
     // Guarda na pilha principal
     this.#undoStack.push(snapshot);
@@ -76,5 +77,26 @@ export class HistoryManager {
   #aplicarEstado(conteudoSvg) {
     definirElementosSelecionados(null);
     this.#svgCanvas.innerHTML = conteudoSvg;
+    this.#removerOverlaysEdicao();
+    this.#limparEstadoFerramentaAtiva();
+  }
+
+  #obterConteudoSvgLimpo() {
+    const containerTemporario = document.createElement('div');
+    containerTemporario.innerHTML = this.#svgCanvas.innerHTML;
+    this.#removerOverlaysEdicao(containerTemporario);
+    return containerTemporario.innerHTML;
+  }
+
+  #removerOverlaysEdicao(raiz = this.#svgCanvas) {
+    raiz.querySelectorAll('.overlay-handles, #overlay-nodes').forEach((elemento) => {
+      elemento.remove();
+    });
+  }
+
+  #limparEstadoFerramentaAtiva() {
+    if (estado.ferramentaAtual && typeof estado.ferramentaAtual.limparSelecao === 'function') {
+      estado.ferramentaAtual.limparSelecao();
+    }
   }
 }
