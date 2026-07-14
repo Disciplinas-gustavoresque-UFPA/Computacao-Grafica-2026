@@ -306,7 +306,7 @@
             <!-- Lista de imagens e configurações -->
             <div id="tracer-conteudo">
                 <label class="propriedade-label">Selecione a imagem:</label>
-                <div id="tracer-lista-imagens" class="lista-imagens-container" style="max-height: 120px; overflow-y: auto; margin-bottom: 15px; border: 1px solid #ccc; padding: 5px;">
+                <div id="tracer-lista-imagens" class="lista-imagens-container" style="max-height: 100px; overflow-y: auto; margin-bottom: 15px; border: 1px solid #ccc; padding: 5px;">
                     <!-- Lista injetada via JS -->
                 </div>
 
@@ -317,10 +317,59 @@
                         <option value="posterized2">Posterizado (2 cores)</option>
                         <option value="artistic1">Artístico detalhado</option>
                         <option value="bw">Preto e Branco</option>
+                        <option value="custom">⚙️ Personalizado Avançado</option>
                     </select>
                     <svg class="select-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                       <path d="M7 10l5 5 5-5z" />
                     </svg>
+                </div>
+
+                <!-- Painel de Configurações Avançadas (Exibido apenas em modo 'custom') -->
+                <div id="tracer-advanced-panel" style="display: none; border-top: 1px solid #ddd; padding-top: 10px; margin-bottom: 15px; max-height: 280px; overflow-y: auto;">
+                    
+                    <h4 style="margin: 5px 0; font-size: 0.9em; color: #4a90d9; text-transform: uppercase; letter-spacing: 0.5px;">Paleta de Cores</h4>
+                    <div style="margin-bottom: 10px;">
+                        <label style="display:block; font-size:0.85em; margin-bottom: 4px;">Máx. de Cores: <strong id="val-tracer-colors">16</strong></label>
+                        <input type="range" id="tracer-colors" min="2" max="64" value="16" style="width:100%;">
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <label style="display:block; font-size:0.85em; margin-bottom: 4px;">Ciclos (Agrupamento): <strong id="val-tracer-cycles">3</strong></label>
+                        <input type="range" id="tracer-cycles" min="1" max="10" value="3" style="width:100%;">
+                    </div>
+
+                    <h4 style="margin: 15px 0 5px 0; font-size: 0.9em; color: #4a90d9; text-transform: uppercase; letter-spacing: 0.5px;">Traçado e Curvas</h4>
+                    <div style="margin-bottom: 10px;">
+                        <label style="display:block; font-size:0.85em; margin-bottom: 4px;">Tolerância Linear (ltres): <strong id="val-tracer-ltres">1.0</strong></label>
+                        <input type="range" id="tracer-ltres" min="0.1" max="10" step="0.1" value="1.0" style="width:100%;">
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <label style="display:block; font-size:0.85em; margin-bottom: 4px;">Tolerância Curva (qtres): <strong id="val-tracer-qtres">1.0</strong></label>
+                        <input type="range" id="tracer-qtres" min="0.1" max="10" step="0.1" value="1.0" style="width:100%;">
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <label style="display:block; font-size:0.85em; margin-bottom: 4px;">Ignorar Ruídos (pathomit): <strong id="val-tracer-omit">8</strong> px</label>
+                        <input type="range" id="tracer-omit" min="0" max="64" value="8" style="width:100%;">
+                    </div>
+                    <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+                        <input type="checkbox" id="tracer-rightangle" style="cursor: pointer;">
+                        <label for="tracer-rightangle" style="font-size:0.85em; cursor:pointer; user-select: none;">Forçar/Realçar ângulos retos</label>
+                    </div>
+
+                    <h4 style="margin: 15px 0 5px 0; font-size: 0.9em; color: #4a90d9; text-transform: uppercase; letter-spacing: 0.5px;">Filtros (Pré-processo)</h4>
+                    <div style="margin-bottom: 10px;">
+                        <label style="display:block; font-size:0.85em; margin-bottom: 4px;">Raio do Desfoque (blur): <strong id="val-tracer-blur">0</strong> px</label>
+                        <input type="range" id="tracer-blur" min="0" max="10" value="0" style="width:100%;">
+                    </div>
+
+                    <h4 style="margin: 15px 0 5px 0; font-size: 0.9em; color: #4a90d9; text-transform: uppercase; letter-spacing: 0.5px;">Otimização e Saída</h4>
+                    <div style="margin-bottom: 10px;">
+                        <label style="display:block; font-size:0.85em; margin-bottom: 4px;">Espessura de Contorno: <strong id="val-tracer-stroke">0.0</strong> px</label>
+                        <input type="range" id="tracer-stroke" min="0" max="5" step="0.1" value="0.0" style="width:100%;">
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <label style="display:block; font-size:0.85em; margin-bottom: 4px;">Casas Decimais (SVG): <strong id="val-tracer-round">1</strong></label>
+                        <input type="range" id="tracer-round" min="-1" max="5" step="1" value="1" style="width:100%;">
+                    </div>
                 </div>
 
                 <button id="btn-tracer-aplicar" class="btn-menu">Aplicar Vetorização</button>

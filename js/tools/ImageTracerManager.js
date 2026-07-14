@@ -1,6 +1,7 @@
 /**
+ * [source: 10]
  * ImageTracerManager.js
- * Gerencia a aba de vetorização de imagens rasterizadas.
+ * Gerencia a aba de vetorização de imagens rasterizadas com suporte a parâmetros manuais.
  */
 import { registrarAcaoHistorico, definirElementosSelecionados } from '../core/StateManager.js';
 
@@ -10,15 +11,30 @@ export class ImageTracerManager {
         this.inputImagem = inputImagem;
         this.imagemSelecionada = null;
 
-        // Elementos de UI
+        // Elementos base de UI
         this.emptyState = document.getElementById('tracer-empty-state');
         this.conteudoAtivo = document.getElementById('tracer-conteudo');
         this.containerLista = document.getElementById('tracer-lista-imagens');
         this.btnImportar = document.getElementById('btn-tracer-importar');
         this.btnAplicar = document.getElementById('btn-tracer-aplicar');
         this.selectPreset = document.getElementById('tracer-preset');
+        this.advancedPanel = document.getElementById('tracer-advanced-panel');
+
+        // Mapeamento dos novos inputs avançados e seus respectivos indicadores numéricos
+        this.inputsAvancados = {
+            numberofcolors: { input: document.getElementById('tracer-colors'), val: document.getElementById('val-tracer-colors') },
+            colorquantcycles: { input: document.getElementById('tracer-cycles'), val: document.getElementById('val-tracer-cycles') },
+            ltres: { input: document.getElementById('tracer-ltres'), val: document.getElementById('val-tracer-ltres') },
+            qtres: { input: document.getElementById('tracer-qtres'), val: document.getElementById('val-tracer-qtres') },
+            pathomit: { input: document.getElementById('tracer-omit'), val: document.getElementById('val-tracer-omit') },
+            blurradius: { input: document.getElementById('tracer-blur'), val: document.getElementById('val-tracer-blur') },
+            strokewidth: { input: document.getElementById('tracer-stroke'), val: document.getElementById('val-tracer-stroke') },
+            roundcoords: { input: document.getElementById('tracer-round'), val: document.getElementById('val-tracer-round') },
+            rightangleenhance: { input: document.getElementById('tracer-rightangle'), val: null }
+        };
 
         this._bindEvents();
+        this._initSlidersSync();
     }
 
     _bindEvents() {
@@ -27,6 +43,29 @@ export class ImageTracerManager {
         });
 
         this.btnAplicar.addEventListener('click', () => this.aplicarTracer());
+
+        // Escuta a alteração no seletor de estilo para alternar visibilidade do painel avançado
+        this.selectPreset.addEventListener('change', () => {
+            if (this.selectPreset.value === 'custom') {
+                this.advancedPanel.style.display = 'block';
+            } else {
+                this.advancedPanel.style.display = 'none';
+            }
+        });
+    }
+
+    /**
+     * Inicializa a sincronização dinâmica de texto nos labels de exibição conforme os sliders se movem
+     */
+    _initSlidersSync() {
+        Object.keys(this.inputsAvancados).forEach(chave => {
+            const item = this.inputsAvancados[chave];
+            if (item.val && item.input) {
+                item.input.addEventListener('input', (e) => {
+                    item.val.textContent = e.target.value;
+                });
+            }
+        });
     }
 
     atualizarLista() {
@@ -55,7 +94,6 @@ export class ImageTracerManager {
             this.containerLista.appendChild(item);
         });
 
-        // Seleciona automaticamente a primeira imagem
         if (imagens.length > 0) {
             this.selecionarImagem(imagens[0], this.containerLista.firstChild);
         }
@@ -78,6 +116,23 @@ export class ImageTracerManager {
         definirElementosSelecionados([img]);
     }
 
+    /**
+     * Coleta todos os parâmetros definidos na UI e monta o objeto customizado para o ImageTracerJS
+     */
+    _obterOpcoesCustomizadas() {
+        return {
+            numberofcolors: parseInt(this.inputsAvancados.numberofcolors.input.value, 10),
+            colorquantcycles: parseInt(this.inputsAvancados.colorquantcycles.input.value, 10),
+            ltres: parseFloat(this.inputsAvancados.ltres.input.value),
+            qtres: parseFloat(this.inputsAvancados.qtres.input.value),
+            pathomit: parseInt(this.inputsAvancados.pathomit.input.value, 10),
+            blurradius: parseInt(this.inputsAvancados.blurradius.input.value, 10),
+            strokewidth: parseFloat(this.inputsAvancados.strokewidth.input.value),
+            roundcoords: parseInt(this.inputsAvancados.roundcoords.input.value, 10),
+            rightangleenhance: this.inputsAvancados.rightangleenhance.input.checked
+        };
+    }
+
     aplicarTracer() {
         if (!this.imagemSelecionada || !window.ImageTracer) {
             console.error("ImageTracer indisponível ou nenhuma imagem selecionada.");
@@ -90,7 +145,14 @@ export class ImageTracerManager {
 
         const url = this.imagemSelecionada.getAttribute('href');
         const preset = this.selectPreset.value;
-        const opcoes = preset === 'default' ? null : preset;
+        
+        // Se for 'custom', invoca o extrator de opções manuais; caso contrário, usa a string do preset
+        let opcoes = null;
+        if (preset === 'custom') {
+            opcoes = this._obterOpcoesCustomizadas();
+        } else if (preset !== 'default') {
+            opcoes = preset;
+        }
 
         const x = parseFloat(this.imagemSelecionada.getAttribute('x') || 0);
         const y = parseFloat(this.imagemSelecionada.getAttribute('y') || 0);
