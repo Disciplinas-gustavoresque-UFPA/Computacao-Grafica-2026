@@ -41,6 +41,7 @@ import { duplicarElemento } from './utils/duplicateHelpers.js';
 import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
 import { SideBar } from './core/SideBar.js';
 import { PincelTool } from './tools/PincelTool.js';
+import {definirEspessuraLapis} from "./core/StateManager.js";
 import { CameraSVG } from './core/CameraSVG.js';
 import { ScrollbarSVG } from './core/ScrollbarSVG.js';
 import { obterCoordenadaSVG } from './utils/svgHelpers.js';
@@ -72,6 +73,7 @@ const botoesEstiloLinha = document.querySelectorAll('.btn-line-style');
 const nomeFerramenta = document.getElementById('nome-ferramenta');
 const btnExportar = document.getElementById('btn-exportar');
 const exportFormat = document.getElementById('export-format');
+const inputEspessuraLapis =  document.getElementById("espessura-lapis");
 
 // Botões de histórico
 const btnDesfazer = document.getElementById('btn-desfazer');
@@ -354,6 +356,14 @@ atualizarBotaoEstiloLinhaAtivo(estado.estiloLinha);
 btnExportar.addEventListener('click', () => {
   const formato = exportFormat.value || 'png';
   exportarDesenho(svgCanvas, formato);
+});
+
+const valorEspessura =
+    document.getElementById("valor-espessura-lapis");
+
+inputEspessuraLapis.addEventListener("input", (e) => {
+    definirEspessuraLapis(e.target.value);
+    valorEspessura.textContent = e.target.value;
 });
 
 // --- Controle de Camadas (Z-Index) ---
