@@ -41,6 +41,7 @@ import { inicializarImportadorImagem } from './tools/ImageImporter.js';
 import { inicializarMenuInicial } from './core/UIManager.js';
 import { duplicarElemento } from './utils/duplicateHelpers.js';
 import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
+import { inicializarMenuContexto } from './contextMenu/index.js';
 import { SideBar } from './core/SideBar.js';
 import { PincelTool } from './tools/PincelTool.js';
 import { definirEspessuraLapis } from "./core/StateManager.js";
