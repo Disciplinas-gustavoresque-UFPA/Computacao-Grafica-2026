@@ -545,6 +545,11 @@ window.addEventListener("keydown", (e) => {
       atualizarBotoesHistorico();
       return;
     }
+    // Ctrl+C / Ctrl+V / Ctrl+D são tratados em outro listener — apenas impede
+    // que caiam no mapa de atalhos de ferramenta abaixo.
+    if (['c', 'v', 'd'].includes(e.key.toLowerCase())) {
+      return;
+    }
   }
 
   const mapaTeclas = {
@@ -575,6 +580,11 @@ window.addEventListener("keydown", (e) => {
   }
 });
 
+// --- Área de Transferência (Copiar / Colar) ---
+let clipboard = [];       
+let pasteCount = 0;       
+const PASTE_OFFSET = 20;  
+
 // --- Duplicar elemento ---
 function handlerDuplicar() {
   const el = estado.elementosSelecionados[0];
@@ -587,9 +597,47 @@ function handlerDuplicar() {
 }
 
 document.addEventListener('keydown', (evento) => {
-  if ((evento.ctrlKey || evento.metaKey) && evento.key.toLowerCase() === 'd') {
+  if (!(evento.ctrlKey || evento.metaKey)) return;
+
+  const tecla = evento.key.toLowerCase();
+
+  // Ctrl+D — Duplicar
+  if (tecla === 'd') {
     evento.preventDefault();
     handlerDuplicar();
+    return;
+  }
+
+  // Ctrl+C — Copiar elementos selecionados para a área de transferência interna
+  if (tecla === 'c') {
+    if (estado.elementosSelecionados.length === 0) return;
+    evento.preventDefault();
+    clipboard = estado.elementosSelecionados.map(el => el.cloneNode(true));
+    pasteCount = 0;
+    return;
+  }
+
+  // Ctrl+V — Colar elementos da área de transferência interna
+  if (tecla === 'v') {
+    if (clipboard.length === 0) return;
+    evento.preventDefault();
+    pasteCount++;
+    const offset = PASTE_OFFSET * pasteCount;
+    const novosElementos = [];
+
+    clipboard.forEach(original => {
+      const clone = duplicarElemento(original, svgCanvas, offset, offset);
+      if (clone) {
+        novosElementos.push(clone);
+      }
+    });
+
+    if (novosElementos.length > 0) {
+      definirElementosSelecionados(novosElementos);
+      registrarAcaoHistorico();
+      atualizarBotoesHistorico();
+    }
+    return;
   }
 });
 
