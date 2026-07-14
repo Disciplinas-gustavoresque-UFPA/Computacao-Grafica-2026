@@ -299,8 +299,9 @@ export class SelecaoTool extends ToolBase {
           el.setAttribute('x2', String(parseFloat(el.getAttribute('x2') || 0) + dx));
           el.setAttribute('y2', String(parseFloat(el.getAttribute('y2') || 0) + dy));
           this._ajustarSkewAoTransladar(el, dx, dy);
-      } else if (tag === 'path' || tag === 'g' || tag == 'polygon') {
-        // Aplica a translação nativa em vez de escrever string template
+      } else if (tag === 'g') {
+          this._definirTranslacao(el, novoX, novoY);
+      } else if (tag === 'path' || tag === 'polygon') {
         this._definirTranslacao(el, novoX, novoY);
         atualizarTransformacao(el);
       }

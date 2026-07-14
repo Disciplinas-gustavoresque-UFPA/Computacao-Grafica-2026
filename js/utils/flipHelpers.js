@@ -1,16 +1,34 @@
 function obterCentro(elemento) {
-
     const box = elemento.getBBox();
 
     return {
         cx: box.x + box.width / 2,
         cy: box.y + box.height / 2
     };
-
 }
 
 function numero(elemento, atributo) {
     return parseFloat(elemento.getAttribute(atributo) || 0);
+}
+
+/**
+ * Lê a translação atual do elemento a partir da lista de transformações SVG.
+ */
+function obterTranslacao(elemento) {
+    const transformList = elemento.transform.baseVal;
+
+    for (let i = 0; i < transformList.numberOfItems; i++) {
+        const item = transformList.getItem(i);
+
+        if (item.type === SVGTransform.SVG_TRANSFORM_TRANSLATE) {
+            return {
+                x: item.matrix.e,
+                y: item.matrix.f
+            };
+        }
+    }
+
+    return { x: 0, y: 0 };
 }
 
 export function atualizarTransformacao(elemento) {
@@ -23,8 +41,8 @@ export function atualizarTransformacao(elemento) {
     const scaleX = flipH ? -1 : 1;
     const scaleY = flipV ? -1 : 1;
 
-    const tx = parseFloat(elemento.dataset.translateX || 0);
-    const ty = parseFloat(elemento.dataset.translateY || 0);
+    // Lê a translação real do SVG
+    const { x: tx, y: ty } = obterTranslacao(elemento);
 
     elemento.setAttribute(
         "transform",
@@ -36,7 +54,6 @@ export function atualizarTransformacao(elemento) {
 }
 
 function alternarEspelhamentoHorizontal(elemento) {
-
     elemento.dataset.flipH =
         elemento.dataset.flipH === "true" ? "false" : "true";
 
@@ -44,7 +61,6 @@ function alternarEspelhamentoHorizontal(elemento) {
 }
 
 function alternarEspelhamentoVertical(elemento) {
-
     elemento.dataset.flipV =
         elemento.dataset.flipV === "true" ? "false" : "true";
 
@@ -55,7 +71,6 @@ export function espelharHorizontal(elemento) {
 
     const tag = elemento.tagName.toLowerCase();
 
-    // Linha
     if (tag === "line") {
 
         const { cx } = obterCentro(elemento);
@@ -69,17 +84,16 @@ export function espelharHorizontal(elemento) {
         return;
     }
 
-    // Imagem, Texto, Retangulo, Desenho a Lapis e Circulo/Elipse
     if (
         tag === "image" ||
         tag === "text" ||
         tag === "rect" ||
         tag === "path" ||
         tag === "circle" ||
-        tag === "ellipse"
+        tag === "ellipse" ||
+        tag === "g"
     ) {
         alternarEspelhamentoHorizontal(elemento);
-        return;
     }
 }
 
@@ -87,7 +101,6 @@ export function espelharVertical(elemento) {
 
     const tag = elemento.tagName.toLowerCase();
 
-    // Linha
     if (tag === "line") {
 
         const { cy } = obterCentro(elemento);
@@ -101,16 +114,15 @@ export function espelharVertical(elemento) {
         return;
     }
 
-    // Imagem, Texto, Retangulo, Desenho a Lapis e Circulo/Elipse
     if (
         tag === "image" ||
         tag === "text" ||
         tag === "rect" ||
         tag === "path" ||
         tag === "circle" ||
-        tag === "ellipse"
+        tag === "ellipse" ||
+        tag === "g"
     ) {
         alternarEspelhamentoVertical(elemento);
-        return;
     }
 }

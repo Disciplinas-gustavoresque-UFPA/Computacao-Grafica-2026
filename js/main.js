@@ -50,6 +50,7 @@ import { Regua } from './core/Regua.js';
 import { LosangoTool } from './tools/LosangoTool.js';
 import { agruparElementos, desagruparElementos } from './core/GroupManager.js';
 import { espelharHorizontal, espelharVertical } from "./utils/flipHelpers.js";
+import { CuboTool } from './tools/CuboTool.js';
 
 const svgCanvas = document.getElementById('canvas');
 
@@ -205,6 +206,7 @@ const instanciasFerramentas = {
   lapis: new Lapis(svgCanvas),
   losango: new LosangoTool(svgCanvas),
   pincel: new PincelTool(svgCanvas),
+  cubo: new CuboTool(svgCanvas),
 };
 
 /**
@@ -247,13 +249,23 @@ botoesFerramenta.forEach((btn) => {
     atualizarBotaoAtivo(ferramentaId);
   });
 });
-
 // Ouvir mudanças no input de cor de preenchimento da sidebar
 inputCorPreenchimento.addEventListener('input', () => {
   const novaCor = inputCorPreenchimento.value;
   definirCorPreenchimento(novaCor);
-  // Preenche cada elemento selecionado com a cor desejada
+
   estado.elementosSelecionados.forEach(el => {
+
+    // Cubo
+    if (el.classList.contains('cubo-3d')) {
+      el.querySelectorAll('polygon').forEach(face => {
+        const brilho = FACE_BRIGHTNESS[face.dataset.face] ?? 0.8;
+        face.setAttribute('fill', ajustarBrilho(novaCor, brilho));
+      });
+      return;
+    }
+
+    // Demais elementos
     el.setAttribute('fill', novaCor);
   });
 });
@@ -262,11 +274,40 @@ inputCorPreenchimento.addEventListener('input', () => {
 inputCorBorda.addEventListener('input', () => {
   const novaCor = inputCorBorda.value;
   definirCorBorda(novaCor);
-  // Colore a borda de cada elemento selecionado com a cor desejada
+
   estado.elementosSelecionados.forEach(el => {
+
+    // Cubo
+    if (el.classList.contains('cubo-3d')) {
+      el.querySelectorAll('polygon').forEach(face => {
+        face.setAttribute('stroke', novaCor);
+      });
+      return;
+    }
+
+    // Demais elementos
     el.setAttribute('stroke', novaCor);
   });
 });
+
+const FACE_BRIGHTNESS = {
+  frente: 1.00,
+  direita: 0.85,
+  esquerda: 0.70,
+  topo: 0.95,
+  fundo: 0.55,
+  'trás': 0.65,
+};
+
+function ajustarBrilho(hex, fator) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+
+  const clamp = v => Math.min(255, Math.max(0, Math.round(v * fator)));
+
+  return `rgb(${clamp(r)}, ${clamp(g)}, ${clamp(b)})`;
+}
 
 function atualizarBotaoEstiloLinhaAtivo(estiloLinha) {
   botoesEstiloLinha.forEach((btn) => {
@@ -488,6 +529,7 @@ window.addEventListener("keydown", (e) => {
     "t" : "texto",
     "i" : "Conta-gotas",
     "g": "losango",
+    "3": "cubo",
   }
 
   const teclaPressionada = e.key.toLowerCase();
