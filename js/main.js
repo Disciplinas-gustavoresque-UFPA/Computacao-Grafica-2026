@@ -52,6 +52,7 @@ import { Regua } from './core/Regua.js';
 import { LosangoTool } from './tools/LosangoTool.js';
 import { agruparElementos, desagruparElementos } from './core/GroupManager.js';
 import { espelharHorizontal, espelharVertical } from "./utils/flipHelpers.js";
+import { ImageTracerManager } from './tools/ImageTracerManager.js';
 
 const svgCanvas = document.getElementById('canvas');
 
@@ -603,6 +604,21 @@ btnImportarImagem.addEventListener('click', () => {
 
 inicializarImportadorImagem(svgCanvas, inputImagem);
 
+// --- Inicialização do ImageTracer ---
+const tracerManager = new ImageTracerManager(svgCanvas, inputImagem);
+
+// Assiste a aba do Tracer para atualizar a lista de imagens quando ela for ativada
+const tabTracer = document.getElementById('tab-tracer');
+if (tabTracer) {
+    const observerTab = new MutationObserver(() => {
+        // Verifica se a classe 'ativo' foi adicionada pela SideBar.js
+        if (tabTracer.classList.contains('ativo')) {
+            tracerManager.atualizarLista();
+        }
+    });
+    observerTab.observe(tabTracer, { attributes: true, attributeFilter: ['class'] });
+}
+
 // Inicializar o estado dos botões de histórico
 atualizarBotoesHistorico();
 
@@ -620,3 +636,18 @@ svgCanvas.addEventListener('wheel', (e) => {
   cameraGlobal.zoom(escala, coords.x, coords.y);
   scrollbar.atualizar();
 }, { passive: false });
+
+// Observa o canvas para atualizar o Tracer automaticamente quando uma imagem for adicionada ou removida
+const observerCanvas = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+        if (mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0) {
+            // Verifica se a aba do tracer está aberta no momento
+            if (tabTracer && tabTracer.classList.contains('ativo')) {
+                tracerManager.atualizarLista();
+            }
+        }
+    });
+});
+
+// Começa a observar a adição/remoção de elementos filhos no svgCanvas
+observerCanvas.observe(svgCanvas, { childList: true });
