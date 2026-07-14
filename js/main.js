@@ -478,6 +478,16 @@ window.addEventListener("keydown", (e) => {
       atualizarBotoesHistorico();
       return;
     }
+    if (e.key === ']' || e.key === '}') {
+      e.preventDefault();
+      moverCamada(e.shiftKey ? 'frente' : 'avancar');
+      return;
+    }
+    if (e.key === '[' || e.key === '{') {
+      e.preventDefault();
+      moverCamada(e.shiftKey ? 'fundo' : 'recuar');
+      return;
+    }
   }
 
   const teclaPressionada = e.key.toLowerCase();
@@ -504,6 +514,15 @@ window.addEventListener("keydown", (e) => {
     } else if (teclaPressionada === "i") {
       e.preventDefault();
       btnImportarImagem?.click();
+    } else if (teclaPressionada === "h") {
+      e.preventDefault();
+      btnFlipHorizontal?.click();
+    } else if (teclaPressionada === "v") {
+      e.preventDefault();
+      btnFlipVertical?.click();
+    } else if (teclaPressionada === "r") {
+      e.preventDefault();
+      btnToggleRegua?.click();
     } else if (mapaTeclasShift[teclaPressionada]) {
       e.preventDefault();
       const botao = document.querySelector(`.btn-ferramenta[data-ferramenta="${mapaTeclasShift[teclaPressionada]}"]`);
