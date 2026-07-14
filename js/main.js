@@ -504,9 +504,11 @@ window.addEventListener("keydown", (e) => {
   if (["input", "textarea", "select"].includes(tagAtiva) || elementoAtivo.isContentEditable)
     return;
 
-  // Atalhos de teclado para o histórico
+  // 1. Agrupamos TODA lógica que depende obrigatoriamente de Ctrl / Cmd
   if (e.ctrlKey || e.metaKey) {
-    if (e.key.toLowerCase() === 'g') {
+    const teclaCtrl = e.key.toLowerCase();
+
+    if (teclaCtrl === 'g') {
       e.preventDefault();
       if (e.shiftKey) {
         desagruparElementos();
@@ -516,7 +518,7 @@ window.addEventListener("keydown", (e) => {
       atualizarBotoesHistorico();
       return;
     }
-    if (e.key.toLowerCase() === 'z') {
+    if (teclaCtrl === 'z') {
       e.preventDefault();
       if (e.shiftKey) {
         refazerAcao();
@@ -526,30 +528,20 @@ window.addEventListener("keydown", (e) => {
       atualizarBotoesHistorico();
       return;
     }
-    if (e.key.toLowerCase() === 'y') {
+    if (teclaCtrl === 'y') {
       e.preventDefault();
       refazerAcao();
       atualizarBotoesHistorico();
       return;
     }
-    // Ctrl+C / Ctrl+V / Ctrl+D são tratados em outro listener — apenas impede
-    // que caiam no mapa de atalhos de ferramenta abaixo.
-    if (['c', 'v', 'd'].includes(e.key.toLowerCase())) {
+    
+    // Agora este bloqueio está protegido dentro do bloco "if (e.ctrlKey || e.metaKey)"
+    // Ele impede que Ctrl+C, Ctrl+V ou Ctrl+D vazem para o mapa de ferramentas abaixo,
+    // mas não interfere quando as teclas C, V ou D são pressionadas sozinhas!
+    if (['c', 'v', 'd'].includes(teclaCtrl)) {
       return;
     }
   }
-
-  const mapaTeclas = {
-    "s" : "selecao",
-    "r" : "retangulo",
-    "e" : "elipse",
-    "l" : "linha",
-    "c" : "linhaCurvada",
-    "p" : "poligono",
-    "t" : "texto",
-    "i" : "Conta-gotas",
-    "g" : "losango",
-  };
 
   // --- LÓGICA DE DELEÇÃO CORRIGIDA ---
   if (e.key === "Delete" || e.key === "Backspace") {
@@ -562,6 +554,19 @@ window.addEventListener("keydown", (e) => {
     }
     return;
   }
+
+  // 2. Se chegou aqui e Ctrl/Cmd NÃO está ativo, as teclas isoladas seguem normalmente para as ferramentas
+  const mapaTeclas = {
+    "s" : "selecao",
+    "r" : "retangulo",
+    "e" : "elipse",
+    "l" : "linha",
+    "c" : "linhaCurvada", // Agora funciona livremente ao digitar "C" sozinho!
+    "p" : "poligono",
+    "t" : "texto",
+    "i" : "Conta-gotas",
+    "g" : "losango",
+  };
 
   const teclaPressionada = e.key.toLowerCase();
   const ferramentaAlvo = e.shiftKey && teclaPressionada === 'c'

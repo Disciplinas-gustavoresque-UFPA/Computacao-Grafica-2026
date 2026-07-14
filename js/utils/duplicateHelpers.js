@@ -1,20 +1,10 @@
-import { criarElementoSVG } from './svgHelpers.js';
-
-const OFFSET_DEFAULT = 20;
-
-const TAG_POS_ATTRS = {
-  rect: { x: 'x', y: 'y' },
-  image: { x: 'x', y: 'y' },
-  text: { x: 'x', y: 'y' },
-  circle: { x: 'cx', y: 'cy' },
-  ellipse: { x: 'cx', y: 'cy' },
-  line: { x: ['x1', 'x2'], y: ['y1', 'y2'] }
-};
-
 function ajustarPosicaoElemento(elemento, offsetX, offsetY) {
   const tag = elemento.tagName ? elemento.tagName.toLowerCase() : '';
 
-  if (tag === 'g') {
+  // Agrupamos as tags que devem ser deslocadas via transform/translate
+  const tagsComTransform = ['g', 'path', 'polygon', 'polyline'];
+
+  if (tagsComTransform.includes(tag)) {
     const transformAttr = elemento.getAttribute('transform') || '';
     let translateX = 0;
     let translateY = 0;
@@ -55,22 +45,4 @@ function ajustarPosicaoElemento(elemento, offsetX, offsetY) {
     const yVal = parseFloat(elemento.getAttribute(attrs.y)) || 0;
     elemento.setAttribute(attrs.y, yVal + offsetY);
   }
-}
-
-function clonarRecursivamente(elemento, offsetX, offsetY) {
-  const clone = elemento.cloneNode(true);
-  ajustarPosicaoElemento(clone, offsetX, offsetY);
-  return clone;
-}
-
-export function duplicarElemento(elemento, svgCanvas, offsetX = OFFSET_DEFAULT, offsetY = OFFSET_DEFAULT) {
-  if (!elemento || !svgCanvas) {
-    console.warn('duplicarElemento: elemento ou svgCanvas inválido');
-    return null;
-  }
-
-  const clone = clonarRecursivamente(elemento, offsetX, offsetY);
-  svgCanvas.appendChild(clone);
-
-  return clone;
 }
