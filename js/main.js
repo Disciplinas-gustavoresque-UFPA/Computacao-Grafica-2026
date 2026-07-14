@@ -18,7 +18,8 @@ import {
   definirGerenciadorHistorico,
   desfazerAcao,
   refazerAcao,
-  registrarAcaoHistorico
+  registrarAcaoHistorico,
+  atualizarPosicaoSelecaoVisual
 } from './core/StateManager.js';
 import { ColorPickerTool } from './tools/ColorPickerTool.js';
 import { Lapis } from './tools/LapisTool.js';
@@ -41,12 +42,15 @@ import { duplicarElemento } from './utils/duplicateHelpers.js';
 import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
 import { SideBar } from './core/SideBar.js';
 import { PincelTool } from './tools/PincelTool.js';
+import {definirEspessuraLapis} from "./core/StateManager.js";
 import { CameraSVG } from './core/CameraSVG.js';
+import { ScrollbarSVG } from './core/ScrollbarSVG.js';
 import { obterCoordenadaSVG } from './utils/svgHelpers.js';
 import { HistoryManager } from './core/HistoryManager.js';
 import { Regua } from './core/Regua.js';
 import { LosangoTool } from './tools/LosangoTool.js';
 import { agruparElementos, desagruparElementos } from './core/GroupManager.js';
+import { espelharHorizontal, espelharVertical } from "./utils/flipHelpers.js";
 
 const svgCanvas = document.getElementById('canvas');
 
@@ -70,6 +74,7 @@ const botoesEstiloLinha = document.querySelectorAll('.btn-line-style');
 const nomeFerramenta = document.getElementById('nome-ferramenta');
 const btnExportar = document.getElementById('btn-exportar');
 const exportFormat = document.getElementById('export-format');
+const inputEspessuraLapis =  document.getElementById("espessura-lapis");
 
 // Botões de histórico
 const btnDesfazer = document.getElementById('btn-desfazer');
@@ -184,8 +189,9 @@ definirGerenciadorSelecao(selecaoVisual);
 
 // Instâncias das ferramentas disponíveis com todas as implementações da main
 const cameraGlobal = new CameraSVG([svgCanvas, overlayCanvas]);
+const scrollbar = new ScrollbarSVG(canvasContainer, svgCanvas, cameraGlobal);
 const instanciasFerramentas = {
-  selecao: new SelecaoTool(svgCanvas),
+  selecao: new SelecaoTool(svgCanvas, selecaoVisual),
   edicaoVertices: new NodeEditTool(svgCanvas),
   retangulo: new RetanguloTool(svgCanvas),
   linha: new LinhaTool(svgCanvas),
@@ -210,14 +216,16 @@ const instanciasFerramentas = {
  * @param {string} nomeDaFerramenta - Identificador da ferramenta ativa.
  */
 function atualizarBotaoAtivo(nomeDaFerramenta) {
+  let btnAtivo = null;
   botoesFerramenta.forEach((btn) => {
     if (btn.getAttribute('data-ferramenta') === nomeDaFerramenta) {
       btn.classList.add('ativo');
+      btnAtivo = btn;
     } else {
       btn.classList.remove('ativo');
     }
   });
-  nomeFerramenta.textContent = nomeDaFerramenta || 'Nenhuma';
+  nomeFerramenta.textContent = btnAtivo?.dataset.nome || 'Nenhuma';
 }
 
 // --- Barra de Ferramentas & Modos ---
@@ -313,6 +321,27 @@ svgCanvas.addEventListener('mousemove', (evento) => {
   }
 });
 
+// O overlay tem pointer-events:none (para não bloquear cliques no canvas),
+// exceto nos elementos de UI que o próprio Selecao habilita explicitamente
+// (ex: alças de skew) — por isso precisa dos mesmos listeners delegados.
+overlayCanvas.addEventListener('mousedown', (evento) => {
+  if (estado.ferramentaAtual) {
+    estado.ferramentaAtual.onMouseDown(evento);
+  }
+});
+
+overlayCanvas.addEventListener('mousemove', (evento) => {
+  if (estado.ferramentaAtual) {
+    estado.ferramentaAtual.onMouseMove(evento);
+  }
+});
+
+overlayCanvas.addEventListener('mouseup', (evento) => {
+  if (estado.ferramentaAtual) {
+    estado.ferramentaAtual.onMouseUp(evento);
+  }
+});
+
 // Previne o menu de opções do botão direito no canvas
 svgCanvas.addEventListener('contextmenu', (e) => {
   if (e.target.closest('#canvas')) {
@@ -329,6 +358,14 @@ atualizarBotaoEstiloLinhaAtivo(estado.estiloLinha);
 btnExportar.addEventListener('click', () => {
   const formato = exportFormat.value || 'png';
   exportarDesenho(svgCanvas, formato);
+});
+
+const valorEspessura =
+    document.getElementById("valor-espessura-lapis");
+
+inputEspessuraLapis.addEventListener("input", (e) => {
+    definirEspessuraLapis(e.target.value);
+    valorEspessura.textContent = e.target.value;
 });
 
 // --- Controle de Camadas (Z-Index) ---
@@ -375,6 +412,32 @@ btnSendToBack.addEventListener('click', () => moverCamada('fundo'));
 btnStepBackward.addEventListener('click', () => moverCamada('recuar'));
 btnStepForward.addEventListener('click', () => moverCamada('avancar'));
 btnBringToFront.addEventListener('click', () => moverCamada('frente'));
+
+// --- Configurar Espelhamento ---
+const btnFlipHorizontal = document.getElementById('btn-flip-horizontal');
+const btnFlipVertical = document.getElementById('btn-flip-vertical');
+
+btnFlipHorizontal.addEventListener("click", () => {
+
+    estado.elementosSelecionados.forEach(el => {
+        espelharHorizontal(el);
+    });
+
+    atualizarPosicaoSelecaoVisual();
+    registrarAcaoHistorico();
+
+});
+
+btnFlipVertical.addEventListener("click", () => {
+
+    estado.elementosSelecionados.forEach(el => {
+        espelharVertical(el);
+    });
+
+    atualizarPosicaoSelecaoVisual();
+    registrarAcaoHistorico();
+
+});
 
 // Atalhos de Teclado (Tool Selection)
 window.addEventListener("keydown", (e) => {
@@ -434,7 +497,7 @@ window.addEventListener("keydown", (e) => {
     ? 'bezier'
     : e.shiftKey && teclaPressionada === 'e'
       ? 'espiral'
-      : mapaTeclas[teclaPressionada];
+    : mapaTeclas[teclaPressionada];
 
   if (ferramentaAlvo) {
     e.preventDefault();
@@ -485,4 +548,5 @@ svgCanvas.addEventListener('wheel', (e) => {
     : 1 - fator;  // scroll para cima  = zoom in
 
   cameraGlobal.zoom(escala, coords.x, coords.y);
+  scrollbar.atualizar();
 }, { passive: false });
