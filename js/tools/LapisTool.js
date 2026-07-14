@@ -1,6 +1,7 @@
 import { ToolBase } from './ToolBase.js';
 import { criarElementoSVG, obterCoordenadaSVG } from '../utils/svgHelpers.js';
 import { estado } from '../core/StateManager.js';
+import { registrarAcaoHistorico } from '../core/StateManager.js';
 
 export class Lapis extends ToolBase {
     constructor(svgCanvas){
@@ -24,10 +25,12 @@ export class Lapis extends ToolBase {
         this.path = criarElementoSVG("path", {
             d: this.d,
             stroke: estado?.corBorda || "black",
-            "stroke-width": 2,
+            "stroke-width": estado.espessuraLapis,
             fill: "none",
             "stroke-linecap": "round",
-            "stroke-linejoin": "round"
+            "stroke-linejoin": "round",
+            "data-x": "0",
+            "data-y": "0"
         });
     
         this.svgCanvas.appendChild(this.path);
@@ -59,5 +62,7 @@ export class Lapis extends ToolBase {
         this.d = "";
         this.ultimoPonto = null;
         this.penultimoPonto = null;
+
+        registrarAcaoHistorico();
     }
 }
