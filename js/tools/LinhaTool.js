@@ -19,6 +19,7 @@ export class LinhaTool extends ToolBase {
     this.svgCanvas = svgCanvas;
     this.isDrawing = false;
     this.lineElement = null;
+    window.linhaTool = this;
   }
 
   onMouseDown(evento) {

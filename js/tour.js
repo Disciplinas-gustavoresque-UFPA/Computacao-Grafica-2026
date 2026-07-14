@@ -43,6 +43,33 @@ const driverObj = window.driver.js.driver({
             popover: {
                 title: 'Linha',
                 description: 'Desenhe linhas entre dois pontos.'
+            },
+            onHighlighted: () => {
+                document.getElementById('btn-criar-linha').click();
+            }
+        },
+        {
+            element: '#btn-line-continua',
+            popover: {
+                title: 'Linha Contínua',
+                description: 'Para uma linha contínua, selecione esta opção antes de desenhar.'
+            }
+        },
+        {
+            element: '#btn-line-tracejada',
+            popover: {
+                title: 'Linha Tracejada',
+                description: 'Para uma linha tracejada, selecione esta opção antes de desenhar.'
+            }
+        },
+        {
+            element: '#btn-line-pontilhada',
+            popover: {
+                title: 'Linha Pontilhada',
+                description: 'Para uma linha pontilhada, selecione esta opção antes de desenhar.'
+            },
+            onDeselected: () => {
+                window.linhaTool.closePanel();
             }
         },
         {
