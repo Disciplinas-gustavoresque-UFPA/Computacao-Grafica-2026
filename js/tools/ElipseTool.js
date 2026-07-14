@@ -8,6 +8,12 @@ import { definirElementosSelecionados } from '../core/StateManager.js';
  * ElipseTool
  * 
  * Ferramenta responsável por desenhar elipses no canvas SVG.
+ *
+ * Modificadores de teclado durante o desenho:
+ * - Ctrl  -> Simetria: força um círculo perfeito (rx === ry).
+ * - Shift -> Centralidade: o ponto inicial do clique vira o centro da
+ *            elipse, em vez de um dos cantos do retângulo delimitador.
+ * (Os dois podem ser usados juntos: círculo desenhado a partir do centro.)
  */
 export class ElipseTool extends ToolBase {
   constructor(svgCanvas) {
@@ -17,6 +23,23 @@ export class ElipseTool extends ToolBase {
     this.startX = 0;
     this.startY = 0;
     this.elipseElement = null;
+
+    // Último ponto do mouse conhecido, usado para recalcular a geometria
+    // imediatamente quando o usuário pressiona/solta Ctrl ou Shift.
+    this.ultimoPonto = null;
+
+    // Estado dos modificadores de teclado
+    this.ctrlPressionado = false;
+    this.shiftPressionado = false;
+
+    // Bindings para poder adicionar/remover os listeners corretamente
+    this.onKeyDownBound = this.onKeyDown.bind(this);
+    this.onKeyUpBound = this.onKeyUp.bind(this);
+  }
+
+  onAtivar() {
+    window.addEventListener('keydown', this.onKeyDownBound);
+    window.addEventListener('keyup', this.onKeyUpBound);
   }
 
   onMouseDown(evento) {
@@ -25,6 +48,7 @@ export class ElipseTool extends ToolBase {
     const pt = obterCoordenadaSVG(evento, this.svgCanvas);
     this.startX = pt.x;
     this.startY = pt.y;
+    this.ultimoPonto = pt;
 
     // Cria o elemento <ellipse>. 
     // Inicialmente com raios zero no ponto de clique.
@@ -44,16 +68,80 @@ export class ElipseTool extends ToolBase {
   onMouseMove(evento) {
     if (!this.isDrawing || !this.elipseElement) return;
 
-    const pt = obterCoordenadaSVG(evento, this.svgCanvas);
+    this.ultimoPonto = obterCoordenadaSVG(evento, this.svgCanvas);
+    this._atualizarElipse();
+  }
 
-    // Cálculos matemáticos para a elipse
-    // O raio é metade da distância absoluta entre o início e o cursor
-    const rx = Math.abs(pt.x - this.startX) / 2;
-    const ry = Math.abs(pt.y - this.startY) / 2;
+  onMouseUp(evento) {
+    this.isDrawing = false;
+    this.elipseElement = null;
+    this.ultimoPonto = null;
 
-    // O centro (cx, cy) deve ser o ponto médio entre o clique inicial e o cursor
-    const cx = (this.startX + pt.x) / 2;
-    const cy = (this.startY + pt.y) / 2;
+    // Integração com o History Manager
+    registrarAcaoHistorico();
+  }
+
+  onKeyDown(evento) {
+    let alterou = false;
+
+    if (evento.key === 'Control' && !this.ctrlPressionado) {
+      this.ctrlPressionado = true;
+      alterou = true;
+    }
+
+    if (evento.key === 'Shift' && !this.shiftPressionado) {
+      this.shiftPressionado = true;
+      alterou = true;
+    }
+
+    // Atualiza a elipse em tempo real, sem precisar mover o mouse
+    if (alterou && this.isDrawing) {
+      this._atualizarElipse();
+    }
+  }
+
+  onKeyUp(evento) {
+    let alterou = false;
+
+    if (evento.key === 'Control') {
+      this.ctrlPressionado = false;
+      alterou = true;
+    }
+
+    if (evento.key === 'Shift') {
+      this.shiftPressionado = false;
+      alterou = true;
+    }
+
+    if (alterou && this.isDrawing) {
+      this._atualizarElipse();
+    }
+  }
+
+  onDesativar() {
+    window.removeEventListener('keydown', this.onKeyDownBound);
+    window.removeEventListener('keyup', this.onKeyUpBound);
+
+    this.ctrlPressionado = false;
+    this.shiftPressionado = false;
+
+    if (this.isDrawing && this.elipseElement) {
+      this.elipseElement.remove();
+      this.isDrawing = false;
+      this.elipseElement = null;
+      this.ultimoPonto = null;
+    }
+  }
+
+  /**
+   * Recalcula e aplica cx, cy, rx e ry no elemento de elipse em desenho,
+   * de acordo com o último ponto do mouse e os modificadores pressionados.
+   * @private
+   */
+  _atualizarElipse() {
+    if (!this.elipseElement || !this.ultimoPonto) return;
+
+    const { cx, cy, rx, ry } = this._calcularGeometria(this.ultimoPonto);
 
     this.elipseElement.setAttribute('cx', cx);
     this.elipseElement.setAttribute('cy', cy);
@@ -61,19 +149,39 @@ export class ElipseTool extends ToolBase {
     this.elipseElement.setAttribute('ry', ry);
   }
 
-  onMouseUp(evento) {
-    this.isDrawing = false;
-    this.elipseElement = null;
+  /**
+   * Calcula o centro (cx, cy) e os raios (rx, ry) da elipse a partir do
+   * ponto inicial do clique, do ponto atual do mouse e dos modificadores
+   * de teclado (Ctrl = simetria/círculo, Shift = desenho a partir do centro).
+   * @private
+   */
+  _calcularGeometria(pt) {
+    const dx = pt.x - this.startX;
+    const dy = pt.y - this.startY;
 
-    // Integração com o History Manager
-    registrarAcaoHistorico();
-  }
+    let cx, cy, rx, ry;
 
-  onDesativar() {
-    if (this.isDrawing && this.elipseElement) {
-      this.elipseElement.remove();
-      this.isDrawing = false;
-      this.elipseElement = null;
+    if (this.shiftPressionado) {
+      // Centralidade: o clique inicial é o centro da elipse
+      cx = this.startX;
+      cy = this.startY;
+      rx = Math.abs(dx);
+      ry = Math.abs(dy);
+    } else {
+      // Comportamento padrão: o clique inicial é um canto do retângulo delimitador
+      cx = (this.startX + pt.x) / 2;
+      cy = (this.startY + pt.y) / 2;
+      rx = Math.abs(dx) / 2;
+      ry = Math.abs(dy) / 2;
     }
+
+    if (this.ctrlPressionado) {
+      // Simetria: força um círculo perfeito, usando o maior raio calculado
+      const raio = Math.max(rx, ry);
+      rx = raio;
+      ry = raio;
+    }
+
+    return { cx, cy, rx, ry };
   }
 }
