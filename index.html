@@ -242,13 +242,30 @@
                 <div class="tabs-container">
                     <div id="tab-estilo" class="tab-content ativo">
                         <h3>Estilo do Objeto</h3>
-                        <label>Preenchimento:
-                            <input type="color" id="cor-preenchimento" value="#4a90d9" />
-                        </label>
 
-                        <label>Borda:
-                            <input type="color" id="cor-borda" value="#1a1a2e" />
-                        </label>
+                        <div class="color-control-group">
+                            <label>Preenchimento:
+                                <input type="color" id="cor-preenchimento" value="#4a90d9" />
+                            </label>
+                            <button id="btn-preenchimento-nenhum" class="btn-color-none" title="Sem preenchimento">❌</button>
+                            <div class="opacity-slider-wrapper">
+                                <label>Opacidade:
+                                    <input type="range" id="opacity-preenchimento" min="0" max="1" step="0.1" value="1" />
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="color-control-group" style="margin-top: 16px;">
+                            <label>Borda:
+                                <input type="color" id="cor-borda" value="#1a1a2e" />
+                            </label>
+                            <button id="btn-borda-nenhum" class="btn-color-none" title="Sem borda">❌</button>
+                            <div class="opacity-slider-wrapper">
+                                <label>Opacidade:
+                                    <input type="range" id="opacity-borda" min="0" max="1" step="0.1" value="1" />
+                                </label>
+                            </div>
+                        </div>
                     </div>
 
                     <div id="tab-tracer" class="tab-content"></div>
