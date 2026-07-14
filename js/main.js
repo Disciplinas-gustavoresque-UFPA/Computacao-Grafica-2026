@@ -52,6 +52,7 @@ import { Regua } from './core/Regua.js';
 import { LosangoTool } from './tools/LosangoTool.js';
 import { agruparElementos, desagruparElementos } from './core/GroupManager.js';
 import { espelharHorizontal, espelharVertical } from "./utils/flipHelpers.js";
+import { salvarRascunho, marcarSalvo } from './utils/autoSave.js';
 
 const svgCanvas = document.getElementById('canvas');
 
@@ -60,7 +61,7 @@ const historyManager = new HistoryManager(svgCanvas);
 definirGerenciadorHistorico(historyManager);
 
 // Inicializar a tela de menu inicial
-inicializarMenuInicial(svgCanvas);
+inicializarMenuInicial(svgCanvas, definirCorPreenchimento, definirCorBorda);
 
 // Inicializar a sidebar
 const barraLateral = new SideBar();
@@ -76,6 +77,10 @@ const nomeFerramenta = document.getElementById('nome-ferramenta');
 const btnExportar = document.getElementById('btn-exportar');
 const exportFormat = document.getElementById('export-format');
 const inputEspessuraLapis = document.getElementById("espessura-lapis");
+
+const indicadorNaoSalvo = document.getElementById('indicador-nao-salvo');
+function mostrarIndicadorNaoSalvo() { if (indicadorNaoSalvo) indicadorNaoSalvo.classList.remove('oculto'); }
+function ocultarIndicadorNaoSalvo() { if (indicadorNaoSalvo) indicadorNaoSalvo.classList.add('oculto'); }
 
 // Botões de histórico
 const btnDesfazer = document.getElementById('btn-desfazer');
@@ -327,6 +332,10 @@ svgCanvas.addEventListener('mouseup', (evento) => {
     definirCorPreenchimento(corPreenchimentoAtual);
     definirCorBorda(corBordaAtual);
   }
+
+  // Auto-save silencioso após cada ação de desenho concluída no canvas principal
+  salvarRascunho(svgCanvas, estado, 'editor');
+  mostrarIndicadorNaoSalvo();
 });
 
 btnPreenchimentoNenhum.addEventListener('click', () => {
@@ -408,6 +417,10 @@ overlayCanvas.addEventListener('mouseup', (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseUp(evento);
   }
+
+  // Auto-save silencioso após ações realizadas via overlay (ex: mover seleções, lápis)
+  salvarRascunho(svgCanvas, estado, 'editor');
+  mostrarIndicadorNaoSalvo();
 });
 
 // Previne o menu de opções do botão direito no canvas
@@ -426,6 +439,8 @@ atualizarBotaoEstiloLinhaAtivo(estado.estiloLinha);
 btnExportar.addEventListener('click', () => {
   const formato = exportFormat.value || 'png';
   exportarDesenho(svgCanvas, formato);
+  marcarSalvo();
+  ocultarIndicadorNaoSalvo();
 });
 
 const valorEspessura = document.getElementById("valor-espessura-lapis");
