@@ -51,6 +51,7 @@ import { Regua } from './core/Regua.js';
 import { LosangoTool } from './tools/LosangoTool.js';
 import { agruparElementos, desagruparElementos } from './core/GroupManager.js';
 import { espelharHorizontal, espelharVertical } from "./utils/flipHelpers.js";
+import { ImageTracerManager } from './tools/ImageTracerManager.js';
 
 const svgCanvas = document.getElementById('canvas');
 
