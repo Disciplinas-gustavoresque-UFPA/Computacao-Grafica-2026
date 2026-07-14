@@ -113,22 +113,40 @@ export class CameraSVG {
   zoomToRect(x, y, width, height) {
     if (!width || !height || width <= 0) return;
 
-    const minW = this.initialViewBox.width / (this.maxZoomLimit / 100);
+    // 1. Pega a proporção física real da tela em pixels
+    const svgEl = this.svgs[0];
+    const screenWidth = svgEl.clientWidth || 800;
+    const screenHeight = svgEl.clientHeight || 600;
+    const aspect = screenWidth / screenHeight;
 
-    // Se o usuário selecionou uma área minúscula que estouraria o limite:
-    if (width < minW) {
-      const correctionScale = minW / width;
-      const newW = minW;
-      const newH = height * correctionScale;
+    let newWidth = width;
+    let newHeight = height;
 
-      // Centraliza o novo viewBox seguro no retângulo original
-      x = x - (newW - width) / 2;
-      y = y - (newH - height) / 2;
-      width = newW;
-      height = newH;
+    // 2. Ajusta o retângulo matemático
+    if (newWidth / newHeight > aspect) {
+      newHeight = newWidth / aspect;
+    } else {
+      newWidth = newHeight * aspect;
     }
 
-    this.viewBox = { x, y, width, height };
+    const minW = this.initialViewBox.width / (this.maxZoomLimit / 100);
+
+    // 3. Se ultrapassar o limite, crava o tamanho mínimo seguro matematicamente
+    if (newWidth < minW) {
+      newWidth = minW;
+      newHeight = minW / aspect;
+    }
+
+    // Centraliza o novo viewBox seguro no retângulo original
+    const cx = x + width / 2;
+    const cy = y + height / 2;
+
+    this.viewBox = {
+      x: cx - newWidth / 2,
+      y: cy - newHeight / 2,
+      width: newWidth,
+      height: newHeight,
+    };
     this.applyViewBox();
   }
 
@@ -136,22 +154,35 @@ export class CameraSVG {
   zoomOutFromRect(x, y, width, height) {
     if (!width || !height || width <= 0) return;
 
-    let scale = Math.max(
-      this.viewBox.width / width,
-      this.viewBox.height / height,
-    );
+    // 1. Pega a proporção física real da tela em pixels (Igual ao Zoom In)
+    const svgEl = this.svgs[0];
+    const screenWidth = svgEl.clientWidth || 800;
+    const screenHeight = svgEl.clientHeight || 600;
+    const aspect = screenWidth / screenHeight;
+
+    let adjustedWidth = width;
+    let adjustedHeight = height;
+
+    // 2. Ajusta o retângulo desenhado para casar com a proporção da tela
+    if (adjustedWidth / adjustedHeight > aspect) {
+      adjustedHeight = adjustedWidth / aspect;
+    } else {
+      adjustedWidth = adjustedHeight * aspect;
+    }
+
+    // 3. Calcula o fator de expansão do viewBox
+    // Se o usuário desenhou um retângulo que ocupa 20% da tela, o viewBox precisa crescer 5x
+    const scale = this.viewBox.width / adjustedWidth;
 
     let newWidth = this.viewBox.width * scale;
     let newHeight = this.viewBox.height * scale;
 
-    // Qual é a maior largura permitida (10% de zoom)?
+    // 4. Trava no limite máximo de distanciamento (Zoom Out mínimo, ex: 10%)
     const maxW = this.initialViewBox.width / (this.minZoomLimit / 100);
 
-    // Se a operação for afastar a tela além dos 10%:
     if (newWidth > maxW) {
-      scale = maxW / this.viewBox.width; // Recalcula escala limite
       newWidth = maxW;
-      newHeight = this.viewBox.height * scale;
+      newHeight = maxW / aspect;
     }
 
     this.viewBox = {

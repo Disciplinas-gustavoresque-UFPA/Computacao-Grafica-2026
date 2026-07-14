@@ -153,7 +153,10 @@ export class LupaTool extends ToolBase {
     const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
     rect.setAttribute("fill", "rgba(0,0,255,0.15)");
     rect.setAttribute("stroke", "blue");
+    rect.setAttribute("stroke-width", "1");
     rect.setAttribute("stroke-dasharray", "4");
+    rect.setAttribute("vector-effect", "non-scaling-stroke");
+    rect.setAttribute("pointer-events", "none");
     this.overlaySvg.appendChild(rect);
     this.drag.rect = rect;
   }
@@ -196,6 +199,8 @@ export class LupaTool extends ToolBase {
 
   // Inicio da interação com o mouse
   onMouseDown(evento) {
+    evento.preventDefault();
+
     const coords = obterCoordenadaSVG(evento, this.svg);
 
     // Botão do meio ( Reset do viebox, independente do modo)
@@ -228,6 +233,8 @@ export class LupaTool extends ToolBase {
 
   // Atualiza retangulo de seleção em relação a posiçao
   onMouseMove(evento) {
+    evento.preventDefault();
+
     if (!this.drag.active || !this.drag.rect) return;
 
     const coords = obterCoordenadaSVG(evento, this.svg);
@@ -254,24 +261,24 @@ export class LupaTool extends ToolBase {
     const width = Math.abs(coords.x - this.drag.start.x);
     const height = Math.abs(coords.y - this.drag.start.y);
 
+    const acaoBotao = this.drag.button;
+    this.cleanupDrag();
+
     // Ignora seleções muito pequenas
-    if (width < 5 || height < 5) {
-      this.cleanupDrag();
+    if (width === 0 || height === 0) {
       return;
     }
 
     // Zoom In
-    if (evento.button === 0) {
+    if (acaoBotao === 0) {
       this.camera.zoomToRect(x, y, width, height);
     }
 
     // Zoom Out
-    if (evento.button === 2) {
+    if (acaoBotao === 2) {
       this.camera.zoomOutFromRect(x, y, width, height);
     }
-
     this.updateZoomIndicator();
-    this.cleanupDrag();
   }
 
   // Interação do scroll do mouse (zoom conforme movimento do scroll)
@@ -286,6 +293,13 @@ export class LupaTool extends ToolBase {
     this.updateZoomIndicator();
   }
 
+  onMouseLeave(evento) {
+    if (!this.drag.active) {
+      return;
+    } else {
+      this.onMouseUp(evento);
+    }
+  }
   /* ============================================
     Ciclo de Vida
   ============================================ */
@@ -293,7 +307,9 @@ export class LupaTool extends ToolBase {
   // Ativa ferramenta, exibe painel de opcoes do zoom e o Indicador de Zoom
   onAtivar() {
     this._wheelHandler = (e) => this.onWheel(e);
+    this._leaveHandler = (e) => this.onMouseLeave(e);
     this.svg.addEventListener("wheel", this._wheelHandler, { passive: false });
+    this.svg.addEventListener("mouseleave", this._leaveHandler);
     this.openPanel();
     this.updateCursor();
     this.updateZoomIndicator();
@@ -305,7 +321,10 @@ export class LupaTool extends ToolBase {
       this.svg.removeEventListener("wheel", this._wheelHandler);
       this._wheelHandler = null;
     }
-
+    if (this._leaveHandler) {
+      this.svg.removeEventListener("mouseleave", this._leaveHandler);
+      this._leaveHandler = null;
+    }
     this.cleanupDrag();
     this.closePanel();
 
