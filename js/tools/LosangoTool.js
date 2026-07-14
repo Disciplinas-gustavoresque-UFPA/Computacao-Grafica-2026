@@ -30,6 +30,7 @@ export class LosangoTool extends ToolBase {
     this.losnElement = criarElementoSVG('polygon', {
       x: this.startX,
       y: this.startY,
+      'data-shape': 'losango',
       width: 0,
       height: 0,
       fill: estado.corPreenchimento,

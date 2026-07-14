@@ -43,6 +43,7 @@ import { PincelTool } from './tools/PincelTool.js';
 import { CameraSVG } from './core/CameraSVG.js';
 import { obterCoordenadaSVG } from './utils/svgHelpers.js';
 import { HistoryManager } from './core/HistoryManager.js';
+import { Regua } from './core/Regua.js';
 import { LosangoTool } from './tools/LosangoTool.js';
 import { agruparElementos, desagruparElementos } from './core/GroupManager.js';
 
@@ -133,6 +134,8 @@ const canvasContainer = document.createElement('div');
 canvasContainer.style.position = 'relative';
 canvasContainer.style.width = '100%';
 canvasContainer.style.height = '100%';
+canvasContainer.style.paddingTop = '20px';
+canvasContainer.style.paddingLeft = '20px';
 
 // Encapsulando o svg original
 svgCanvas.parentNode.insertBefore(canvasContainer, svgCanvas);
@@ -148,6 +151,16 @@ overlayCanvas.style.top = '0';
 overlayCanvas.style.left = '0';
 overlayCanvas.style.pointerEvents = 'none'; // Coordenado com o principal
 canvasContainer.appendChild(overlayCanvas);
+
+// Réguas de medida (em pixels) nas bordas do canvas
+const regua = new Regua(canvasContainer, svgCanvas);
+const btnToggleRegua = document.getElementById('btn-toggle-regua');
+if (btnToggleRegua) {
+  btnToggleRegua.addEventListener('click', () => {
+    const ativa = regua.alternar();
+    btnToggleRegua.classList.toggle('ativo', ativa);
+  });
+}
 
 // Sincronizar viewBox entre canvas principal e overlay quando necessário
 const observer = new MutationObserver((mutations) => {

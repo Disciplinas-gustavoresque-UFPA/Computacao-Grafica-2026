@@ -13,7 +13,6 @@ jobs:
       - name: Atualizar Status no GitHub Projects V2
         uses: leonsteinhaeuser/project-beta-automations@v2.2.1
         with:
-          # Usa o token VIP
           gh_token: ${{ secrets.PROJECT_PAT }}
           organization: "Disciplinas-gustavoresque-UFPA"
           project_id: 1 
