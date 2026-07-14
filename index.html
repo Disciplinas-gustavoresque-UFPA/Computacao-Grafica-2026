@@ -292,7 +292,40 @@
             </label>
           </div>
 
-          <div id="tab-tracer" class="tab-content"></div>
+          <div id="tab-tracer" class="tab-content">
+            <h3>Vetorizar Imagem</h3>
+            
+            <!-- Estado vazio: Nenhuma imagem -->
+            <div id="tracer-empty-state" class="oculto">
+                <p style="font-size: 0.9em; color: #666; margin-bottom: 10px;">
+                    Nenhuma imagem rasterizada encontrada no canvas.
+                </p>
+                <button id="btn-tracer-importar" class="btn-menu">Importar Imagem</button>
+            </div>
+
+            <!-- Lista de imagens e configurações -->
+            <div id="tracer-conteudo">
+                <label class="propriedade-label">Selecione a imagem:</label>
+                <div id="tracer-lista-imagens" class="lista-imagens-container" style="max-height: 120px; overflow-y: auto; margin-bottom: 15px; border: 1px solid #ccc; padding: 5px;">
+                    <!-- Lista injetada via JS -->
+                </div>
+
+                <label for="tracer-preset" class="propriedade-label">Predefinição de estilo:</label>
+                <div class="select-wrapper" style="margin-bottom: 15px;">
+                    <select id="tracer-preset" class="select-format">
+                        <option value="default" selected>Padrão</option>
+                        <option value="posterized2">Posterizado (2 cores)</option>
+                        <option value="artistic1">Artístico detalhado</option>
+                        <option value="bw">Preto e Branco</option>
+                    </select>
+                    <svg class="select-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                      <path d="M7 10l5 5 5-5z" />
+                    </svg>
+                </div>
+
+                <button id="btn-tracer-aplicar" class="btn-menu">Aplicar Vetorização</button>
+            </div>
+          </div>
 
           <div id="tab-camadas" class="tab-content"></div>
         </div>
