@@ -1,10 +1,11 @@
 import { definirInterface, definirAreaPagina } from './StateManager.js';
+import { restaurarRascunho, obterTelaRascunho, limparRascunho, STORAGE_KEY } from '../utils/autoSave.js';
 
 /**
  * Inicializa os ouvintes de evento para a Tela Inicial
  * @param {SVGSVGElement} svgCanvas - A referência ao canvas principal
  */
-export function inicializarMenuInicial(svgCanvas) {
+export function inicializarMenuInicial(svgCanvas, definirCorPreenchimento, definirCorBorda) {
     const telaInicial = document.getElementById('tela-inicial');
     const telaEditor = document.getElementById('app');
     
@@ -19,6 +20,25 @@ export function inicializarMenuInicial(svgCanvas) {
         definirInterface('editor');
         svgCanvas.dispatchEvent(new CustomEvent('canvas-cleared'));
     }
+
+    // ── Auto-Save: verificar rascunho ao iniciar ──────────────────────────────
+    const telaRascunho = obterTelaRascunho();
+    const temRascunho = !!localStorage.getItem(STORAGE_KEY);
+
+    if (temRascunho && telaRascunho === 'editor') {
+      const restaurar = confirm(
+        'Encontramos um rascunho não salvo. Deseja restaurar o seu trabalho anterior?'
+      );
+
+      if (restaurar) {
+        restaurarRascunho(svgCanvas, definirCorPreenchimento, definirCorBorda);
+        irParaEditor();
+      } else {
+        limparRascunho();
+      }
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+
 
     // 1. Lógica: Criar Novo Documento
     btnNovoDoc.addEventListener('click', () => {
@@ -36,6 +56,7 @@ export function inicializarMenuInicial(svgCanvas) {
         }
         
         svgCanvas.innerHTML = '';
+        limparRascunho();
         irParaEditor();
     });
 
@@ -67,6 +88,7 @@ export function inicializarMenuInicial(svgCanvas) {
                     svgCanvas.setAttribute('viewBox', svgImportado.getAttribute('viewBox'));
                 }
                 
+                limparRascunho();
                 irParaEditor();
             };
             leitor.readAsText(arquivo);

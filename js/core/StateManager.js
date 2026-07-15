@@ -8,21 +8,31 @@
  * - ferramentaAtual {ToolBase|null} - Instância da ferramenta de desenho ativa.
  * - corPreenchimento {string}       - Cor de preenchimento dos elementos (formato hex).
  * - corBorda {string}               - Cor da borda/stroke dos elementos (formato hex).
+ * - estiloLinha {string}            - Estilo visual usado pela ferramenta de linha.
  * - elementosSelecionados {SVGElement[]} - Elementos SVG atualmente selecionados.
  * - interfaceAtual {string}         - Flag para sabermos a tela onde o usuário está.
+ * - areaPagina {Object}            - Área da página (x, y, width, height).
+ * - espessuraLapis {number}        - Espessura do traço da ferramenta lápis.
  */
 
-/** @type {{ ferramentaAtual: import('../tools/ToolBase.js').ToolBase|null, corPreenchimento: string, corBorda: string, elementosSelecionados: SVGElement[], interfaceAtual: string, areaPagina: {x: number, y: number, width: number, height: number} }} */
+/** @type {{ ferramentaAtual: import('../tools/ToolBase.js').ToolBase|null, corPreenchimento: string, corBorda: string, estiloLinha: string, elementosSelecionados: SVGElement[], interfaceAtual: string, areaPagina: {x: number, y: number, width: number, height: number} }} */
 export const estado = {
   ferramentaAtual: null,
   corPreenchimento: '#4a90d9',
   corBorda: '#1a1a2e',
+  estiloLinha: 'continua',
   interfaceAtual: 'inicio',
   elementosSelecionados: [],
   areaPagina: { x: 0, y: 0, width: 800, height: 1131 },
+  espessuraLapis: 2,
 };
 
 let gerenciadorSelecaoVisual = null;
+
+
+export function definirEspessuraLapis(espessura) {
+  estado.espessuraLapis = Number(espessura);
+}
 
 export function definirGerenciadorSelecao(selecao) {
   gerenciadorSelecaoVisual = selecao;
@@ -74,6 +84,10 @@ export function definirCorPreenchimento(cor) {
  */
 export function definirCorBorda(cor) {
   estado.corBorda = cor;
+}
+
+export function definirEstiloLinha(estilo) {
+  estado.estiloLinha = estilo;
 }
 
 /**
