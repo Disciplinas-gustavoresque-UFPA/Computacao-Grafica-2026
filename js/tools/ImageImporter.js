@@ -74,10 +74,6 @@ export function inicializarImportadorImagem(svgCanvas, inputImagem) {
 
         // (Opcional) Define explicitamente como 'none' para forçar o preenchimento da caixa
         svgImage.setAttribute('preserveAspectRatio', 'none');
-
-        svgImage.style.width = `${larguraFinal}px`;
-        svgImage.style.height = `${alturaFinal}px`;
-        svgImage.style.display = 'block';
         
         svgImage.classList.add('elemento-desenho'); 
 
