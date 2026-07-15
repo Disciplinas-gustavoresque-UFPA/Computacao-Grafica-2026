@@ -96,7 +96,7 @@ export class BorrachaTool extends ToolBase {
       if (
         elemento &&
         elemento !== this.svgCanvas &&
-        elemento.parentNode === this.svgCanvas
+        (elemento.parentNode === this.svgCanvas || elemento.parentNode?.parentNode === this.svgCanvas)
       ) {
         const tag = elemento.tagName?.toLowerCase();
         if (this.allowedTags.includes(tag)) {
@@ -129,7 +129,8 @@ export class BorrachaTool extends ToolBase {
     if (
       elemento &&
       elemento !== this.svgCanvas &&
-      elemento.parentNode === this.svgCanvas &&
+      (elemento.parentNode === this.svgCanvas || elemento.parentNode?.parentNode === this.svgCanvas)
+      &&
       this.allowedTags.includes(tag)
     ) {
       elemento.remove();
