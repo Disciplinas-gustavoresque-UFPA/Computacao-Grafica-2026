@@ -35,10 +35,11 @@ export class RetanguloTool extends ToolBase {
       width: 0,
       height: 0,
       fill: estado.corPreenchimento,
+      'fill-opacity': estado.opacidadePreenchimento, // Injetado
       stroke: estado.corBorda,
+      'stroke-opacity': estado.opacidadeBorda,       // Injetado
       'stroke-width': 2
     });
-
     this.svgCanvas.appendChild(this.rectElement);
   }
 

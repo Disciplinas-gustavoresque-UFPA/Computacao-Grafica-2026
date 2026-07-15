@@ -34,7 +34,9 @@ export class ElipseTool extends ToolBase {
       rx: 0,
       ry: 0,
       fill: estado.corPreenchimento,
+      'fill-opacity': estado.opacidadePreenchimento, // Injetado
       stroke: estado.corBorda,
+      'stroke-opacity': estado.opacidadeBorda,       // Injetado
       'stroke-width': 2
     });
 
