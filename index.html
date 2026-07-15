@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Editor Vetorial — Computação Gráfica 2026</title>
+  <link rel="stylesheet" href="css/tracer.css" />
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/contextMenu.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
@@ -59,34 +60,71 @@
         </button>
       </div>
 
+      <!-- Painel de Alinhamento (visível apenas com múltiplos objetos selecionados) -->
+      <div id="painel-alinhamento" class="painel-alinhamento oculto">
+        <span class="propriedade-label align-label">Alinhar:</span>
+        <div class="align-group">
+          <!-- Horizontal -->
+          <button id="btn-alinhar-esquerda" class="btn-align" title="Alinhar à Esquerda">
+            <svg viewBox="0 0 20 20" fill="currentColor"><rect x="2" y="4" width="2" height="12"/><rect x="4" y="6" width="8" height="3"/><rect x="4" y="11" width="12" height="3"/></svg>
+          </button>
+          <button id="btn-alinhar-centro-h" class="btn-align" title="Centralizar Horizontalmente">
+            <svg viewBox="0 0 20 20" fill="currentColor"><rect x="9" y="2" width="2" height="16"/><rect x="4" y="5" width="12" height="3"/><rect x="6" y="12" width="8" height="3"/></svg>
+          </button>
+          <button id="btn-alinhar-direita" class="btn-align" title="Alinhar à Direita">
+            <svg viewBox="0 0 20 20" fill="currentColor"><rect x="16" y="4" width="2" height="12"/><rect x="8" y="6" width="8" height="3"/><rect x="4" y="11" width="12" height="3"/></svg>
+          </button>
+          <div class="align-separator"></div>
+          <!-- Vertical -->
+          <button id="btn-alinhar-topo" class="btn-align" title="Alinhar ao Topo">
+            <svg viewBox="0 0 20 20" fill="currentColor"><rect x="4" y="2" width="12" height="2"/><rect x="6" y="4" width="3" height="8"/><rect x="11" y="4" width="3" height="12"/></svg>
+          </button>
+          <button id="btn-alinhar-centro-v" class="btn-align" title="Centralizar Verticalmente">
+            <svg viewBox="0 0 20 20" fill="currentColor"><rect x="2" y="9" width="16" height="2"/><rect x="5" y="4" width="3" height="12"/><rect x="12" y="6" width="3" height="8"/></svg>
+          </button>
+          <button id="btn-alinhar-base" class="btn-align" title="Alinhar à Base">
+            <svg viewBox="0 0 20 20" fill="currentColor"><rect x="4" y="16" width="12" height="2"/><rect x="6" y="8" width="3" height="8"/><rect x="11" y="4" width="3" height="12"/></svg>
+          </button>
+          <div class="align-separator"></div>
+          <!-- Distribuição -->
+          <button id="btn-distribuir-h" class="btn-align" title="Distribuir Horizontalmente (mín. 3)">
+            <svg viewBox="0 0 20 20" fill="currentColor"><rect x="2" y="4" width="2" height="12"/><rect x="16" y="4" width="2" height="12"/><rect x="8" y="6" width="4" height="8"/></svg>
+          </button>
+          <button id="btn-distribuir-v" class="btn-align" title="Distribuir Verticalmente (mín. 3)">
+            <svg viewBox="0 0 20 20" fill="currentColor"><rect x="4" y="2" width="12" height="2"/><rect x="4" y="16" width="12" height="2"/><rect x="6" y="8" width="8" height="4"/></svg>
+          </button>
+        </div>
+      </div>
+
       <!-- Controle de Camadas -->
       <div class="layer-controls">
-        <button id="btn-send-to-back" data-tooltip="Enviar para o Fundo" class="btn-layer" title="Enviar para o Fundo">⏮</button>
-        <button id="btn-step-backward" data-tooltip="Recuar" class="btn-layer" title="Recuar">⏪</button>
-        <button id="btn-step-forward" data-tooltip="Avançar" class="btn-layer" title="Avançar">⏩</button>
-        <button id="btn-bring-to-front" data-tooltip="Trazer para a Frente" class="btn-layer" title="Trazer para a Frente">⏭</button>
+        <button id="btn-send-to-back" data-tooltip="Enviar para o Fundo (Ctrl+Shift+[)" class="btn-layer" title="Enviar para o Fundo (Ctrl+Shift+[)">⏮</button>
+        <button id="btn-step-backward" data-tooltip="Recuar (Ctrl+[)" class="btn-layer" title="Recuar (Ctrl+[)">⏪</button>
+        <button id="btn-step-forward" data-tooltip="Avançar (Ctrl+])" class="btn-layer" title="Avançar (Ctrl+])">⏩</button>
+        <button id="btn-bring-to-front" data-tooltip="Trazer para a Frente (Ctrl+Shift+])" class="btn-layer" title="Trazer para a Frente (Ctrl+Shift+])">⏭</button>
       </div>
 
       <!-- Botões de Espelhamento -->
-      <button id="btn-flip-horizontal" class="btn-layer" data-tooltip="Espelhar Horizontal" title="Espelhar Horizontal">
+      <button id="btn-flip-horizontal" class="btn-layer" data-tooltip="Espelhar Horizontal (Shift+H)" title="Espelhar Horizontal (Shift+H)">
         ↔
       </button>
 
-      <button id="btn-flip-vertical" class="btn-layer" data-tooltip="Espelhar Vertical" title="Espelhar Vertical">
+      <button id="btn-flip-vertical" class="btn-layer" data-tooltip="Espelhar Vertical (Shift+V)" title="Espelhar Vertical (Shift+V)">
         ↕
       </button>
 
       <!-- Controle de Visualização (Réguas de medida) -->
       <div class="view-controls">
-        <button id="btn-toggle-regua" data-tooltip="Mostrar/Ocultar Réguas" class="btn-layer" title="Mostrar/Ocultar Réguas">📏</button>
+        <button id="btn-toggle-regua" data-tooltip="Mostrar/Ocultar Réguas (Shift+R)" class="btn-layer" title="Mostrar/Ocultar Réguas (Shift+R)">📏</button>
       </div>
 
-      <!-- Botão de exportar/descarregar desenho -->
+      <!-- Botão de Primeiros Passos -->
       <button id="btn-primeiros-passos" class="btn-ajuda">
         <i class="btn-primeiros-passos-i" data-lucide="info"></i>
         Primeiros Passos
       </button>
 
+      <!-- Seção de Exportação (Corrigida e única) -->
       <label for="export-format" class="propriedade-label">Exportar:</label>
       <div class="select-wrapper">
         <select class="select-format" id="export-format" title="Formato de exportação">
@@ -94,20 +132,22 @@
           <option value="jpg">JPG</option>
           <option value="svg">SVG</option>
         </select>
-
         <svg class="select-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <path d="M7 10l5 5 5-5z" />
         </svg>
       </div>
+
+      <!-- Botão Baixar -->
       <button class="cssbuttons-io-button btn-exportar" id="btn-exportar" data-tooltip="Salvar/Exportar desenho" title="Salvar/Exportar desenho">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
           <path fill="none" d="M0 0h24v24H0z"></path>
-          <path fill="white"
-            d="M1 14.5a6.496 6.496 0 0 1 3.064-5.519 8.001 8.001 0 0 1 15.872 0 6.5 6.5 0 0 1-2.936 12L7 21c-3.356-.274-6-3.078-6-6.5zm15.848 4.487a4.5 4.5 0 0 0 2.03-8.309l-.807-.503-.12-.942a6.001 6.001 0 0 0-11.903 0l-.12.942-.805.503a4.5 4.5 0 0 0 2.029 8.309l.173.013h9.35l.173-.013zM13 12h3l-4 5-4-5h3V8h2v4z">
-          </path>
+          <path fill="white" d="M1 14.5a6.496 6.496 0 0 1 3.064-5.519 8.001 8.001 0 0 1 15.872 0 6.5 6.5 0 0 1-2.936 12L7 21c-3.356-.274-6-3.078-6-6.5zm15.848 4.487a4.5 4.5 0 0 0 2.03-8.309l-.807-.503-.12-.942a6.001 6.001 0 0 0-11.903 0l-.12.942-.805.503a4.5 4.5 0 0 0 2.029 8.309l.173.013h9.35l.173-.013zM13 12h3l-4 5-4-5h3V8h2v4z"></path>
         </svg>
         <span style="color: white;">Baixar</span>
       </button>
+      <span id="indicador-nao-salvo" class="indicador-nao-salvo oculto" aria-live="polite">
+          ● Modificações não salvas
+      </span>
 
     </header>
 
@@ -123,7 +163,7 @@
         <button id="btn-criar-retangulo" class="btn-ferramenta" data-ferramenta="retangulo" data-nome="Retângulo" data-tooltip="Retângulo (R)" title="Retângulo (R)">
           <i class="ti ti-rectangle"></i>
         </button>
-        <button id="btn-criar-losango" class="btn-ferramenta" data-ferramenta="losango" data-nome="Losango" data-tooltip="Losango (G)" title="Losango (G)">
+<button id="btn-criar-losango" class="btn-ferramenta" data-ferramenta="losango" data-nome="Losango" data-tooltip="Losango (H)" title="Losango (H)">
           <i class="ti ti-diamonds"></i>
         </button>
         <button id="btn-criar-elipse" class="btn-ferramenta" data-ferramenta="elipse" data-nome="Elipse" data-tooltip="Elipse (E)" title="Elipse (E)">
@@ -180,8 +220,9 @@
           <i class="ti ti-pencil-minus"></i>
         </button>
 
-        <button id="btn-pincel" class="btn-ferramenta" data-ferramenta="pincel" data-nome="Pincel" data-tooltip="Pincel dinâmico" title="Pincel dinâmico">
+        <button id="btn-pincel" class="btn-ferramenta" data-ferramenta="pincel" data-nome="Pincel" data-tooltip="Pincel dinâmico (D)" title="Pincel dinâmico (D)">
           <i class="ti ti-brush"></i>
+        </button>
         </button>
 
         <button id="btn-zoom-click" class="btn-ferramenta" data-ferramenta="lupa" data-nome="Zoom" data-tooltip="Zoom (Z)" title="Zoom (Z)">
@@ -195,6 +236,38 @@
         </button>
 
         <input type="file" id="input-imagem" accept="image/png, image/jpeg, image/svg+xml" style="display: none;" />
+
+
+        <button
+          id="btn-medidor"
+          class="btn-ferramenta"
+          data-ferramenta="medidor"
+          data-nome="Medidor"
+          data-tooltip="Medidor (M)"
+          title="Medidor (M)">
+
+          <svg xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round">
+
+            <!-- Linha principal -->
+            <line x1="4" y1="18" x2="20" y2="6"/>
+
+            <!-- Marcações -->
+            <line x1="6" y1="17" x2="7" y2="16"/>
+            <line x1="9" y1="14" x2="10" y2="13"/>
+            <line x1="12" y1="11" x2="13" y2="10"/>
+            <line x1="15" y1="8" x2="16" y2="7"/>
+            <line x1="18" y1="5" x2="19" y2="4"/>
+          </svg>
+
+        </button>
       </aside>
 
       <!-- Área Central de Desenho -->
@@ -205,22 +278,23 @@
       </main>
       <aside id="barra-configuracoes">
         <button id="btn-toggle-sidebar" title="Esconder Painel">❯</button>
-        <nav class="tabs-nav"></nav>
+
+        <nav class="tabs-nav">
+          <button class="tab-btn ativo" data-target="tab-estilo">Estilo</button>
+          <button class="tab-btn" data-target="tab-tracer">Vetorizar</button>
+          <button class="tab-btn" data-target="tab-camadas">Camadas</button>
+        </nav>
 
         <div class="tabs-container">
           <div id="tab-estilo" class="tab-content ativo">
             <h3>Estilo do Objeto</h3>
 
             <div class="color-control-group">
-              <label>
-                Preenchimento:
+              <span class="grupo-titulo">Preenchimento:</span>
+              <div class="color-row">
                 <input type="color" id="cor-preenchimento" value="#4a90d9" />
-              </label>
-
-              <button id="btn-preenchimento-nenhum" class="btn-color-none" title="Sem preenchimento" aria-label="Remover preenchimento">
-                ❌
+                <button id="btn-preenchimento-nenhum" class="btn-color-none" title="Sem preenchimento" aria-label="Remover preenchimento">
               </button>
-
               <div class="opacity-slider-wrapper">
                 <label>
                   Opacidade:
@@ -228,17 +302,15 @@
                 </label>
               </div>
             </div>
+          </div>
+
 
             <div class="color-control-group" style="margin-top: 16px;">
-              <label>
-                Borda:
+              <span class="grupo-titulo">Borda:</span>
+              <div class="color-row">
                 <input type="color" id="cor-borda" value="#1a1a2e" />
-              </label>
-
-              <button id="btn-borda-nenhum" class="btn-color-none" title="Sem borda" aria-label="Remover borda">
-                ❌
+                <button id="btn-borda-nenhum" class="btn-color-none" title="Sem borda" aria-label="Remover borda">
               </button>
-
               <div class="opacity-slider-wrapper">
                 <label>
                   Opacidade:
@@ -246,22 +318,107 @@
                 </label>
               </div>
             </div>
+            <label> Espessura do Lápis:
+              <input type="range" id="espessura-lapis" min="1" max="100" value="2">
+
+              <span id="valor-espessura-lapis">2</span> px
+            </label>
           </div>
 
-          <div id="tab-tracer" class="tab-content"></div>
+          <div id="tab-tracer" class="tab-content" style="height: 100%; box-sizing: border-box;">
+
+            <h3>Vetorizar Imagem</h3>
+            
+            <!-- Estado vazio: Nenhuma imagem -->
+            <div id="tracer-empty-state" class="oculto">
+                <p style="font-size: 0.9em; color: #666; margin-bottom: 10px;">
+                    Nenhuma imagem rasterizada encontrada no canvas.
+                </p>
+                <button id="btn-tracer-importar" class="btn-menu">Importar Imagem</button>
+            </div>
+
+            <!-- Lista de imagens e configurações -->
+            <div id="tracer-conteudo">
+                <label class="propriedade-label">Selecione a imagem:</label>
+                <div id="tracer-lista-imagens" class="lista-imagens-container" style="max-height: 100px; overflow-y: auto; margin-bottom: 15px; border: 1px solid #ccc; padding: 5px;">
+                    <!-- Lista injetada via JS -->
+                </div>
+
+                <label for="tracer-preset" class="propriedade-label">Predefinição de estilo:</label>
+                <div class="select-wrapper" style="margin-bottom: 15px;">
+                    <select id="tracer-preset" class="select-format">
+                        <option value="default" selected>Padrão</option>
+                        <option value="posterized2">Posterizado (2 cores)</option>
+                        <option value="artistic1">Artístico detalhado</option>
+                        <option value="bw">Preto e Branco</option>
+                        <option value="custom">⚙️ Personalizado Avançado</option>
+                    </select>
+                    <svg class="select-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                      <path d="M7 10l5 5 5-5z" />
+                    </svg>
+                </div>
+
+                <!-- Painel de Configurações Avançadas (Ocupa o espaço restante e rola internamente) -->
+                <div id="tracer-advanced-panel" style="display: none; border-top: 1px solid #ddd; padding-top: 10px; margin-bottom: 15px; flex: 1; min-height: 0; overflow-y: auto; padding-right: 5px;">
+                    
+                    <h4 style="margin: 5px 0; font-size: 0.9em; color: #4a90d9; text-transform: uppercase; letter-spacing: 0.5px;">Paleta de Cores</h4>
+                    <div style="margin-bottom: 10px;">
+                        <label style="display:block; font-size:0.85em; margin-bottom: 4px;">Máx. de Cores: <strong id="val-tracer-colors">16</strong></label>
+                        <input type="range" id="tracer-colors" min="2" max="64" value="16" style="width:100%;">
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <label style="display:block; font-size:0.85em; margin-bottom: 4px;">Ciclos (Agrupamento): <strong id="val-tracer-cycles">3</strong></label>
+                        <input type="range" id="tracer-cycles" min="1" max="10" value="3" style="width:100%;">
+                    </div>
+
+                    <h4 style="margin: 15px 0 5px 0; font-size: 0.9em; color: #4a90d9; text-transform: uppercase; letter-spacing: 0.5px;">Traçado e Curvas</h4>
+                    <div style="margin-bottom: 10px;">
+                        <label style="display:block; font-size:0.85em; margin-bottom: 4px;">Tolerância Linear (ltres): <strong id="val-tracer-ltres">1.0</strong></label>
+                        <input type="range" id="tracer-ltres" min="0.1" max="10" step="0.1" value="1.0" style="width:100%;">
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <label style="display:block; font-size:0.85em; margin-bottom: 4px;">Tolerância Curva (qtres): <strong id="val-tracer-qtres">1.0</strong></label>
+                        <input type="range" id="tracer-qtres" min="0.1" max="10" step="0.1" value="1.0" style="width:100%;">
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <label style="display:block; font-size:0.85em; margin-bottom: 4px;">Ignorar Ruídos (pathomit): <strong id="val-tracer-omit">8</strong> px</label>
+                        <input type="range" id="tracer-omit" min="0" max="64" value="8" style="width:100%;">
+                    </div>
+                    <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+                        <input type="checkbox" id="tracer-rightangle" style="cursor: pointer;">
+                        <label for="tracer-rightangle" style="font-size:0.85em; cursor:pointer; user-select: none;">Forçar/Realçar ângulos retos</label>
+                    </div>
+
+                    <h4 style="margin: 15px 0 5px 0; font-size: 0.9em; color: #4a90d9; text-transform: uppercase; letter-spacing: 0.5px;">Filtros (Pré-processo)</h4>
+                    <div style="margin-bottom: 10px;">
+                        <label style="display:block; font-size:0.85em; margin-bottom: 4px;">Raio do Desfoque (blur): <strong id="val-tracer-blur">0</strong> px</label>
+                        <input type="range" id="tracer-blur" min="0" max="10" value="0" style="width:100%;">
+                    </div>
+
+                    <h4 style="margin: 15px 0 5px 0; font-size: 0.9em; color: #4a90d9; text-transform: uppercase; letter-spacing: 0.5px;">Otimização e Saída</h4>
+                    <div style="margin-bottom: 10px;">
+                        <label style="display:block; font-size:0.85em; margin-bottom: 4px;">Espessura de Contorno: <strong id="val-tracer-stroke">0.0</strong> px</label>
+                        <input type="range" id="tracer-stroke" min="0" max="5" step="0.1" value="0.0" style="width:100%;">
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <label style="display:block; font-size:0.85em; margin-bottom: 4px;">Casas Decimais (SVG): <strong id="val-tracer-round">1</strong></label>
+                        <input type="range" id="tracer-round" min="-1" max="5" step="1" value="1" style="width:100%;">
+                    </div>
+                </div>
+
+                <button id="btn-tracer-aplicar" class="btn-menu">Aplicar Vetorização</button>
+            </div>
+          </div>
 
           <div id="tab-camadas" class="tab-content"></div>
         </div>
-        <label> Espessura do Lápis:
-          <input type="range" id="espessura-lapis" min="1" max="100" value="2">
-
-          <span id="valor-espessura-lapis">2</span> px
-        </label>
       </aside>
 
     </div><!-- /#workspace -->
   </div><!-- /#app -->
 
+  <!-- Importando o ImageTracerJS localmente -->
+  <script src="js/libs/imagetracer_v1.2.6.js"></script>
 
   <!-- Ponto de entrada da aplicação: ES6 Module -->
   <script type="module" src="js/main.js"></script>
