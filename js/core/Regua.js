@@ -59,44 +59,52 @@ export class Regua {
     return passosCandidatos[passosCandidatos.length - 1];
   }
 
-  /** Lê o viewBox atual (ou assume 1 unidade de documento = 1px de tela, se não houver). */
-  _obterViewBox() {
-    const vb = this.svgCanvas.viewBox.baseVal;
-    const rect = this.svgCanvas.getBoundingClientRect();
-
-    if (vb && vb.width > 0 && vb.height > 0) {
-      return { x: vb.x, y: vb.y, width: vb.width, height: vb.height, rect };
-    }
-    return { x: 0, y: 0, width: rect.width, height: rect.height, rect };
-  }
-
   /** Recalcula e redesenha as marcações das duas réguas. Chamado automaticamente. */
   atualizar() {
     if (!this.ativa) return;
 
-    const { x, y, width, height, rect } = this._obterViewBox();
-    console.log('[Regua] atualizar()', { x, y, width, height, rect });
-    if (width <= 0 || height <= 0) {
-      console.warn('[Regua] largura/altura inválida, abortando desenho', { width, height });
-      return;
-    }
+    // Obtém a matriz CTM nativa que mapeia coordenadas SVG para pixels da tela
+    const matrix = this.svgCanvas.getScreenCTM();
+    if (!matrix) return;
 
-    const escalaX = rect.width / width;
-    const escalaY = rect.height / height;
+    // Calcula a escala real (pixels por unidade de SVG) em cada eixo
+    const escalaX = Math.sqrt(matrix.a * matrix.a + matrix.b * matrix.b);
+    const escalaY = Math.sqrt(matrix.c * matrix.c + matrix.d * matrix.d);
 
-    this._desenharEixo(this.horizontal, x, width, escalaX, 'horizontal');
-    this._desenharEixo(this.vertical, y, height, escalaY, 'vertical');
+    const rectContainer = this.container.getBoundingClientRect();
+
+    // Encontra a posição na tela da origem (0,0) do SVG relativa ao container
+    const origemXContainer = matrix.e - rectContainer.left;
+    const origemYContainer = matrix.f - rectContainer.top;
+
+    // As réguas começam deslocadas pela espessura da régua perpendicular (20px)
+    const offsetReguaX = origemXContainer - ESPESSURA_REGUA_PX;
+    const offsetReguaY = origemYContainer - ESPESSURA_REGUA_PX;
+
+    // Determina a faixa de coordenadas SVG visíveis em cada régua
+    const origemSvgX = -offsetReguaX / escalaX;
+    const extensaoSvgX = (rectContainer.width - ESPESSURA_REGUA_PX) / escalaX;
+
+    const origemSvgY = -offsetReguaY / escalaY;
+    const extensaoSvgY = (rectContainer.height - ESPESSURA_REGUA_PX) / escalaY;
+
+    this._desenharEixo(this.horizontal, origemSvgX, extensaoSvgX, escalaX, offsetReguaX, 'horizontal');
+    this._desenharEixo(this.vertical, origemSvgY, extensaoSvgY, escalaY, offsetReguaY, 'vertical');
   }
 
-  _desenharEixo(elementoRegua, origem, extensao, escala, orientacao) {
+  _desenharEixo(elementoRegua, origemSvg, extensaoSvg, escala, offsetRegua, orientacao) {
     elementoRegua.innerHTML = '';
     const passo = this._calcularPasso(escala);
 
-    const inicio = Math.floor(origem / passo) * passo;
-    const fim = origem + extensao;
+    const inicio = Math.floor(origemSvg / passo) * passo;
+    const fim = origemSvg + extensaoSvg;
 
     for (let valor = inicio; valor <= fim; valor += passo) {
-      const posicaoPx = (valor - origem) * escala;
+      // Converte a coordenada SVG para a posição em pixels na régua
+      const posicaoPx = valor * escala + offsetRegua;
+
+      // Evita renderizar marcações fora da área visível da régua
+      if (posicaoPx < 0) continue;
 
       const marcador = document.createElement('div');
       marcador.className = 'regua-marcador';

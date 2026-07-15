@@ -68,13 +68,10 @@ export function inicializarImportadorImagem(svgCanvas, inputImagem) {
         svgImage.setAttribute('width', larguraFinal.toString());
         svgImage.setAttribute('height', alturaFinal.toString());
 
-        // FORÇA as dimensões via CSS inline para impedir que classes externas espremam o SVG
-        svgImage.style.width = larguraFinal + 'px';
-        svgImage.style.height = alturaFinal + 'px';
-
         // (Opcional) Define explicitamente como 'none' para forçar o preenchimento da caixa
         svgImage.setAttribute('preserveAspectRatio', 'none');
         
+        svgImage.style.display = 'block';
         svgImage.classList.add('elemento-desenho'); 
 
         // Insere no canvas
