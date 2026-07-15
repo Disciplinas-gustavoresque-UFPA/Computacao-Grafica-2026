@@ -12,6 +12,12 @@ export class Regua {
       inside: false,
     };
 
+    this.tamanhoTicks = {
+      major: 12,
+      minor: 8,
+      micro: 4,
+    };
+
     this._criarElementos();
     this._registrarObservadores();
   }
@@ -223,28 +229,78 @@ export class Regua {
       .forEach((el) => el.remove());
   }
 
-  _desenharEixo(elementoRegua, origem, extensao, escala, orientacao) {
-    this._limparMarcadores(elementoRegua);
+  _calcularSubdivisoes(passo) {
+    return { major: passo, minor: passo / 2, micro: passo / 10 };
+  }
 
-    const passo = this._calcularPasso(escala);
+  _criarMarcador(elementoRegua, posicaoPx, orientacao, valor, tipo) {
+    const marcador = document.createElement("div");
+    marcador.className = `regua-marcador ${tipo}`;
 
-    const inicio = Math.floor(origem / passo) * passo;
-    const fim = origem + extensao;
+    const tamanho = this.tamanhoTicks[tipo];
 
-    for (let valor = inicio; valor <= fim; valor += passo) {
-      const posicaoPx = (valor - origem) * escala;
+    if (orientacao === "horizontal") {
+      marcador.style.width = "1px";
+      marcador.style.height = `${tamanho}px`;
+      marcador.style["left"] = `${posicaoPx}px`;
+    } else if (orientacao === "vertical") {
+      marcador.style.height = "1px";
+      marcador.style.width = `${tamanho}px`;
+      marcador.style["top"] = `${posicaoPx}px`;
+    }
 
-      const marcador = document.createElement("div");
-      marcador.className = "regua-marcador";
-      marcador.style[orientacao === "horizontal" ? "left" : "top"] =
-        `${posicaoPx}px`;
-
+    if (tipo === "major") {
       const rotulo = document.createElement("span");
       rotulo.className = "regua-rotulo";
       rotulo.textContent = Math.round(valor);
       marcador.appendChild(rotulo);
+    }
 
-      elementoRegua.appendChild(marcador);
+    elementoRegua.appendChild(marcador);
+  }
+
+  _ehMultiplo(valor, passo) {
+    if (passo === 0) return false;
+    const ratio = valor / passo;
+    return Math.abs(ratio - Math.round(ratio)) < 0.00001;
+  }
+
+  _desenharEixo(elementoRegua, origem, extensao, escala, orientacao) {
+    this._limparMarcadores(elementoRegua);
+
+    const passo = this._calcularPasso(escala);
+    const { major, minor, micro } = this._calcularSubdivisoes(passo);
+
+    const inicio = Math.floor(origem / micro) * micro;
+    const fim = origem + extensao + micro;
+
+    for (let valor = inicio; valor <= fim; valor += micro) {
+      const posicaoPx = (valor - origem) * escala;
+
+      if (this._ehMultiplo(valor, major))
+        this._criarMarcador(
+          elementoRegua,
+          posicaoPx,
+          orientacao,
+          valor,
+          "major",
+        );
+      else if (this._ehMultiplo(valor, minor))
+        this._criarMarcador(
+          elementoRegua,
+          posicaoPx,
+          orientacao,
+          valor,
+          "minor",
+        );
+      else
+        this._criarMarcador(
+          elementoRegua,
+          posicaoPx,
+          orientacao,
+          valor,
+          "micro",
+        );
     }
   }
 
