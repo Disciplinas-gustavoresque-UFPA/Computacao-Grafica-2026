@@ -241,7 +241,7 @@ const instanciasFerramentas = {
   lapis: new Lapis(svgCanvas),
   losango: new LosangoTool(svgCanvas),
   pincel: new PincelTool(svgCanvas),
-  medidor: new MedidorTool(svgCanvas, overlay, cameraGlobal),
+  medidor: new MedidorTool(svgCanvas, overlayCanvas, cameraGlobal),
 };
 
 /**
