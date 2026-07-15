@@ -1,4 +1,4 @@
-import { estado, registrarAcaoHistorico } from './StateManager.js';
+import { estado, registrarAcaoHistorico, definirElementosSelecionados } from './StateManager.js';
 import { criarElementoSVG } from '../utils/svgHelpers.js';
 
 /**
@@ -38,13 +38,9 @@ export function agruparElementos() {
         grupo.appendChild(el);
     });
 
-    // Atualiza o estado da seleção: agora o grupo inteiro é o selecionado
-    estado.elementosSelecionados = [grupo];
-
-    // Refaz o desenho da borda azul ao redor do novo grupo
-    if (estado.gerenciadorSelecao) {
-        estado.gerenciadorSelecao.desenhar(estado.elementosSelecionados);
-    }
+    // Atualiza o estado da seleção e redesenha a borda azul:
+    // agora o grupo inteiro é o selecionado
+    definirElementosSelecionados([grupo]);
 
     // Registra a criação do grupo para o Ctrl+Z funcionar
     registrarAcaoHistorico();
@@ -145,11 +141,7 @@ export function desagruparElementos() {
 
     // Se pelo menos um grupo foi desfeito, atualiza o estado e o histórico
     if (ocorreuDesagrupamento) {
-        estado.elementosSelecionados = novaSelecao;
-
-        if (estado.gerenciadorSelecao) {
-            estado.gerenciadorSelecao.desenhar(estado.elementosSelecionados);
-        }
+        definirElementosSelecionados(novaSelecao);
 
         registrarAcaoHistorico();
     }
