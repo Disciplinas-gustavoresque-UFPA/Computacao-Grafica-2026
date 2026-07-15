@@ -80,6 +80,7 @@ export class TextoTool extends ToolBase {
   tratarTeclaPressionada(evento) {
     if (evento.key === 'Enter') {
       this.finalizarTexto();
+      
     } else if (evento.key === 'Escape') {
       this.removerInputTemporario();
     }

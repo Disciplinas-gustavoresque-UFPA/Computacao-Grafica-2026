@@ -30,6 +30,7 @@ export class LosangoTool extends ToolBase {
     this.losnElement = criarElementoSVG('polygon', {
       x: this.startX,
       y: this.startY,
+      'data-shape': 'losango',
       width: 0,
       height: 0,
       fill: estado.corPreenchimento,
@@ -71,7 +72,7 @@ export class LosangoTool extends ToolBase {
     // Finaliza a operação de desenho
     this.isDrawing = false;
     this.losnElement = null;
-    
+
     // Integração com o History Manager
     registrarAcaoHistorico();
   }

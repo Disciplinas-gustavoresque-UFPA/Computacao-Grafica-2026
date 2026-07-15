@@ -1,0 +1,217 @@
+/* =========================================================
+   Menu de Contexto Flutuante
+   ========================================================= */
+
+.menu-contexto {
+  position: fixed;
+  z-index: 9999;
+  min-width: 240px;
+  max-width: 320px;
+  padding: 8px 0;
+  border: 1px solid rgba(74, 144, 217, 0.4);
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(22, 33, 62, 0.99), rgba(31, 45, 77, 0.99));
+  color: var(--cor-texto);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 1px rgba(74, 144, 217, 0.2);
+  backdrop-filter: blur(8px);
+}
+
+.menu-contexto[hidden] {
+  display: none !important;
+}
+
+/* --- Seções --- */
+
+.menu-contexto__secao {
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.menu-contexto__titulo {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--cor-texto-secundario);
+  margin-bottom: 2px;
+}
+
+.menu-contexto__separador {
+  margin: 4px 0;
+  padding: 0 8px;
+}
+
+.menu-contexto__separador hr {
+  border: none;
+  border-top: 1px solid rgba(74, 144, 217, 0.15);
+  margin: 0;
+}
+
+/* --- Grupos de controle --- */
+
+.menu-contexto__grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.menu-contexto__grupo[hidden] {
+    display: none !important;
+}
+
+.menu-contexto__label {
+  font-size: 11px;
+  color: var(--cor-texto-secundario);
+}
+
+/* --- Slider --- */
+
+.menu-contexto__slider-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.menu-contexto__slider {
+  flex: 1;
+  height: 4px;
+  accent-color: var(--cor-destaque);
+  cursor: pointer;
+}
+
+.menu-contexto__valor {
+  font-size: 11px;
+  color: var(--cor-texto);
+  min-width: 28px;
+  text-align: right;
+}
+
+/* --- Cor --- */
+
+.menu-contexto__cor-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.menu-contexto__cor-wrapper input[type="color"] {
+  width: 36px;
+  height: 24px;
+  padding: 1px;
+  border: 1px solid var(--cor-borda-ui);
+  border-radius: 4px;
+  background: none;
+  cursor: pointer;
+}
+
+.menu-contexto__cor-wrapper input[type="color"]:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.menu-contexto__none-btn {
+  font-size: 11px;
+  padding: 3px 8px;
+  border: 1px solid var(--cor-borda-ui);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--cor-texto-secundario);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.menu-contexto__none-btn:hover {
+  border-color: var(--cor-destaque);
+  color: var(--cor-destaque);
+}
+
+.menu-contexto__none-btn--ativo {
+  border-color: var(--cor-destaque);
+  color: var(--cor-destaque);
+  background: rgba(74, 144, 217, 0.15);
+}
+
+/* --- Estilo de borda (dash) --- */
+
+.menu-contexto__dash-opcoes {
+  display: flex;
+  gap: 4px;
+}
+
+.menu-contexto__dash-btn {
+  flex: 1;
+  padding: 4px 0;
+  font-size: 11px;
+  border: 1px solid var(--cor-borda-ui);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--cor-texto-secundario);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.menu-contexto__dash-btn:hover {
+  border-color: var(--cor-destaque);
+  color: var(--cor-destaque);
+}
+
+.menu-contexto__dash-btn--ativo {
+  border-color: var(--cor-destaque);
+  background: rgba(74, 144, 217, 0.2);
+  color: var(--cor-destaque);
+}
+
+/* --- Botões de ação --- */
+
+.menu-contexto__acao-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.menu-contexto__acao-btn {
+  width: 100%;
+  padding: 6px 12px;
+  font-size: 12px;
+  text-align: left;
+  border: 1px solid var(--cor-borda-ui);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--cor-texto);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.menu-contexto__acao-btn:hover {
+  background: rgba(74, 144, 217, 0.15);
+  border-color: var(--cor-destaque);
+  color: var(--cor-destaque);
+}
+
+.menu-contexto__acao-btn:focus-visible {
+  outline: 1px solid rgba(74, 144, 217, 0.5);
+  outline-offset: -2px;
+  background: rgba(74, 144, 217, 0.15);
+}
+
+/* --- Excluir: estados normal / confirmação --- */
+
+.menu-contexto__deletar {
+  border-color: rgba(220, 53, 69, 0.4);
+  color: #dc3545;
+}
+
+.menu-contexto__deletar:hover {
+  background: rgba(220, 53, 69, 0.15);
+  border-color: #dc3545;
+  color: #dc3545;
+}
+
+.menu-contexto__deletar--confirmando,
+.menu-contexto__deletar--confirmando:hover {
+  border-color: #ffc107;
+  color: #ffc107;
+  background: rgba(255, 193, 7, 0.1);
+}

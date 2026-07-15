@@ -26,6 +26,11 @@ export class RetanguloShape extends ShapeBase {
   }
 
   atualizarForma(coords, targetElement, activeNode) {
+    // Limpa estilos inline de largura/altura se existirem, garantindo que as alterações
+    // nos atributos SVG de largura/altura tomem efeito visual imediatamente.
+    if (targetElement.style.width) targetElement.style.width = '';
+    if (targetElement.style.height) targetElement.style.height = '';
+
     const x = parseFloat(targetElement.getAttribute('x'));
     const y = parseFloat(targetElement.getAttribute('y'));
     const w = parseFloat(targetElement.getAttribute('width'));

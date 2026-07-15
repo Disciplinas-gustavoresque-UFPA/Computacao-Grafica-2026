@@ -21,12 +21,29 @@ export const estado = {
   estiloLinha: 'continua',
   interfaceAtual: 'inicio', // Nova flag para sabermos onde o usuário está
   elementosSelecionados: [],
+  espessuraLapis: 2,
 };
 
 let gerenciadorSelecaoVisual = null;
+let callbackPainelAlinhamento = null;
+
+
+export function definirEspessuraLapis(espessura) {
+  estado.espessuraLapis = Number(espessura);
+}
 
 export function definirGerenciadorSelecao(selecao) {
   gerenciadorSelecaoVisual = selecao;
+}
+
+export function definirCallbackPainelAlinhamento(fn) {
+  callbackPainelAlinhamento = fn;
+}
+
+function _notificarPainelAlinhamento() {
+  if (typeof callbackPainelAlinhamento === 'function') {
+    callbackPainelAlinhamento(estado.elementosSelecionados.length);
+  }
 }
 
 export function atualizarPosicaoSelecaoVisual() {
@@ -98,6 +115,7 @@ export function definirElementosSelecionados(elementos) {
   if (gerenciadorSelecaoVisual) {
     gerenciadorSelecaoVisual.desenhar(estado.elementosSelecionados);
   }
+  _notificarPainelAlinhamento();
 }
 
 /**
@@ -119,6 +137,7 @@ export function adicionarElementoSelecao(elemento) {
     if (gerenciadorSelecaoVisual) {
       gerenciadorSelecaoVisual.desenhar(estado.elementosSelecionados);
     }
+    _notificarPainelAlinhamento();
   }
 }
 
@@ -132,6 +151,7 @@ export function removerElementoSelecao(elemento) {
   if (gerenciadorSelecaoVisual) {
     gerenciadorSelecaoVisual.desenhar(estado.elementosSelecionados);
   }
+  _notificarPainelAlinhamento();
 }
 
 export function definirInterface(novaInterface) {
