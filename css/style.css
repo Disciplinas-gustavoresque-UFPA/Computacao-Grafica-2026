@@ -885,5 +885,9 @@ body {
 }
 
 #grid-overlay.ativo {
-  display: inline-block;
+  display: block;
+
+  /* --- TESTE --- */
+  background-color: rgba(255, 0, 0, 0.1); 
+  border: 5px solid red;
 }

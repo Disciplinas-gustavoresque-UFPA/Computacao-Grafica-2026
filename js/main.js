@@ -51,6 +51,7 @@ import { Regua } from './core/Regua.js';
 import { LosangoTool } from './tools/LosangoTool.js';
 import { agruparElementos, desagruparElementos } from './core/GroupManager.js';
 import { espelharHorizontal, espelharVertical } from "./utils/flipHelpers.js";
+import { GridManager } from './core/GridManager.js'
 
 const svgCanvas = document.getElementById('canvas');
 
@@ -173,6 +174,16 @@ if (btnToggleRegua) {
   btnToggleRegua.addEventListener('click', () => {
     const ativa = regua.alternar();
     btnToggleRegua.classList.toggle('ativo', ativa);
+  });
+}
+
+// Grid
+const gridManager = new GridManager(canvasContainer);
+const btnToggleGrid = document.getElementById('btn-toggle-grid');
+if (btnToggleGrid) {
+  btnToggleGrid.addEventListener('click', () => {
+    const isAtivo = gridManager.alternar();
+    btnToggleGrid.classList.toggle('ativo', isAtivo);
   });
 }
 
