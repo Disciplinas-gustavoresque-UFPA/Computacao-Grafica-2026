@@ -427,9 +427,7 @@ svgCanvas.addEventListener("mousemove", (evento) => {
   }
 });
 
-// O overlay tem pointer-events:none (para não bloquear cliques no canvas),
-// exceto nos elementos de UI que o próprio Selecao habilita explicitamente
-// (ex: alças de skew) — por isso precisa dos mesmos listeners delegados.
+// O overlay tem pointer-events:none, exceto nos elementos de UI habilitados de forma explícita
 overlayCanvas.addEventListener("mousedown", (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseDown(evento);
@@ -557,9 +555,9 @@ window.addEventListener("keydown", (e) => {
     return;
 
   // Atalhos de teclado para o histórico
-  if (e.ctrlKey || e.metaKey) { // metaKey é o Cmd do Mac
+  if (e.ctrlKey || e.metaKey) {
     if (e.key.toLowerCase() === "g") {
-      e.preventDefault(); // Impede o navegador de tentar buscar (find)
+      e.preventDefault();
       if (e.shiftKey) {
         desagruparElementos();
       } else {
