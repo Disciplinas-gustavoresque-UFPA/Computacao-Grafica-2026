@@ -6,67 +6,137 @@
  */
 
 /**
- * Obtém o bounding box de um elemento SVG no espaço do próprio SVG canvas.
- * Usa getBBox() que retorna coordenadas no espaço do elemento.
+ * Obtém o bounding box de um elemento SVG no espaço do pai (SVG Canvas),
+ * levando em consideração as transformações locais (como translate, scale, rotate).
  *
  * @param {SVGGraphicsElement} el
  * @returns {{ x: number, y: number, width: number, height: number }}
  */
 function getBBox(el) {
+  let bbox;
   try {
-    const bbox = el.getBBox();
-    return bbox;
+    const rawBBox = el.getBBox();
+    // Clonamos para um objeto simples para evitar referências vivas do DOMRect
+    bbox = { x: rawBBox.x, y: rawBBox.y, width: rawBBox.width, height: rawBBox.height };
   } catch {
-    // Fallback para elementos sem suporte a getBBox (ex: <image>)
+    // Fallback para elementos sem suporte a getBBox (ex: <image> fora do DOM)
     const tag = el.tagName.toLowerCase();
     if (tag === 'rect' || tag === 'image' || tag === 'text') {
-      return {
+      bbox = {
         x: parseFloat(el.getAttribute('x') || 0),
         y: parseFloat(el.getAttribute('y') || 0),
         width: parseFloat(el.getAttribute('width') || 0),
         height: parseFloat(el.getAttribute('height') || 0),
       };
-    }
-    if (tag === 'circle') {
+    } else if (tag === 'circle') {
       const cx = parseFloat(el.getAttribute('cx') || 0);
       const cy = parseFloat(el.getAttribute('cy') || 0);
       const r = parseFloat(el.getAttribute('r') || 0);
-      return { x: cx - r, y: cy - r, width: r * 2, height: r * 2 };
-    }
-    if (tag === 'ellipse') {
+      bbox = { x: cx - r, y: cy - r, width: r * 2, height: r * 2 };
+    } else if (tag === 'ellipse') {
       const cx = parseFloat(el.getAttribute('cx') || 0);
       const cy = parseFloat(el.getAttribute('cy') || 0);
       const rx = parseFloat(el.getAttribute('rx') || 0);
       const ry = parseFloat(el.getAttribute('ry') || 0);
-      return { x: cx - rx, y: cy - ry, width: rx * 2, height: ry * 2 };
-    }
-    if (tag === 'line') {
+      bbox = { x: cx - rx, y: cy - ry, width: rx * 2, height: ry * 2 };
+    } else if (tag === 'line') {
       const x1 = parseFloat(el.getAttribute('x1') || 0);
       const y1 = parseFloat(el.getAttribute('y1') || 0);
       const x2 = parseFloat(el.getAttribute('x2') || 0);
       const y2 = parseFloat(el.getAttribute('y2') || 0);
-      return {
+      bbox = {
         x: Math.min(x1, x2),
         y: Math.min(y1, y2),
         width: Math.abs(x2 - x1),
         height: Math.abs(y2 - y1),
       };
+    } else {
+      bbox = { x: 0, y: 0, width: 0, height: 0 };
     }
-    return { x: 0, y: 0, width: 0, height: 0 };
   }
+
+  // Aplica a matriz de transformação local do elemento, se existir
+  const transformList = el.transform && el.transform.baseVal;
+  if (transformList && transformList.numberOfItems > 0) {
+    try {
+      const matrix = transformList.consolidate().matrix;
+      
+      // Projeta os 4 cantos da caixa delimitadora local
+      const pontos = [
+        { x: bbox.x, y: bbox.y },
+        { x: bbox.x + bbox.width, y: bbox.y },
+        { x: bbox.x, y: bbox.y + bbox.height },
+        { x: bbox.x + bbox.width, y: bbox.y + bbox.height }
+      ];
+
+      const pontosTransformados = pontos.map(pt => ({
+        x: pt.x * matrix.a + pt.y * matrix.c + matrix.e,
+        y: pt.x * matrix.b + pt.y * matrix.d + matrix.f
+      }));
+
+      // Calcula os novos limites min/max no espaço do canvas
+      const xs = pontosTransformados.map(pt => pt.x);
+      const ys = pontosTransformados.map(pt => pt.y);
+      const minX = Math.min(...xs);
+      const maxX = Math.max(...xs);
+      const minY = Math.min(...ys);
+      const maxY = Math.max(...ys);
+
+      return {
+        x: minX,
+        y: minY,
+        width: maxX - minX,
+        height: maxY - minY
+      };
+    } catch {
+      // Se falhar ao consolidar a matriz, retorna o bbox local como fallback
+      return bbox;
+    }
+  }
+
+  return bbox;
 }
 
 /**
- * Move um elemento para uma nova posição de ancoragem.
+ * Move um elemento de forma segura usando transformações ou atributos geométricos.
+ * 
  * @param {SVGElement} el
- * @param {{ x?: number, y?: number }} novaPos  x e/ou y do canto superior-esquerdo do bbox
+ * @param {{ x?: number, y?: number }} novaPos x e/ou y desejado no espaço do canvas
  */
 function moverElemento(el, novaPos) {
   const tag = el.tagName.toLowerCase();
-  const bbox = getBBox(el);
+  const bbox = getBBox(el); // BBox real (no espaço do canvas)
+
+  // Verifica se o elemento já possui alguma transformação ativa
+  const temTransform = el.hasAttribute('transform') && el.getAttribute('transform').trim() !== '';
 
   if ('x' in novaPos) {
     const dx = novaPos.x - bbox.x;
+    if (dx !== 0) {
+      if (temTransform || tag === 'g' || tag === 'path') {
+        aplicarTranslacaoTransform(el, dx, 0);
+      } else {
+        aplicarTranslacaoAtributo(el, dx, 0, tag);
+      }
+    }
+  }
+
+  if ('y' in novaPos) {
+    const bbox2 = getBBox(el); // Re-calcula após a atualização do X
+    const dy = novaPos.y - bbox2.y;
+    if (dy !== 0) {
+      if (temTransform || tag === 'g' || tag === 'path') {
+        aplicarTranslacaoTransform(el, 0, dy);
+      } else {
+        aplicarTranslacaoAtributo(el, 0, dy, tag);
+      }
+    }
+  }
+}
+
+/** Move o elemento alterando seus atributos geométricos diretamente. */
+function aplicarTranslacaoAtributo(el, dx, dy, tag) {
+  if (dx !== 0) {
     if (tag === 'rect' || tag === 'image' || tag === 'text') {
       el.setAttribute('x', String(parseFloat(el.getAttribute('x') || 0) + dx));
     } else if (tag === 'circle' || tag === 'ellipse') {
@@ -74,22 +144,9 @@ function moverElemento(el, novaPos) {
     } else if (tag === 'line') {
       el.setAttribute('x1', String(parseFloat(el.getAttribute('x1') || 0) + dx));
       el.setAttribute('x2', String(parseFloat(el.getAttribute('x2') || 0) + dx));
-    } else if (tag === 'g' || tag === 'path') {
-      const current = el.getAttribute('transform') || '';
-      const matchTranslate = current.match(/translate\(([^,]+),([^)]+)\)/);
-      if (matchTranslate) {
-        const tx = parseFloat(matchTranslate[1]) + dx;
-        const ty = parseFloat(matchTranslate[2]);
-        el.setAttribute('transform', current.replace(/translate\([^)]+\)/, `translate(${tx},${ty})`));
-      } else {
-        el.setAttribute('transform', `${current} translate(${dx},0)`.trim());
-      }
     }
   }
-
-  if ('y' in novaPos) {
-    const bbox2 = getBBox(el); // Re-read after potential x update
-    const dy = novaPos.y - bbox2.y;
+  if (dy !== 0) {
     if (tag === 'rect' || tag === 'image' || tag === 'text') {
       el.setAttribute('y', String(parseFloat(el.getAttribute('y') || 0) + dy));
     } else if (tag === 'circle' || tag === 'ellipse') {
@@ -97,17 +154,21 @@ function moverElemento(el, novaPos) {
     } else if (tag === 'line') {
       el.setAttribute('y1', String(parseFloat(el.getAttribute('y1') || 0) + dy));
       el.setAttribute('y2', String(parseFloat(el.getAttribute('y2') || 0) + dy));
-    } else if (tag === 'g' || tag === 'path') {
-      const current = el.getAttribute('transform') || '';
-      const matchTranslate = current.match(/translate\(([^,]+),([^)]+)\)/);
-      if (matchTranslate) {
-        const tx = parseFloat(matchTranslate[1]);
-        const ty = parseFloat(matchTranslate[2]) + dy;
-        el.setAttribute('transform', current.replace(/translate\([^)]+\)/, `translate(${tx},${ty})`));
-      } else {
-        el.setAttribute('transform', `${current} translate(0,${dy})`.trim());
-      }
     }
+  }
+}
+
+/** Move o elemento atualizando seu atributo 'transform'. */
+function aplicarTranslacaoTransform(el, dx, dy) {
+  const current = el.getAttribute('transform') || '';
+  const matchTranslate = current.match(/translate\(([^,\s)]+)[,\s]*([^)]+)?\)/);
+
+  if (matchTranslate) {
+    const tx = parseFloat(matchTranslate[1] || 0) + dx;
+    const ty = parseFloat(matchTranslate[2] || 0) + dy;
+    el.setAttribute('transform', current.replace(/translate\([^)]+\)/, `translate(${tx},${ty})`));
+  } else {
+    el.setAttribute('transform', `${current} translate(${dx},${dy})`.trim());
   }
 }
 
