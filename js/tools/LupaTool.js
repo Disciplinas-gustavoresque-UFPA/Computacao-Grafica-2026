@@ -222,6 +222,9 @@ export class LupaTool extends ToolBase {
 
     // Modo zoom por seleção ('drag')
     if (this.modo === "drag") {
+      // Previne dupla seleção e o congelamento decorrente dela
+      if (this.drag.active) return;
+
       this.drag.active = true;
       this.drag.start = coords;
       this.drag.button = evento.button;
@@ -253,7 +256,10 @@ export class LupaTool extends ToolBase {
   onMouseUp(evento) {
     evento.preventDefault();
 
-    if (!this.drag.active) return;
+    // Checa se o botão do capturado é o mesmo que iniciou a seleção
+    if (this.drag.active && evento.button !== this.drag.button) {
+      return;
+    }
 
     const coords = obterCoordenadaSVG(evento, this.svg);
     const x = Math.min(this.drag.start.x, coords.x);
@@ -293,12 +299,9 @@ export class LupaTool extends ToolBase {
     this.updateZoomIndicator();
   }
 
-  onMouseLeave(evento) {
-    if (!this.drag.active) {
-      return;
-    } else {
-      this.onMouseUp(evento);
-    }
+  onMouseLeave() {
+    if (!this.drag.active) return;
+    this.cleanupDrag();
   }
   /* ============================================
     Ciclo de Vida
