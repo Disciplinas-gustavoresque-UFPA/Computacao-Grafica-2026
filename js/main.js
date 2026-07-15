@@ -165,11 +165,11 @@ canvasContainer.appendChild(svgCanvas);
 // Camada de Interação: instanciar o novo SVG de overlay para seleções
 const overlayCanvas = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 overlayCanvas.setAttribute('id', 'overlay-canvas');
-overlayCanvas.setAttribute('width', '100%');
-overlayCanvas.setAttribute('height', '100%');
 overlayCanvas.style.position = 'absolute';
-overlayCanvas.style.top = '0';
-overlayCanvas.style.left = '0';
+overlayCanvas.style.top = '20px';
+overlayCanvas.style.left = '20px';
+overlayCanvas.style.width = 'calc(100% - 20px)';
+overlayCanvas.style.height = 'calc(100% - 20px)';
 overlayCanvas.style.pointerEvents = 'none'; // Coordenado com o principal
 canvasContainer.appendChild(overlayCanvas);
 
@@ -230,7 +230,7 @@ const instanciasFerramentas = {
 /**
  * Atualiza o estado visual dos botões da sidebar,
  * destacando apenas o botão da ferramenta ativa.
- *
+ * 
  * @param {string} nomeDaFerramenta - Identificador da ferramenta ativa.
  */
 function atualizarBotaoAtivo(nomeDaFerramenta) {
@@ -312,11 +312,9 @@ svgCanvas.addEventListener('mouseup', (evento) => {
   if (primeiroSelecionado) {
     const corPreenchimentoAtual = primeiroSelecionado.getAttribute('fill') || '#ffffff';
     const corBordaAtual = primeiroSelecionado.getAttribute('stroke') || '#000000';
-    
-    // Captura as opacidades existentes (padrão é 1 se não houver atributo)
+    // Captura as opacidades existentes (padrão é 1 se não houver atributo)    
     const opacidadePreenchimentoAtual = primeiroSelecionado.getAttribute('fill-opacity') || '1';
     const opacidadeBordaAtual = primeiroSelecionado.getAttribute('stroke-opacity') || '1';
-
     // Só atualizamos os seletores visuais do HTML se o valor do SVG for uma cor hexadecimal válida.
     if (corPreenchimentoAtual !== 'none' && corPreenchimentoAtual.startsWith('#')) {
       inputCorPreenchimento.value = corPreenchimentoAtual;
@@ -324,11 +322,10 @@ svgCanvas.addEventListener('mouseup', (evento) => {
     if (corBordaAtual !== 'none' && corBordaAtual.startsWith('#')) {
       inputCorBorda.value = corBordaAtual;
     }
-
+    
     // Atualiza visualmente os Sliders de Opacidade na UI
     sliderOpacidadePreenchimento.value = opacidadePreenchimentoAtual;
     sliderOpacidadeBorda.value = opacidadeBordaAtual;
-
     // Atualiza também os valores armazenados no StateManager para consistência
     definirCorPreenchimento(corPreenchimentoAtual);
     definirCorBorda(corBordaAtual);
@@ -341,43 +338,36 @@ svgCanvas.addEventListener('mouseup', (evento) => {
 
 btnPreenchimentoNenhum.addEventListener('click', () => {
   definirCorPreenchimento('none');
-  
   estado.elementosSelecionados.forEach(el => {
     el.setAttribute('fill', 'none');
   });
-  
   registrarAcaoHistorico();
   atualizarBotoesHistorico();
 });
 
 btnBordaNenhum.addEventListener('click', () => {
   definirCorBorda('none');
-  
   estado.elementosSelecionados.forEach(el => {
     el.setAttribute('stroke', 'none');
   });
-  
   registrarAcaoHistorico();
   atualizarBotoesHistorico();
 });
 
 sliderOpacidadePreenchimento.addEventListener('input', () => {
   const valor = sliderOpacidadePreenchimento.value;
-  
   estado.elementosSelecionados.forEach(el => {
     el.setAttribute('fill-opacity', valor);
   });
 });
 
 sliderOpacidadePreenchimento.addEventListener('change', () => {
-  // Salva no histórico apenas quando o usuário soltar o slider
   registrarAcaoHistorico();
   atualizarBotoesHistorico();
 });
 
 sliderOpacidadeBorda.addEventListener('input', () => {
   const valor = sliderOpacidadeBorda.value;
-  
   estado.elementosSelecionados.forEach(el => {
     el.setAttribute('stroke-opacity', valor);
   });
@@ -418,7 +408,6 @@ overlayCanvas.addEventListener('mouseup', (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseUp(evento);
   }
-
   // Auto-save silencioso após ações realizadas via overlay (ex: mover seleções, lápis)
   salvarRascunho(svgCanvas, estado, 'editor');
   mostrarIndicadorNaoSalvo();
@@ -674,12 +663,11 @@ inicializarImportadorImagem(svgCanvas, inputImagem);
 
 // --- Inicialização do ImageTracer ---
 const tracerManager = new ImageTracerManager(svgCanvas, inputImagem);
-
 // Assiste a aba do Tracer para atualizar a lista de imagens quando ela for ativada
 const tabTracer = document.getElementById('tab-tracer');
 if (tabTracer) {
     const observerTab = new MutationObserver(() => {
-        // Verifica se a classe 'ativo' foi adicionada pela SideBar.js
+      // Verifica se a classe 'ativo' foi adicionada pela SideBar.js
         if (tabTracer.classList.contains('ativo')) {
             tracerManager.atualizarLista();
         }
@@ -709,7 +697,7 @@ svgCanvas.addEventListener('wheel', (e) => {
 const observerCanvas = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
         if (mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0) {
-            // Verifica se a aba do tracer está aberta no momento
+          // Verifica se a aba do tracer está aberta no momento
             if (tabTracer && tabTracer.classList.contains('ativo')) {
                 tracerManager.atualizarLista();
             }
