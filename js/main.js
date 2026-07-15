@@ -210,7 +210,7 @@ const cameraGlobal = new CameraSVG([svgCanvas, overlayCanvas]);
 const scrollbar = new ScrollbarSVG(canvasContainer, svgCanvas, cameraGlobal);
 const instanciasFerramentas = {
   selecao: new SelecaoTool(svgCanvas, selecaoVisual),
-  edicaoVertices: new NodeEditTool(svgCanvas),
+  edicaoVertices: new NodeEditTool(svgCanvas, selecaoVisual),
   retangulo: new RetanguloTool(svgCanvas),
   linha: new LinhaTool(svgCanvas),
   linhaCurvada: new LinhaCurvadaTool(svgCanvas),
@@ -704,6 +704,18 @@ svgCanvas.addEventListener('wheel', (e) => {
   cameraGlobal.zoom(escala, coords.x, coords.y);
   scrollbar.atualizar();
 }, { passive: false });
+
+svgCanvas.addEventListener('dblclick', (evento) => {
+  if (estado.ferramentaAtual && typeof estado.ferramentaAtual.onDoubleClick === 'function') {
+    estado.ferramentaAtual.onDoubleClick(evento);
+  }
+});
+
+overlayCanvas.addEventListener('dblclick', (evento) => {
+  if (estado.ferramentaAtual && typeof estado.ferramentaAtual.onDoubleClick === 'function') {
+    estado.ferramentaAtual.onDoubleClick(evento);
+  }
+});
 
 // Observa o canvas para atualizar o Tracer automaticamente quando uma imagem for adicionada ou removida
 const observerCanvas = new MutationObserver((mutations) => {
