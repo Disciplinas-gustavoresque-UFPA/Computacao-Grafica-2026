@@ -19,7 +19,7 @@ function getBBox(el) {
     // Clonamos para um objeto simples para evitar referências vivas do DOMRect
     bbox = { x: rawBBox.x, y: rawBBox.y, width: rawBBox.width, height: rawBBox.height };
   } catch {
-    // Fallback para elementos sem suporte a getBBox (ex: <image> fora do DOM)
+    // Fallback para elementos sem suporte a getBBox (ex: <image> fora do DOM ou ambientes de teste)
     const tag = el.tagName.toLowerCase();
     if (tag === 'rect' || tag === 'image' || tag === 'text') {
       bbox = {
@@ -39,6 +39,21 @@ function getBBox(el) {
       const rx = parseFloat(el.getAttribute('rx') || 0);
       const ry = parseFloat(el.getAttribute('ry') || 0);
       bbox = { x: cx - rx, y: cy - ry, width: rx * 2, height: ry * 2 };
+    } else if (tag === 'polygon' || tag === 'polyline') {
+      // CORREÇÃO: Fallback de cálculo de caixa para polígonos (como losangos)
+      const pointsAttr = el.getAttribute('points') || '';
+      const coords = pointsAttr.trim().split(/[\s,]+/).map(Number).filter(n => !isNaN(n));
+      if (coords.length >= 2) {
+        const xs = coords.filter((_, idx) => idx % 2 === 0);
+        const ys = coords.filter((_, idx) => idx % 2 === 1);
+        const minX = Math.min(...xs);
+        const maxX = Math.max(...xs);
+        const minY = Math.min(...ys);
+        const maxY = Math.max(...ys);
+        bbox = { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
+      } else {
+        bbox = { x: 0, y: 0, width: 0, height: 0 };
+      }
     } else if (tag === 'line') {
       const x1 = parseFloat(el.getAttribute('x1') || 0);
       const y1 = parseFloat(el.getAttribute('y1') || 0);
@@ -110,10 +125,13 @@ function moverElemento(el, novaPos) {
   // Verifica se o elemento já possui alguma transformação ativa
   const temTransform = el.hasAttribute('transform') && el.getAttribute('transform').trim() !== '';
 
+  // CORREÇÃO: Força polígonos, caminhos e grupos a moverem via 'transform'
+  const requerTransform = temTransform || tag === 'g' || tag === 'path' || tag === 'polygon' || tag === 'polyline';
+
   if ('x' in novaPos) {
     const dx = novaPos.x - bbox.x;
     if (dx !== 0) {
-      if (temTransform || tag === 'g' || tag === 'path') {
+      if (requerTransform) {
         aplicarTranslacaoTransform(el, dx, 0);
       } else {
         aplicarTranslacaoAtributo(el, dx, 0, tag);
@@ -125,7 +143,7 @@ function moverElemento(el, novaPos) {
     const bbox2 = getBBox(el); // Re-calcula após a atualização do X
     const dy = novaPos.y - bbox2.y;
     if (dy !== 0) {
-      if (temTransform || tag === 'g' || tag === 'path') {
+      if (requerTransform) {
         aplicarTranslacaoTransform(el, 0, dy);
       } else {
         aplicarTranslacaoAtributo(el, 0, dy, tag);
@@ -168,7 +186,9 @@ function aplicarTranslacaoTransform(el, dx, dy) {
     const ty = parseFloat(matchTranslate[2] || 0) + dy;
     el.setAttribute('transform', current.replace(/translate\([^)]+\)/, `translate(${tx},${ty})`));
   } else {
-    el.setAttribute('transform', `${current} translate(${dx},${dy})`.trim());
+    // CORREÇÃO CRÍTICA: Prependemos o translate para que a movimentação ocorra 
+    // no espaço global do canvas, e não seja distorcida por rotações existentes.
+    el.setAttribute('transform', `translate(${dx},${dy}) ${current}`.trim());
   }
 }
 
