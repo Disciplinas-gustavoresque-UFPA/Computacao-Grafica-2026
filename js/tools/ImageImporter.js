@@ -63,11 +63,21 @@ export function inicializarImportadorImagem(svgCanvas, inputImagem) {
         svgImage.setAttribute('href', dataUrl);
         svgImage.setAttribute('x', '50');
         svgImage.setAttribute('y', '50');
+
+        // Atributos originais base
         svgImage.setAttribute('width', larguraFinal.toString());
         svgImage.setAttribute('height', alturaFinal.toString());
-        
-        // Limpando qualquer comportamento de proporção fixo que force distorções
-        svgImage.removeAttribute('preserveAspectRatio');
+
+        // FORÇA as dimensões via CSS inline para impedir que classes externas espremam o SVG
+        svgImage.style.width = larguraFinal + 'px';
+        svgImage.style.height = alturaFinal + 'px';
+
+        // (Opcional) Define explicitamente como 'none' para forçar o preenchimento da caixa
+        svgImage.setAttribute('preserveAspectRatio', 'none');
+
+        svgImage.style.width = `${larguraFinal}px`;
+        svgImage.style.height = `${alturaFinal}px`;
+        svgImage.style.display = 'block';
         
         svgImage.classList.add('elemento-desenho'); 
 
