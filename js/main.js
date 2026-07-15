@@ -19,7 +19,8 @@ import {
   desfazerAcao,
   refazerAcao,
   registrarAcaoHistorico,
-  atualizarPosicaoSelecaoVisual
+  atualizarPosicaoSelecaoVisual,
+  definirEspessuraLapis
 } from './core/StateManager.js';
 import { ColorPickerTool } from './tools/ColorPickerTool.js';
 import { Lapis } from './tools/LapisTool.js';
@@ -43,7 +44,6 @@ import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
 import { inicializarMenuContexto } from './contextMenu/index.js';
 import { SideBar } from './core/SideBar.js';
 import { PincelTool } from './tools/PincelTool.js';
-import { definirEspessuraLapis } from "./core/StateManager.js";
 import { CameraSVG } from './core/CameraSVG.js';
 import { ScrollbarSVG } from './core/ScrollbarSVG.js';
 import { obterCoordenadaSVG } from './utils/svgHelpers.js';
@@ -537,6 +537,59 @@ window.addEventListener("keydown", (e) => {
       atualizarBotoesHistorico();
       return;
     }
+    if (e.key === ']' || e.key === '}') {
+      e.preventDefault();
+      moverCamada(e.shiftKey ? 'frente' : 'avancar');
+      return;
+    }
+    if (e.key === '[' || e.key === '{') {
+      e.preventDefault();
+      moverCamada(e.shiftKey ? 'fundo' : 'recuar');
+      return;
+    }
+  }
+
+  const teclaPressionada = e.key.toLowerCase();
+
+  // Atalhos com Shift
+  if (e.shiftKey) {
+    const mapaTeclasShift = {
+      "c": "bezier",
+      "e": "espiral",
+    };
+
+    if (teclaPressionada === "z") {
+      e.preventDefault();
+      const btnDrag = document.getElementById('btn-drag');
+      if (btnDrag) {
+        btnDrag.click();
+      } else {
+        const botaoZoom = document.querySelector('.btn-ferramenta[data-ferramenta="lupa"]');
+        if (botaoZoom) {
+          botaoZoom.click();
+          setTimeout(() => document.getElementById('btn-drag')?.click(), 0);
+        }
+      }
+    } else if (teclaPressionada === "i") {
+      e.preventDefault();
+      btnImportarImagem?.click();
+    } else if (teclaPressionada === "h") {
+      e.preventDefault();
+      btnFlipHorizontal?.click();
+    } else if (teclaPressionada === "v") {
+      e.preventDefault();
+      btnFlipVertical?.click();
+    } else if (teclaPressionada === "r") {
+      e.preventDefault();
+      btnToggleRegua?.click();
+    } else if (mapaTeclasShift[teclaPressionada]) {
+      e.preventDefault();
+      const botao = document.querySelector(`.btn-ferramenta[data-ferramenta="${mapaTeclasShift[teclaPressionada]}"]`);
+      if (botao) {
+        botao.click();
+      }
+    }
+    return;
   }
 
   const mapaTeclas = {
@@ -545,30 +598,30 @@ window.addEventListener("keydown", (e) => {
     "e" : "elipse",
     "l" : "linha",
     "c" : "linhaCurvada",
-    "p" : "poligono",
+    "g" : "poligono",
+    "p" : "lapis",
     "t" : "texto",
     "i" : "Conta-gotas",
-    "g" : "losango",
-  };
+    "b" : "borracha",
+    "v" : "edicaoVertices",
+    "z" : "lupa",
+    "d" : "pincel",
+    "h" : "losango",
+  }
 
-  // --- LÓGICA DE DELEÇÃO CORRIGIDA ---
+  // --- LÓGICA DE DELEÇÃO ---
   if (e.key === "Delete" || e.key === "Backspace") {
     if (estado.elementosSelecionados && estado.elementosSelecionados.length > 0) {
       estado.elementosSelecionados.forEach(el => el.remove());
-      definirElementosSelecionados([]); 
-      atualizarPosicaoSelecaoVisual(); 
-      registrarAcaoHistorico(); 
+      definirElementosSelecionados([]);
+      atualizarPosicaoSelecaoVisual();
+      registrarAcaoHistorico();
       atualizarBotoesHistorico();
     }
     return;
   }
 
-  const teclaPressionada = e.key.toLowerCase();
-  const ferramentaAlvo = e.shiftKey && teclaPressionada === 'c'
-    ? 'bezier'
-    : e.shiftKey && teclaPressionada === 'e'
-      ? 'espiral'
-    : mapaTeclas[teclaPressionada];
+  const ferramentaAlvo = mapaTeclas[teclaPressionada];
 
   if (ferramentaAlvo) {
     e.preventDefault();
