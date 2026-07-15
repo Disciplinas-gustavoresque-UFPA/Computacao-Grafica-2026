@@ -20,6 +20,9 @@ import {
   refazerAcao,
   registrarAcaoHistorico,
   atualizarPosicaoSelecaoVisual
+  definirCallbackPainelAlinhamento,
+  atualizarPosicaoSelecaoVisual,
+  definirEspessuraLapis
 } from './core/StateManager.js';
 import { ColorPickerTool } from './tools/ColorPickerTool.js';
 import { Lapis } from './tools/LapisTool.js';
@@ -51,6 +54,18 @@ import { Regua } from './core/Regua.js';
 import { LosangoTool } from './tools/LosangoTool.js';
 import { agruparElementos, desagruparElementos } from './core/GroupManager.js';
 import { espelharHorizontal, espelharVertical } from "./utils/flipHelpers.js";
+import {
+  alinharEsquerda,
+  alinharCentroHorizontal,
+  alinharDireita,
+  alinharTopo,
+  alinharCentroVertical,
+  alinharBase,
+  distribuirHorizontalmente,
+  distribuirVerticalmente,
+} from './utils/alignHelpers.js';
+import { salvarRascunho, marcarSalvo } from './utils/autoSave.js';
+import { ImageTracerManager } from './tools/ImageTracerManager.js';
 
 const svgCanvas = document.getElementById('canvas');
 
@@ -194,6 +209,21 @@ observer.observe(svgCanvas, { attributes: true, attributeFilter: ['viewBox'] });
 // Inicializar a classe de seleção visual
 const selecaoVisual = new Selecao(overlayCanvas);
 definirGerenciadorSelecao(selecaoVisual);
+
+// --- Painel de Alinhamento (multi-seleção) ---
+const painelAlinhamento = document.getElementById('painel-alinhamento');
+function atualizarVisibilidadePainelAlinhamento(qtd) {
+  if (!painelAlinhamento) return;
+  if (qtd >= 2) {
+    painelAlinhamento.classList.remove('oculto');
+  } else {
+    painelAlinhamento.classList.add('oculto');
+  }
+}
+definirCallbackPainelAlinhamento(atualizarVisibilidadePainelAlinhamento);
+
+// Menu de contexto simples em utilitário
+inicializarMenuContexto(svgCanvas);
 
 // Instâncias das ferramentas disponíveis com todas as implementações da main
 const cameraGlobal = new CameraSVG([svgCanvas, overlayCanvas]);
@@ -425,7 +455,7 @@ const valorEspessura =
 
 inputEspessuraLapis.addEventListener("input", (e) => {
     definirEspessuraLapis(e.target.value);
-    valorEspessura.textContent = e.target.value;
+    if (valorEspessura) valorEspessura.textContent = e.target.value;
 });
 
 // --- Controle de Camadas (Z-Index) ---
@@ -673,6 +703,24 @@ svgCanvas.addEventListener('wheel', (e) => {
   scrollbar.atualizar();
 }, { passive: false });
 }, { passive: false });
+
+// --- Botões de Alinhamento ---
+function executarAlinhamento(fn) {
+  fn(estado.elementosSelecionados);
+  atualizarPosicaoSelecaoVisual();
+  registrarAcaoHistorico();
+  atualizarBotoesHistorico();
+}
+
+// Com encadeamento opcional (?) caso os botões não existam em outras views
+document.getElementById('btn-alinhar-esquerda')?.addEventListener('click', () => executarAlinhamento(alinharEsquerda));
+document.getElementById('btn-alinhar-centro-h')?.addEventListener('click', () => executarAlinhamento(alinharCentroHorizontal));
+document.getElementById('btn-alinhar-direita')?.addEventListener('click',  () => executarAlinhamento(alinharDireita));
+document.getElementById('btn-alinhar-topo')?.addEventListener('click',     () => executarAlinhamento(alinharTopo));
+document.getElementById('btn-alinhar-centro-v')?.addEventListener('click', () => executarAlinhamento(alinharCentroVertical));
+document.getElementById('btn-alinhar-base')?.addEventListener('click',     () => executarAlinhamento(alinharBase));
+document.getElementById('btn-distribuir-h')?.addEventListener('click',     () => executarAlinhamento(distribuirHorizontalmente));
+document.getElementById('btn-distribuir-v')?.addEventListener('click',     () => executarAlinhamento(distribuirVerticalmente));
 
 // Observa o canvas para atualizar o Tracer automaticamente quando uma imagem for adicionada ou removida
 const observerCanvas = new MutationObserver((mutations) => {
