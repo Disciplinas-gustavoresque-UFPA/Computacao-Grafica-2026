@@ -12,15 +12,17 @@
  * - interfaceAtual {string}         - Flag para sabermos a tela onde o usuário está.
  */
 
-/** @type {{ ferramentaAtual: import('../tools/ToolBase.js').ToolBase|null, corPreenchimento: string, corBorda: string, opacidadePreenchimento: string, opacidadeBorda: string, elementosSelecionados: SVGElement[], interfaceAtual: string }} */
+/** @type {{ ferramentaAtual: import('../tools/ToolBase.js').ToolBase|null, corPreenchimento: string, corBorda: string, opacidadePreenchimento: string, opacidadeBorda: string, estiloLinha: string, elementosSelecionados: SVGElement[], interfaceAtual: string, espessuraLapis: number }} */
 export const estado = {
   ferramentaAtual: null,
   corPreenchimento: '#4a90d9',
   corBorda: '#1a1a2e',
   opacidadePreenchimento: '1', // Padrão: 100% opaco
-  opacidadeBorda: '1',        // Padrão: 100% opaco
-  interfaceAtual: 'inicio',
+  opacidadeBorda: '1',         // Padrão: 100% opaco
+  estiloLinha: 'continua',
+  interfaceAtual: 'inicio', 
   elementosSelecionados: [],
+  espessuraLapis: 2,
 };
 
 let gerenciadorSelecaoVisual = null;
