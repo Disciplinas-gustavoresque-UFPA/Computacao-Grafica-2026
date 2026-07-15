@@ -932,8 +932,37 @@ input[type="range"]::-moz-range-thumb {
 }
 
 #valor-espessura-lapis {
-  color: var(--cor-texto);
-  font-weight: 500;
-  min-width: 24px;
-  text-align: right;
+    color: var(--cor-texto);
+    font-weight: 500;
+    min-width: 24px;
+    text-align: right;
+}
+
+.btn-line-style svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* --- Indicador de Não Salvo --- */
+.indicador-nao-salvo {
+    font-size: 11px;
+    color: #e8a838;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    pointer-events: none;
+    margin-left: auto;
+    margin-right: 15px;
+    display: flex;
+    align-items: center;
+}
+
+/* Sobrescreve o display:none do .oculto para permitir transição */
+.indicador-nao-salvo.oculto {
+    display: flex !important;
+    opacity: 0;
+    visibility: hidden;
 }
