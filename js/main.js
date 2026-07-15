@@ -427,6 +427,12 @@ svgCanvas.addEventListener("mousemove", (evento) => {
   }
 });
 
+svgCanvas.addEventListener("dblclick", (evento) => {
+  if (estado.ferramentaAtual && typeof estado.ferramentaAtual.onDblClick === 'function') {
+    estado.ferramentaAtual.onDblClick(evento);
+  }
+});
+
 // O overlay tem pointer-events:none, exceto nos elementos de UI habilitados de forma explícita
 overlayCanvas.addEventListener("mousedown", (evento) => {
   if (estado.ferramentaAtual) {
