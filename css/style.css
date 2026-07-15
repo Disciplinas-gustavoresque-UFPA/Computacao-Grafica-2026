@@ -706,56 +706,55 @@ body {
    Barra Lateral
    ========================================================= */
 
-/* Nova Barra Lateral Direita */
 #barra-configuracoes {
   width: 300px;
   height: auto;
-  background-color: #f4f4f4;
-  border-left: 1px solid #ccc;
+  background-color: var(--cor-fundo-painel);
+  border-left: 1px solid var(--cor-borda-ui);
   display: flex;
   flex-direction: column;
-  color: #0f3460;
+  color: var(--cor-texto);
   flex-shrink: 0;
-
-  /* Transição por margem faz o Canvas redimensionar dinamicamente */
   transition: margin-right 0.3s ease;
   margin-right: 0;
 }
 
-/* Quando escondida, puxa a barra para fora e cede o espaço no Flexbox */
 #barra-configuracoes.escondida {
   margin-right: -300px;
 }
 
-/* Estilo do botão de toggle posicionado dinamicamente */
 #btn-toggle-sidebar {
   position: absolute;
   right: 300px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: #eee;
-  border: 1px solid #ddd;
+  top: 28px;
+  transform: rotate(0deg);
+  background: var(--cor-fundo-barra);
+  border: 1px solid var(--cor-borda-ui);
+  color: var(--cor-texto);
   border-radius: 5px 0 0 5px;
   cursor: pointer;
   padding: 10px 5px;
   z-index: 10;
-  transition: right 0.3s ease, transform 0.3s ease;
+  transition: right 0.3s ease, transform 0.3s ease, background-color 0.2s ease;
 }
 
-/* Rotaciona a setinha quando esconder */
+#btn-toggle-sidebar:hover {
+  background: rgba(74, 144, 217, 0.2);
+  color: var(--cor-destaque);
+}
+
 #btn-toggle-sidebar.sidebar-escondida {
   right: 0;
   transform: translateY(-50%) rotate(180deg);
 }
 
-/* Navegação das Abas */
+/* Navegação das abas */
 .tabs-nav {
   display: flex;
-  background-color: #e0e0e0;
-  border-bottom: 1px solid #ccc;
+  background-color: var(--cor-fundo-painel);
+  border-bottom: 1px solid var(--cor-borda-ui);
 }
 
-/* Botão das abas */
 .tab-btn {
   flex: 1;
   padding: 10px;
@@ -763,136 +762,207 @@ body {
   border: none;
   background: none;
   font-size: 1.2rem;
+  color: var(--cor-texto-secundario);
 }
 
-/* Destaca a aba que está clicada */
 .tab-btn.ativo {
-  background-color: #f4f4f4;
-  border-bottom: 2px solid #4a90d9;
+  background-color: var(--cor-fundo-painel);
+  border-bottom: 2px solid var(--cor-destaque);
+  color: var(--cor-destaque);
 }
 
 /* Container do conteúdo */
 .tabs-container {
-  overflow-y: scroll;
+  overflow-y: auto;
   overflow-x: hidden;
+  padding: 18px 16px;
 }
+
 .tab-content {
   display: none;
-  height: auto;
 }
 
 .tab-content.ativo {
   display: block;
 }
 
-.node-handle:hover {
-    fill: #4a90d9; /* Inverte a cor ao passar o mouse */
-    stroke: white;
+.tab-content h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--cor-texto);
 }
 
+/* Grupo cor + opacidade */
 .color-control-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.grupo-titulo {
+  font-size: 12px;
+  color: var(--cor-texto-secundario);
+}
+
+.color-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+input[type="color"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 36px;
+  height: 28px;
+  border: 1px solid var(--cor-borda-ui);
+  border-radius: var(--raio-borda);
+  padding: 0;
+  background: none;
+  cursor: pointer;
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 2px;
+}
+
+input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: 4px;
 }
 
 .btn-color-none {
-    width: 28px;
-    height: 28px;
-    border: 1px solid var(--cor-borda-ui);
-    border-radius: var(--raio-borda);
-    background: linear-gradient(45deg, transparent 45%, #ff4a4a 45%, #ff4a4a 55%, transparent 55%), #ffffff;
-    cursor: pointer;
-    font-size: 0; 
-    transition: transform 0.1s;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  border: 1px solid var(--cor-borda-ui);
+  border-radius: var(--raio-borda);
+  background: linear-gradient(45deg, transparent 47%, #ff4a4a 47%, #ff4a4a 53%, transparent 53%), var(--cor-fundo-painel);
+  cursor: pointer;
+  font-size: 0;
+  transition: transform 0.1s, border-color 0.15s;
 }
 
 .btn-color-none:hover {
-    transform: scale(1.05);
-    border-color: var(--cor-destaque);
+  transform: scale(1.05);
+  border-color: var(--cor-destaque);
 }
 
-.line-tool-group {
-  position: relative;
+.opacity-slider-wrapper {
   display: flex;
-  justify-content: center;
-  width: 100%;
-}
-
-/*
- * Mantém o botão principal com o mesmo tamanho
- * dos demais botões da barra.
- */
-.line-tool-group > .btn-ferramenta {
-  flex: 0 0 auto;
-}
-
-#line-options {
-  position: absolute;
-
-  /*
-   * Posiciona o painel sempre à direita do botão.
-   */
-  left: calc(100% + 8px);
-  top: 50%;
-  transform: translateY(-50%);
-
-  z-index: 10000;
-
-  padding: 6px;
-  border-radius: 6px;
-
-  /*
-   * Impede alterações no espaço ocupado pela barra.
-   */
-  width: max-content;
-  min-width: max-content;
-}
-
-#line-options.hidden {
-  display: none !important;
-}
-
-.line-style-controls {
-  display: flex;
-  flex-direction: row;
   align-items: center;
-  gap: 6px;
-  width: max-content;
+  flex: 1;
+  min-width: 150px;
 }
 
-.btn-line-style {
-  width: 42px;
-  height: 34px;
-  flex: 0 0 42px;
-  padding: 4px;
+.opacity-slider-wrapper label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  font-size: 12px;
+  color: var(--cor-texto-secundario);
+  white-space: nowrap;
+  min-width: 0;
+}
+
+/* Sliders (opacidade e espessura) */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: 1;
+  min-width: 0;
+  width: auto;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--cor-borda-ui);
+  accent-color: var(--cor-destaque);
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--cor-borda-ui);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  margin-top: -6px;
+  border-radius: 50%;
+  background: var(--cor-destaque);
+  border: 2px solid var(--cor-fundo-painel);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+input[type="range"]::-moz-range-track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--cor-borda-ui);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--cor-destaque);
+  border: 2px solid var(--cor-fundo-painel);
+  cursor: pointer;
+}
+
+/* Espessura do Lápis */
+#barra-configuracoes > label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-top: 1px solid var(--cor-borda-ui);
+  font-size: 12px;
+  color: var(--cor-texto-secundario);
+}
+
+#valor-espessura-lapis {
+    color: var(--cor-texto);
+    font-weight: 500;
+    min-width: 24px;
+    text-align: right;
 }
 
 .btn-line-style svg {
-  display: block;
-  width: 100%;
-  height: 100%;
+    display: block;
+    width: 100%;
+    height: 100%;
 }
 
 /* --- Indicador de Não Salvo --- */
 .indicador-nao-salvo {
-  font-size: 11px;
-  color: #e8a838;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-  opacity: 1;
-  visibility: visible;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
-  pointer-events: none;
-  margin-left: auto;
-  margin-right: 15px;
-  display: flex;
-  align-items: center;
+    font-size: 11px;
+    color: #e8a838;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    pointer-events: none;
+    margin-left: auto;
+    margin-right: 15px;
+    display: flex;
+    align-items: center;
 }
+
 /* Sobrescreve o display:none do .oculto para permitir transição */
 .indicador-nao-salvo.oculto {
-  display: flex !important;
-  opacity: 0;
-  visibility: hidden;
+    display: flex !important;
+    opacity: 0;
+    visibility: hidden;
 }

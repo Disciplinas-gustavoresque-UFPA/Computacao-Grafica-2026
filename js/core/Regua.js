@@ -133,21 +133,33 @@ export class Regua {
   atualizar() {
     if (!this.ativa) return;
 
-    const { x, y, width, height, rect } = this._obterViewBox();
-    console.log("[Regua] atualizar()", { x, y, width, height, rect });
-    if (width <= 0 || height <= 0) {
-      console.warn("[Regua] largura/altura inválida, abortando desenho", {
-        width,
-        height,
-      });
-      return;
-    }
+    // Obtém a matriz CTM nativa que mapeia coordenadas SVG para pixels da tela
+    const matrix = this.svgCanvas.getScreenCTM();
+    if (!matrix) return;
 
-    const escalaX = rect.width / width;
-    const escalaY = rect.height / height;
+    // Calcula a escala real (pixels por unidade de SVG) em cada eixo
+    const escalaX = Math.sqrt(matrix.a * matrix.a + matrix.b * matrix.b);
+    const escalaY = Math.sqrt(matrix.c * matrix.c + matrix.d * matrix.d);
 
-    this._desenharEixo(this.horizontal, x, width, escalaX, "horizontal");
-    this._desenharEixo(this.vertical, y, height, escalaY, "vertical");
+    const rectContainer = this.container.getBoundingClientRect();
+
+    // Encontra a posição na tela da origem (0,0) do SVG relativa ao container
+    const origemXContainer = matrix.e - rectContainer.left;
+    const origemYContainer = matrix.f - rectContainer.top;
+
+    // As réguas começam deslocadas pela espessura da régua perpendicular (20px)
+    const offsetReguaX = origemXContainer - ESPESSURA_REGUA_PX;
+    const offsetReguaY = origemYContainer - ESPESSURA_REGUA_PX;
+
+    // Determina a faixa de coordenadas SVG visíveis em cada régua
+    const origemSvgX = -offsetReguaX / escalaX;
+    const extensaoSvgX = (rectContainer.width - ESPESSURA_REGUA_PX) / escalaX;
+
+    const origemSvgY = -offsetReguaY / escalaY;
+    const extensaoSvgY = (rectContainer.height - ESPESSURA_REGUA_PX) / escalaY;
+
+    this._desenharEixo(this.horizontal, origemSvgX, extensaoSvgX, escalaX, offsetReguaX, "horizontal");
+    this._desenharEixo(this.vertical, origemSvgY, extensaoSvgY, escalaY, offsetReguaY, "vertical");
     if (this.mouse.inside) {
       this._reposicionarOverlay();
     }
