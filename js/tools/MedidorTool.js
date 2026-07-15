@@ -3,13 +3,11 @@ import { ToolBase } from "./ToolBase.js";
 import { obterCoordenadaSVG } from "../utils/svgHelpers.js";
 
 export class MedidorTool extends ToolBase {
-  constructor(svg, overlaySvg, camera = null) {
+  constructor(svg, camera = null) {
     super();
 
     this.svg = svg;
-    this.overlaySvg = overlaySvg;
     this.camera = camera;
-
     this.ativo = false;
     this.medindo = false;
 
@@ -96,7 +94,7 @@ export class MedidorTool extends ToolBase {
     this.overlayGroup.appendChild(this.baseText);
     this.overlayGroup.appendChild(this.angleText);
 
-    this.overlaySvg.appendChild(this.overlayGroup);
+    this.svg.appendChild(this.overlayGroup);
   }
 
   removerElementosMedidor() {
@@ -117,6 +115,7 @@ export class MedidorTool extends ToolBase {
 
     this.medindo = true;
     const coords = obterCoordenadaSVG(evento, this.svg);
+
     this.start = coords;
     this.current = coords;
 
@@ -204,7 +203,7 @@ export class MedidorTool extends ToolBase {
 
     // Texto de Distância (Linha Azul)
     this.distText.textContent = `${distance.toFixed(2)} px`;
-    this.distText.setAttribute("x", currentPoint.x + labelOffsetX);
+    this.distText.setAttribute("x", currentPoint.x);
     this.distText.setAttribute("y", currentPoint.y);
     this.distText.setAttribute("font-size", `${fontS}px`);
 
