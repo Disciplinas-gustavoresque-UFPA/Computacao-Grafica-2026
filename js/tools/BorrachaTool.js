@@ -80,28 +80,17 @@ export class BorrachaTool extends ToolBase {
    * Apaga elementos atingidos por um segmento da trajetória
    */
   apagarSegmento(p1, p2) {
-    const distancia = Math.hypot(p2.x - p1.x, p2.y - p1.y);
-    const passos = Math.max(1, Math.ceil(distancia / 2));
+    const elementos = Array.from(this.svgCanvas.children);
 
-    for (let i = 0; i <= passos; i++) {
-      const t = i / passos;
+    for (const elemento of elementos) {
+      const tag = elemento.tagName?.toLowerCase();
 
-      const pontoSvg = this.svgCanvas.createSVGPoint();
-      pontoSvg.x = p1.x + (p2.x - p1.x) * t;
-      pontoSvg.y = p1.y + (p2.y - p1.y) * t;
+      if (!this.allowedTags.includes(tag)) {
+        continue;
+      }
 
-      const pontoTela = pontoSvg.matrixTransform(this.svgCanvas.getScreenCTM());
-      const elemento = document.elementFromPoint(pontoTela.x, pontoTela.y);
-
-      if (
-        elemento &&
-        elemento !== this.svgCanvas &&
-        elemento.parentNode === this.svgCanvas
-      ) {
-        const tag = elemento.tagName?.toLowerCase();
-        if (this.allowedTags.includes(tag)) {
-          elemento.remove();
-        }
+      if (this.segmentoInterceptaElemento(p1, p2, elemento)) {
+        elemento.remove();
       }
     }
   }
@@ -129,7 +118,8 @@ export class BorrachaTool extends ToolBase {
     if (
       elemento &&
       elemento !== this.svgCanvas &&
-      elemento.parentNode === this.svgCanvas &&
+      (elemento.parentNode === this.svgCanvas || elemento.parentNode?.parentNode === this.svgCanvas)
+      &&
       this.allowedTags.includes(tag)
     ) {
       elemento.remove();
