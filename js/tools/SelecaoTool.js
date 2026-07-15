@@ -176,6 +176,15 @@ export class SelecaoTool extends ToolBase {
     };
     this.isSkewing = true;
   }
+  _limparMarquee() {
+    this.isSelecting = false;
+    this.selectionStart = null;
+    this.selectionEnd = null;
+    if (this.selectionRect) {
+      this.selectionRect.remove();
+      this.selectionRect = null;
+    }
+  }
 
   onMouseDown(evento) {
     const target = evento.target;
@@ -210,6 +219,7 @@ export class SelecaoTool extends ToolBase {
     }
 
     if (elementoAlvo) {
+      this._limparMarquee();
       this._aplicarSelecaoComModificador(elementoAlvo, isShift, isCtrl);
 
       if (estado.elementosSelecionados.length > 0) {
@@ -244,6 +254,10 @@ export class SelecaoTool extends ToolBase {
   }
 
   onMouseMove(evento) {
+    if (evento.buttons === 0 && (this.isSelecting || this.isDragging || this.isSkewing)) {
+      this.onMouseUp(evento);
+      return;
+    }
     const pt = obterCoordenadaSVG(evento, this.svgCanvas);
     
     // Verifica se estamos no modo de seleção por marquee
@@ -414,12 +428,7 @@ export class SelecaoTool extends ToolBase {
       });
 
       definirElementosSelecionados(selecionados);
-
-      this.isSelecting = false;
-      if (this.selectionRect) {
-          this.selectionRect.remove();
-          this.selectionRect = null;
-      }
+      this._limparMarquee();
 
       return;
     }
@@ -483,6 +492,7 @@ export class SelecaoTool extends ToolBase {
     this.estadoInicialMovimento = null;
     this.isSkewing = false;
     this.skewInicial = null;
+    this._limparMarquee();
     definirElementosSelecionados([]);
   }
 
