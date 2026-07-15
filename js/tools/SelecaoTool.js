@@ -365,15 +365,6 @@ export class SelecaoTool extends ToolBase {
 
     atualizarPosicaoSelecaoVisual();
   }
-  // Função de colisão AABB (Retângulo x Retângulo)
-  _colide(rect1, bbox) {
-      return !(
-          bbox.x > rect1.x + rect1.w ||
-          bbox.x + bbox.width < rect1.x ||
-          bbox.y > rect1.y + rect1.h ||
-          bbox.y + bbox.height < rect1.y
-      );
-  }
   /**
    * Verifica se o elemento (bbox) está completamente contido na seleção (rectSelecao)
    * @private
@@ -405,13 +396,13 @@ export class SelecaoTool extends ToolBase {
       const elementos = this.svgCanvas.querySelectorAll(allowedTags.join(','));
 
       elementos.forEach(elemento => {
-          // 1. CORREÇÃO: Ignora o próprio retângulo do marquee
+          // Ignora o próprio retângulo do marquee
           if (elemento === this.selectionRect) return;
 
           // Verifica se há colisão
           if (this._contem(rectSelecao, elemento.getBBox())) {
               
-              // 2. CORREÇÃO: Passa pelo filtro para pegar o elemento correto 
+              // Passa pelo filtro para pegar o elemento correto 
               // (Ex: pega o 'grupo mestre', ignora o elemento id='canvas')
               const elementoValido = this._buscarElementoValido(elemento, allowedTags);
               
