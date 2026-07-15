@@ -71,12 +71,18 @@ export class LinhaCurvadaTool extends ToolBase {
     this.atualizarPath(this.ultimoPontoMouse);
   }
 
-  onKeyDown(evento) {
-    if (evento.key !== 'Enter') return;
+onKeyDown(evento) {
+    if (evento.key === 'Enter') {
+        evento.preventDefault();
+        this.finalizarCurva(this.ultimoPontoMouse);
+        return;
+    }
 
-    evento.preventDefault();
-    this.finalizarCurva(this.ultimoPontoMouse);
-  }
+    if (evento.key === 'Escape') {
+        evento.preventDefault();
+        this.resetarDesenho();
+    }
+}
 
   onDoubleClick(evento) {
     evento.preventDefault();
