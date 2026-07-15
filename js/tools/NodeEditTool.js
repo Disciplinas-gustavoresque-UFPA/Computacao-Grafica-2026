@@ -6,6 +6,9 @@ import { LinhaCurvadaShape } from '../shape/LinhaCurvadaShape.js';
 import { LosangoShape } from '../shape/LosangoShape.js';
 import { registrarAcaoHistorico } from '../core/StateManager.js';
 
+import { PathShape } from '../shape/PathShape.js';
+import { LinhaShape } from '../shape/LinhaShape.js';
+
 /**
  * NodeEditTool
  * Ferramenta para edição de vértices (nós) de elementos vetoriais.
@@ -25,6 +28,9 @@ export class NodeEditTool extends ToolBase {
             'image': new RetanguloShape(svgCanvas), // Image possui as mesmas propriedades de retangulos
             'linhaCurvada': new LinhaCurvadaShape(svgCanvas),
             'losango': new LosangoShape(svgCanvas),
+
+            'path': new PathShape(svgCanvas), // Para a imagem vetorizada
+            'line': new LinhaShape(svgCanvas) // Para os segmentos do pincel dinâmico
         }
     }
 
@@ -34,15 +40,22 @@ export class NodeEditTool extends ToolBase {
         const tag = elemento.tagName.toLowerCase();
 
         if (tag === 'path') {
+            // Se tiver o dataset específico, é linha curvada. 
+            // Caso contrário, trata como um path padrão (imagem vetorizada).
             return elemento.dataset && elemento.dataset.tipoLinha === 'linhaCurvada'
                 ? 'linhaCurvada'
-                : null;
+                : 'path'; 
         }
 
         if (tag === 'polygon') {
             return elemento.dataset && elemento.dataset.shape === 'losango'
                 ? 'losango'
                 : null;
+        }
+
+        // NOVO: Identificar segmentos do Pincel Dinâmico ou da Ferramenta Linha
+        if (tag === 'line') {
+            return 'line';
         }
 
         return Object.prototype.hasOwnProperty.call(this.allowedShapes, tag) ? tag : null;
@@ -74,7 +87,7 @@ export class NodeEditTool extends ToolBase {
         // Se o clique não foi no canvas vazio e for um elemento permitido
         if (
             target !== this.svgCanvas &&
-            target.parentNode === this.svgCanvas &&
+            this.svgCanvas.contains(target) && // <--- ALTERAÇÃO AQUI
             tipo
         ) {
             // Verifica se há algo selecionado no estado global
