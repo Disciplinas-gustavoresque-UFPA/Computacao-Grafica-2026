@@ -158,8 +158,20 @@ export class Regua {
     const origemSvgY = -offsetReguaY / escalaY;
     const extensaoSvgY = (rectContainer.height - ESPESSURA_REGUA_PX) / escalaY;
 
-    this._desenharEixo(this.horizontal, origemSvgX, extensaoSvgX, escalaX, offsetReguaX, "horizontal");
-    this._desenharEixo(this.vertical, origemSvgY, extensaoSvgY, escalaY, offsetReguaY, "vertical");
+    this._desenharEixo(
+      this.horizontal,
+      origemSvgX,
+      extensaoSvgX,
+      escalaX,
+      "horizontal",
+    );
+    this._desenharEixo(
+      this.vertical,
+      origemSvgY,
+      extensaoSvgY,
+      escalaY,
+      "vertical",
+    );
     if (this.mouse.inside) {
       this._reposicionarOverlay();
     }
