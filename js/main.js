@@ -41,6 +41,7 @@ import { inicializarImportadorImagem } from './tools/ImageImporter.js';
 import { inicializarMenuInicial } from './core/UIManager.js';
 import { duplicarElemento } from './utils/duplicateHelpers.js';
 import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
+import { inicializarMenuContexto } from './contextMenu/index.js';
 import { SideBar } from './core/SideBar.js';
 import { PincelTool } from './tools/PincelTool.js';
 import { CameraSVG } from './core/CameraSVG.js';
@@ -51,6 +52,7 @@ import { Regua } from './core/Regua.js';
 import { LosangoTool } from './tools/LosangoTool.js';
 import { agruparElementos, desagruparElementos } from './core/GroupManager.js';
 import { espelharHorizontal, espelharVertical } from "./utils/flipHelpers.js";
+import { ImageTracerManager } from './tools/ImageTracerManager.js';
 
 const svgCanvas = document.getElementById('canvas');
 
@@ -94,7 +96,7 @@ function atualizarBotoesHistorico() {
 
     if (btnRefazer) {
         btnRefazer.disabled = !podeRefazer;
-        btnRefazer.title = podeRefazer ? 'Refazer (Ctrl+Y)' : 'Nada para refazer';
+        btnRefazer.title = podeRefazer ? 'Refazer (Ctrl+Y / Ctrl+Shift+Z)' : 'Nada para refazer';
     }
 }
 
@@ -195,6 +197,9 @@ observer.observe(svgCanvas, { attributes: true, attributeFilter: ['viewBox'] });
 const selecaoVisual = new Selecao(overlayCanvas);
 definirGerenciadorSelecao(selecaoVisual);
 
+// Menu de contexto simples em utilitário
+inicializarMenuContexto(svgCanvas);
+
 // Instâncias das ferramentas disponíveis com todas as implementações da main
 const cameraGlobal = new CameraSVG([svgCanvas, overlayCanvas]);
 const scrollbar = new ScrollbarSVG(canvasContainer, svgCanvas, cameraGlobal);
@@ -293,7 +298,6 @@ botoesEstiloLinha.forEach((btn) => {
 });
 
 // Atualizar os inputs da sidebar quando o usuário selecionar um objeto
-// Usamos um MutationObserver ou interceptamos cliques no Canvas para capturar a seleção.
 svgCanvas.addEventListener('mouseup', (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseUp(evento);
@@ -388,9 +392,7 @@ svgCanvas.addEventListener('mousemove', (evento) => {
   }
 });
 
-// O overlay tem pointer-events:none (para não bloquear cliques no canvas),
-// exceto nos elementos de UI que o próprio Selecao habilita explicitamente
-// (ex: alças de skew) — por isso precisa dos mesmos listeners delegados.
+// O overlay tem pointer-events:none, exceto nos elementos de UI habilitados de forma explícita
 overlayCanvas.addEventListener('mousedown', (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseDown(evento);
@@ -427,8 +429,7 @@ btnExportar.addEventListener('click', () => {
   exportarDesenho(svgCanvas, formato);
 });
 
-const valorEspessura =
-    document.getElementById("valor-espessura-lapis");
+const valorEspessura = document.getElementById("valor-espessura-lapis");
 
 inputEspessuraLapis.addEventListener("input", (e) => {
     definirEspessuraLapis(e.target.value);
@@ -445,7 +446,6 @@ function moverCamada(acao) {
   const elementos = estado.elementosSelecionados;
   if (!elementos || elementos.length === 0) return;
 
-  // Move o primeiro elemento selecionado (para simplicidade)
   const el = elementos[0];
   if (!el) return;
 
@@ -485,48 +485,40 @@ const btnFlipHorizontal = document.getElementById('btn-flip-horizontal');
 const btnFlipVertical = document.getElementById('btn-flip-vertical');
 
 btnFlipHorizontal.addEventListener("click", () => {
-
     estado.elementosSelecionados.forEach(el => {
         espelharHorizontal(el);
     });
-
     atualizarPosicaoSelecaoVisual();
     registrarAcaoHistorico();
-
 });
 
 btnFlipVertical.addEventListener("click", () => {
-
     estado.elementosSelecionados.forEach(el => {
         espelharVertical(el);
     });
-
     atualizarPosicaoSelecaoVisual();
     registrarAcaoHistorico();
-
 });
 
 // Atalhos de Teclado (Tool Selection)
 window.addEventListener("keydown", (e) => {
   // Prevenção de conflitos
-  // Verifica se o usuário está focado em um campo de texto ou input de cor.
   const elementoAtivo = document.activeElement;
   const tagAtiva = elementoAtivo.tagName.toLocaleLowerCase();
 
-  // Se o foco estiver em um input, textArea, select ou contentEditable, ignora o atalho.
   if (["input", "textarea", "select"].includes(tagAtiva) || elementoAtivo.isContentEditable)
     return;
 
   // Atalhos de teclado para o histórico
-  if (e.ctrlKey || e.metaKey) { // metaKey é o Cmd do Mac
+  if (e.ctrlKey || e.metaKey) {
     if (e.key.toLowerCase() === 'g') {
-      e.preventDefault(); // Impede o navegador de tentar buscar (find)
+      e.preventDefault();
       if (e.shiftKey) {
         desagruparElementos();
       } else {
         agruparElementos();
       }
-      atualizarBotoesHistorico(); // Sincroniza a interface de histórico
+      atualizarBotoesHistorico();
       return;
     }
     if (e.key.toLowerCase() === 'z') {
@@ -617,6 +609,18 @@ window.addEventListener("keydown", (e) => {
     "h" : "losango",
   }
 
+  // --- LÓGICA DE DELEÇÃO ---
+  if (e.key === "Delete" || e.key === "Backspace") {
+    if (estado.elementosSelecionados && estado.elementosSelecionados.length > 0) {
+      estado.elementosSelecionados.forEach(el => el.remove());
+      definirElementosSelecionados([]);
+      atualizarPosicaoSelecaoVisual();
+      registrarAcaoHistorico();
+      atualizarBotoesHistorico();
+    }
+    return;
+  }
+
   const ferramentaAlvo = mapaTeclas[teclaPressionada];
 
   if (ferramentaAlvo) {
@@ -653,6 +657,21 @@ btnImportarImagem.addEventListener('click', () => {
 
 inicializarImportadorImagem(svgCanvas, inputImagem);
 
+// --- Inicialização do ImageTracer ---
+const tracerManager = new ImageTracerManager(svgCanvas, inputImagem);
+
+// Assiste a aba do Tracer para atualizar a lista de imagens quando ela for ativada
+const tabTracer = document.getElementById('tab-tracer');
+if (tabTracer) {
+    const observerTab = new MutationObserver(() => {
+        // Verifica se a classe 'ativo' foi adicionada pela SideBar.js
+        if (tabTracer.classList.contains('ativo')) {
+            tracerManager.atualizarLista();
+        }
+    });
+    observerTab.observe(tabTracer, { attributes: true, attributeFilter: ['class'] });
+}
+
 // Inicializar o estado dos botões de histórico
 atualizarBotoesHistorico();
 
@@ -670,3 +689,18 @@ svgCanvas.addEventListener('wheel', (e) => {
   cameraGlobal.zoom(escala, coords.x, coords.y);
   scrollbar.atualizar();
 }, { passive: false });
+
+// Observa o canvas para atualizar o Tracer automaticamente quando uma imagem for adicionada ou removida
+const observerCanvas = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+        if (mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0) {
+            // Verifica se a aba do tracer está aberta no momento
+            if (tabTracer && tabTracer.classList.contains('ativo')) {
+                tracerManager.atualizarLista();
+            }
+        }
+    });
+});
+
+// Começa a observar a adição/remoção de elementos filhos no svgCanvas
+observerCanvas.observe(svgCanvas, { childList: true });
