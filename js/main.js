@@ -62,7 +62,7 @@ import {
   alinharBase,
   distribuirHorizontalmente,
   distribuirVerticalmente,
-} from './utils/alignHelpers.js';
+} from "./utils/alignHelpers.js";
 import { salvarRascunho, marcarSalvo } from "./utils/autoSave.js";
 import { ImageTracerManager } from "./tools/ImageTracerManager.js";
 import { MedidorTool } from "./tools/MedidorTool.js";
@@ -74,7 +74,7 @@ const historyManager = new HistoryManager(svgCanvas);
 definirGerenciadorHistorico(historyManager);
 
 // Inicializar a tela de menu inicial
-inicializarMenuInicial(svgCanvas, definirCorPreenchimento, definirCorBorda);
+inicializarMenuInicial(svgCanvas);
 
 // Inicializar a sidebar
 const barraLateral = new SideBar();
@@ -189,11 +189,11 @@ canvasContainer.appendChild(svgCanvas);
 // Camada de Interação: instanciar o novo SVG de overlay para seleções
 const overlayCanvas = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 overlayCanvas.setAttribute('id', 'overlay-canvas');
+overlayCanvas.setAttribute('width', '100%');
+overlayCanvas.setAttribute('height', '100%');
 overlayCanvas.style.position = 'absolute';
-overlayCanvas.style.top = '20px';
-overlayCanvas.style.left = '20px';
-overlayCanvas.style.width = 'calc(100% - 20px)';
-overlayCanvas.style.height = 'calc(100% - 20px)';
+overlayCanvas.style.top = '0';
+overlayCanvas.style.left = '0';
 overlayCanvas.style.pointerEvents = 'none'; // Coordenado com o principal
 canvasContainer.appendChild(overlayCanvas);
 
@@ -226,21 +226,6 @@ observer.observe(svgCanvas, { attributes: true, attributeFilter: ["viewBox"] });
 const selecaoVisual = new Selecao(overlayCanvas);
 definirGerenciadorSelecao(selecaoVisual);
 
-// --- Painel de Alinhamento (multi-seleção) ---
-const painelAlinhamento = document.getElementById('painel-alinhamento');
-function atualizarVisibilidadePainelAlinhamento(qtd) {
-  if (!painelAlinhamento) return;
-  if (qtd >= 2) {
-    painelAlinhamento.classList.remove('oculto');
-  } else {
-    painelAlinhamento.classList.add('oculto');
-  }
-}
-definirCallbackPainelAlinhamento(atualizarVisibilidadePainelAlinhamento);
-
-// Menu de contexto simples em utilitário
-inicializarMenuContexto(svgCanvas);
-
 // Instâncias das ferramentas disponíveis com todas as implementações da main
 const cameraGlobal = new CameraSVG([svgCanvas, overlayCanvas]);
 const scrollbar = new ScrollbarSVG(canvasContainer, svgCanvas, cameraGlobal);
@@ -267,7 +252,7 @@ const instanciasFerramentas = {
 /**
  * Atualiza o estado visual dos botões da sidebar,
  * destacando apenas o botão da ferramenta ativa.
- * 
+ *
  * @param {string} nomeDaFerramenta - Identificador da ferramenta ativa.
  */
 function atualizarBotaoAtivo(nomeDaFerramenta) {
@@ -340,6 +325,7 @@ botoesEstiloLinha.forEach((btn) => {
 });
 
 // Atualizar os inputs da sidebar quando o usuário selecionar um objeto
+// Usamos um MutationObserver ou interceptamos cliques no Canvas para capturar a seleção.
 svgCanvas.addEventListener("mouseup", (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseUp(evento);
@@ -349,9 +335,11 @@ svgCanvas.addEventListener("mouseup", (evento) => {
   if (primeiroSelecionado) {
     const corPreenchimentoAtual = primeiroSelecionado.getAttribute('fill') || '#ffffff';
     const corBordaAtual = primeiroSelecionado.getAttribute('stroke') || '#000000';
-    // Captura as opacidades existentes (padrão é 1 se não houver atributo)    
+    
+    // Captura as opacidades existentes (padrão é 1 se não houver atributo)
     const opacidadePreenchimentoAtual = primeiroSelecionado.getAttribute('fill-opacity') || '1';
     const opacidadeBordaAtual = primeiroSelecionado.getAttribute('stroke-opacity') || '1';
+
     // Só atualizamos os seletores visuais do HTML se o valor do SVG for uma cor hexadecimal válida.
     if (
       corPreenchimentoAtual !== "none" &&
@@ -362,10 +350,11 @@ svgCanvas.addEventListener("mouseup", (evento) => {
     if (corBordaAtual !== "none" && corBordaAtual.startsWith("#")) {
       inputCorBorda.value = corBordaAtual;
     }
-    
+
     // Atualiza visualmente os Sliders de Opacidade na UI
     sliderOpacidadePreenchimento.value = opacidadePreenchimentoAtual;
     sliderOpacidadeBorda.value = opacidadeBordaAtual;
+
     // Atualiza também os valores armazenados no StateManager para consistência
     definirCorPreenchimento(corPreenchimentoAtual);
     definirCorBorda(corBordaAtual);
@@ -378,36 +367,43 @@ svgCanvas.addEventListener("mouseup", (evento) => {
 
 btnPreenchimentoNenhum.addEventListener('click', () => {
   definirCorPreenchimento('none');
+  
   estado.elementosSelecionados.forEach(el => {
     el.setAttribute('fill', 'none');
   });
+  
   registrarAcaoHistorico();
   atualizarBotoesHistorico();
 });
 
 btnBordaNenhum.addEventListener('click', () => {
   definirCorBorda('none');
+  
   estado.elementosSelecionados.forEach(el => {
     el.setAttribute('stroke', 'none');
   });
+  
   registrarAcaoHistorico();
   atualizarBotoesHistorico();
 });
 
 sliderOpacidadePreenchimento.addEventListener("input", () => {
   const valor = sliderOpacidadePreenchimento.value;
+  
   estado.elementosSelecionados.forEach(el => {
     el.setAttribute('fill-opacity', valor);
   });
 });
 
 sliderOpacidadePreenchimento.addEventListener('change', () => {
+  // Salva no histórico apenas quando o usuário soltar o slider
   registrarAcaoHistorico();
   atualizarBotoesHistorico();
 });
 
 sliderOpacidadeBorda.addEventListener("input", () => {
   const valor = sliderOpacidadeBorda.value;
+  
   estado.elementosSelecionados.forEach(el => {
     el.setAttribute('stroke-opacity', valor);
   });
@@ -469,15 +465,14 @@ atualizarBotaoEstiloLinhaAtivo(estado.estiloLinha);
 btnExportar.addEventListener("click", () => {
   const formato = exportFormat.value || "png";
   exportarDesenho(svgCanvas, formato);
-  marcarSalvo();
-  ocultarIndicadorNaoSalvo();
 });
 
-const valorEspessura = document.getElementById("valor-espessura-lapis");
+const valorEspessura =
+    document.getElementById("valor-espessura-lapis");
 
 inputEspessuraLapis.addEventListener("input", (e) => {
     definirEspessuraLapis(e.target.value);
-    if (valorEspessura) valorEspessura.textContent = e.target.value;
+    valorEspessura.textContent = e.target.value;
 });
 
 // --- Controle de Camadas (Z-Index) ---
@@ -490,6 +485,7 @@ function moverCamada(acao) {
   const elementos = estado.elementosSelecionados;
   if (!elementos || elementos.length === 0) return;
 
+  // Move o primeiro elemento selecionado (para simplicidade)
   const el = elementos[0];
   if (!el) return;
 
@@ -547,9 +543,11 @@ btnFlipVertical.addEventListener("click", () => {
 // Atalhos de Teclado (Tool Selection)
 window.addEventListener("keydown", (e) => {
   // Prevenção de conflitos
+  // Verifica se o usuário está focado em um campo de texto ou input de cor.
   const elementoAtivo = document.activeElement;
   const tagAtiva = elementoAtivo.tagName.toLocaleLowerCase();
 
+  // Se o foco estiver em um input, textArea, select ou contentEditable, ignora o atalho.
   if (
     ["input", "textarea", "select"].includes(tagAtiva) ||
     elementoAtivo.isContentEditable
@@ -565,7 +563,7 @@ window.addEventListener("keydown", (e) => {
       } else {
         agruparElementos();
       }
-      atualizarBotoesHistorico();
+      atualizarBotoesHistorico(); // Sincroniza a interface de histórico
       return;
     }
     if (e.key.toLowerCase() === "z") {
@@ -592,6 +590,11 @@ window.addEventListener("keydown", (e) => {
     if (e.key === "[" || e.key === "{") {
       e.preventDefault();
       moverCamada(e.shiftKey ? "fundo" : "recuar");
+      return;
+    }
+    // Ctrl+C / Ctrl+V / Ctrl+D são tratados em outro listener — apenas impede
+    // que caiam no mapa de atalhos de ferramenta abaixo.
+    if (['c', 'v', 'd'].includes(e.key.toLowerCase())) {
       return;
     }
   }
@@ -689,6 +692,11 @@ window.addEventListener("keydown", (e) => {
   }
 });
 
+// --- Área de Transferência (Copiar / Colar) ---
+let clipboard = [];       
+let pasteCount = 0;       
+const PASTE_OFFSET = 20;  
+
 // --- Duplicar elemento ---
 function handlerDuplicar() {
   const el = estado.elementosSelecionados[0];
@@ -700,10 +708,48 @@ function handlerDuplicar() {
   }
 }
 
-document.addEventListener("keydown", (evento) => {
-  if ((evento.ctrlKey || evento.metaKey) && evento.key.toLowerCase() === "d") {
+document.addEventListener('keydown', (evento) => {
+  if (!(evento.ctrlKey || evento.metaKey)) return;
+
+  const tecla = evento.key.toLowerCase();
+
+  // Ctrl+D — Duplicar
+  if (tecla === 'd') {
     evento.preventDefault();
     handlerDuplicar();
+    return;
+  }
+
+  // Ctrl+C — Copiar elementos selecionados para a área de transferência interna
+  if (tecla === 'c') {
+    if (estado.elementosSelecionados.length === 0) return;
+    evento.preventDefault();
+    clipboard = estado.elementosSelecionados.map(el => el.cloneNode(true));
+    pasteCount = 0;
+    return;
+  }
+
+  // Ctrl+V — Colar elementos da área de transferência interna
+  if (tecla === 'v') {
+    if (clipboard.length === 0) return;
+    evento.preventDefault();
+    pasteCount++;
+    const offset = PASTE_OFFSET * pasteCount;
+    const novosElementos = [];
+
+    clipboard.forEach(original => {
+      const clone = duplicarElemento(original, svgCanvas, offset, offset);
+      if (clone) {
+        novosElementos.push(clone);
+      }
+    });
+
+    if (novosElementos.length > 0) {
+      definirElementosSelecionados(novosElementos);
+      registrarAcaoHistorico();
+      atualizarBotoesHistorico();
+    }
+    return;
   }
 });
 
@@ -748,36 +794,3 @@ svgCanvas.addEventListener(
   cameraGlobal.zoom(escala, coords.x, coords.y);
   scrollbar.atualizar();
 }, { passive: false });
-
-// --- Botões de Alinhamento ---
-function executarAlinhamento(fn) {
-  fn(estado.elementosSelecionados);
-  atualizarPosicaoSelecaoVisual();
-  registrarAcaoHistorico();
-  atualizarBotoesHistorico();
-}
-
-// Com encadeamento opcional (?) caso os botões não existam em outras views
-document.getElementById('btn-alinhar-esquerda')?.addEventListener('click', () => executarAlinhamento(alinharEsquerda));
-document.getElementById('btn-alinhar-centro-h')?.addEventListener('click', () => executarAlinhamento(alinharCentroHorizontal));
-document.getElementById('btn-alinhar-direita')?.addEventListener('click',  () => executarAlinhamento(alinharDireita));
-document.getElementById('btn-alinhar-topo')?.addEventListener('click',     () => executarAlinhamento(alinharTopo));
-document.getElementById('btn-alinhar-centro-v')?.addEventListener('click', () => executarAlinhamento(alinharCentroVertical));
-document.getElementById('btn-alinhar-base')?.addEventListener('click',     () => executarAlinhamento(alinharBase));
-document.getElementById('btn-distribuir-h')?.addEventListener('click',     () => executarAlinhamento(distribuirHorizontalmente));
-document.getElementById('btn-distribuir-v')?.addEventListener('click',     () => executarAlinhamento(distribuirVerticalmente));
-
-// Observa o canvas para atualizar o Tracer automaticamente quando uma imagem for adicionada ou removida
-const observerCanvas = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-        if (mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0) {
-          // Verifica se a aba do tracer está aberta no momento
-            if (tabTracer && tabTracer.classList.contains('ativo')) {
-                tracerManager.atualizarLista();
-            }
-        }
-    });
-});
-
-// Começa a observar a adição/remoção de elementos filhos no svgCanvas
-observerCanvas.observe(svgCanvas, { childList: true });

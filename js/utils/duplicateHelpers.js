@@ -14,18 +14,31 @@ const TAG_POS_ATTRS = {
 function ajustarPosicaoElemento(elemento, offsetX, offsetY) {
   const tag = elemento.tagName ? elemento.tagName.toLowerCase() : '';
 
-  if (tag === 'g') {
+  // Se for um grupo ou se não tiver atributos simples de posição mapeados (ex: path, polygon, polyline)
+  const attrs = TAG_POS_ATTRS[tag];
+  if (tag === 'g' || !attrs) {
     const transformAttr = elemento.getAttribute('transform') || '';
     let translateX = 0;
     let translateY = 0;
 
     if (transformAttr.includes('translate')) {
+      // Tenta casar translate(X, Y) ou translate(X Y)
       const match = transformAttr.match(/translate\(([^,)]+)[,\s]+([^)]+)\)/);
       if (match) {
         translateX = parseFloat(match[1]) || 0;
         translateY = parseFloat(match[2]) || 0;
         const rest = transformAttr.replace(match[0], '').trim();
         elemento.setAttribute('transform', `translate(${translateX + offsetX}, ${translateY + offsetY}) ${rest}`.trim());
+      } else {
+        // Trata caso tenha apenas um valor no translate, ex: translate(X) (onde Y assume 0)
+        const matchSingle = transformAttr.match(/translate\(([^)]+)\)/);
+        if (matchSingle) {
+          translateX = parseFloat(matchSingle[1]) || 0;
+          const rest = transformAttr.replace(matchSingle[0], '').trim();
+          elemento.setAttribute('transform', `translate(${translateX + offsetX}, ${offsetY}) ${rest}`.trim());
+        } else {
+          elemento.setAttribute('transform', `translate(${offsetX}, ${offsetY}) ${transformAttr}`.trim());
+        }
       }
     } else {
       elemento.setAttribute('transform', `translate(${offsetX}, ${offsetY}) ${transformAttr}`.trim());
@@ -33,9 +46,7 @@ function ajustarPosicaoElemento(elemento, offsetX, offsetY) {
     return;
   }
 
-  const attrs = TAG_POS_ATTRS[tag];
-  if (!attrs) return;
-
+  // Se tiver atributos de posição simples mapeados, altera diretamente neles
   if (Array.isArray(attrs.x)) {
     attrs.x.forEach(attr => {
       const val = parseFloat(elemento.getAttribute(attr)) || 0;
