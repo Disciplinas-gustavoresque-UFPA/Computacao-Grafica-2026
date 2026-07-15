@@ -20,9 +20,6 @@ import {
   refazerAcao,
   registrarAcaoHistorico,
   atualizarPosicaoSelecaoVisual
-  definirCallbackPainelAlinhamento,
-  atualizarPosicaoSelecaoVisual,
-  definirEspessuraLapis
 } from './core/StateManager.js';
 import { ColorPickerTool } from './tools/ColorPickerTool.js';
 import { Lapis } from './tools/LapisTool.js';
@@ -54,18 +51,6 @@ import { Regua } from './core/Regua.js';
 import { LosangoTool } from './tools/LosangoTool.js';
 import { agruparElementos, desagruparElementos } from './core/GroupManager.js';
 import { espelharHorizontal, espelharVertical } from "./utils/flipHelpers.js";
-import {
-  alinharEsquerda,
-  alinharCentroHorizontal,
-  alinharDireita,
-  alinharTopo,
-  alinharCentroVertical,
-  alinharBase,
-  distribuirHorizontalmente,
-  distribuirVerticalmente,
-} from './utils/alignHelpers.js';
-import { salvarRascunho, marcarSalvo } from './utils/autoSave.js';
-import { ImageTracerManager } from './tools/ImageTracerManager.js';
 
 const svgCanvas = document.getElementById('canvas');
 
@@ -173,11 +158,11 @@ canvasContainer.appendChild(svgCanvas);
 // Camada de Interação: instanciar o novo SVG de overlay para seleções
 const overlayCanvas = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 overlayCanvas.setAttribute('id', 'overlay-canvas');
+overlayCanvas.setAttribute('width', '100%');
+overlayCanvas.setAttribute('height', '100%');
 overlayCanvas.style.position = 'absolute';
-overlayCanvas.style.top = '20px';
-overlayCanvas.style.left = '20px';
-overlayCanvas.style.width = 'calc(100% - 20px)';
-overlayCanvas.style.height = 'calc(100% - 20px)';
+overlayCanvas.style.top = '0';
+overlayCanvas.style.left = '0';
 overlayCanvas.style.pointerEvents = 'none'; // Coordenado com o principal
 canvasContainer.appendChild(overlayCanvas);
 
@@ -210,21 +195,6 @@ observer.observe(svgCanvas, { attributes: true, attributeFilter: ['viewBox'] });
 const selecaoVisual = new Selecao(overlayCanvas);
 definirGerenciadorSelecao(selecaoVisual);
 
-// --- Painel de Alinhamento (multi-seleção) ---
-const painelAlinhamento = document.getElementById('painel-alinhamento');
-function atualizarVisibilidadePainelAlinhamento(qtd) {
-  if (!painelAlinhamento) return;
-  if (qtd >= 2) {
-    painelAlinhamento.classList.remove('oculto');
-  } else {
-    painelAlinhamento.classList.add('oculto');
-  }
-}
-definirCallbackPainelAlinhamento(atualizarVisibilidadePainelAlinhamento);
-
-// Menu de contexto simples em utilitário
-inicializarMenuContexto(svgCanvas);
-
 // Instâncias das ferramentas disponíveis com todas as implementações da main
 const cameraGlobal = new CameraSVG([svgCanvas, overlayCanvas]);
 const scrollbar = new ScrollbarSVG(canvasContainer, svgCanvas, cameraGlobal);
@@ -250,7 +220,7 @@ const instanciasFerramentas = {
 /**
  * Atualiza o estado visual dos botões da sidebar,
  * destacando apenas o botão da ferramenta ativa.
- * 
+ *
  * @param {string} nomeDaFerramenta - Identificador da ferramenta ativa.
  */
 function atualizarBotaoAtivo(nomeDaFerramenta) {
@@ -333,9 +303,11 @@ svgCanvas.addEventListener('mouseup', (evento) => {
   if (primeiroSelecionado) {
     const corPreenchimentoAtual = primeiroSelecionado.getAttribute('fill') || '#ffffff';
     const corBordaAtual = primeiroSelecionado.getAttribute('stroke') || '#000000';
-    // Captura as opacidades existentes (padrão é 1 se não houver atributo)    
+    
+    // Captura as opacidades existentes (padrão é 1 se não houver atributo)
     const opacidadePreenchimentoAtual = primeiroSelecionado.getAttribute('fill-opacity') || '1';
     const opacidadeBordaAtual = primeiroSelecionado.getAttribute('stroke-opacity') || '1';
+
     // Só atualizamos os seletores visuais do HTML se o valor do SVG for uma cor hexadecimal válida.
     if (corPreenchimentoAtual !== 'none' && corPreenchimentoAtual.startsWith('#')) {
       inputCorPreenchimento.value = corPreenchimentoAtual;
@@ -343,10 +315,11 @@ svgCanvas.addEventListener('mouseup', (evento) => {
     if (corBordaAtual !== 'none' && corBordaAtual.startsWith('#')) {
       inputCorBorda.value = corBordaAtual;
     }
-    
+
     // Atualiza visualmente os Sliders de Opacidade na UI
     sliderOpacidadePreenchimento.value = opacidadePreenchimentoAtual;
     sliderOpacidadeBorda.value = opacidadeBordaAtual;
+
     // Atualiza também os valores armazenados no StateManager para consistência
     definirCorPreenchimento(corPreenchimentoAtual);
     definirCorBorda(corBordaAtual);
@@ -355,36 +328,43 @@ svgCanvas.addEventListener('mouseup', (evento) => {
 
 btnPreenchimentoNenhum.addEventListener('click', () => {
   definirCorPreenchimento('none');
+  
   estado.elementosSelecionados.forEach(el => {
     el.setAttribute('fill', 'none');
   });
+  
   registrarAcaoHistorico();
   atualizarBotoesHistorico();
 });
 
 btnBordaNenhum.addEventListener('click', () => {
   definirCorBorda('none');
+  
   estado.elementosSelecionados.forEach(el => {
     el.setAttribute('stroke', 'none');
   });
+  
   registrarAcaoHistorico();
   atualizarBotoesHistorico();
 });
 
 sliderOpacidadePreenchimento.addEventListener('input', () => {
   const valor = sliderOpacidadePreenchimento.value;
+  
   estado.elementosSelecionados.forEach(el => {
     el.setAttribute('fill-opacity', valor);
   });
 });
 
 sliderOpacidadePreenchimento.addEventListener('change', () => {
+  // Salva no histórico apenas quando o usuário soltar o slider
   registrarAcaoHistorico();
   atualizarBotoesHistorico();
 });
 
 sliderOpacidadeBorda.addEventListener('input', () => {
   const valor = sliderOpacidadeBorda.value;
+  
   estado.elementosSelecionados.forEach(el => {
     el.setAttribute('stroke-opacity', valor);
   });
@@ -427,9 +407,6 @@ overlayCanvas.addEventListener('mouseup', (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseUp(evento);
   }
-  // Auto-save silencioso após ações realizadas via overlay (ex: mover seleções, lápis)
-  salvarRascunho(svgCanvas, estado, 'editor');
-  mostrarIndicadorNaoSalvo();
 });
 
 // Previne o menu de opções do botão direito no canvas
@@ -455,7 +432,7 @@ const valorEspessura =
 
 inputEspessuraLapis.addEventListener("input", (e) => {
     definirEspessuraLapis(e.target.value);
-    if (valorEspessura) valorEspessura.textContent = e.target.value;
+    valorEspessura.textContent = e.target.value;
 });
 
 // --- Controle de Camadas (Z-Index) ---
@@ -671,20 +648,6 @@ btnImportarImagem.addEventListener('click', () => {
 
 inicializarImportadorImagem(svgCanvas, inputImagem);
 
-// --- Inicialização do ImageTracer ---
-const tracerManager = new ImageTracerManager(svgCanvas, inputImagem);
-// Assiste a aba do Tracer para atualizar a lista de imagens quando ela for ativada
-const tabTracer = document.getElementById('tab-tracer');
-if (tabTracer) {
-    const observerTab = new MutationObserver(() => {
-      // Verifica se a classe 'ativo' foi adicionada pela SideBar.js
-        if (tabTracer.classList.contains('ativo')) {
-            tracerManager.atualizarLista();
-        }
-    });
-    observerTab.observe(tabTracer, { attributes: true, attributeFilter: ['class'] });
-}
-
 // Inicializar o estado dos botões de histórico
 atualizarBotoesHistorico();
 
@@ -702,37 +665,3 @@ svgCanvas.addEventListener('wheel', (e) => {
   cameraGlobal.zoom(escala, coords.x, coords.y);
   scrollbar.atualizar();
 }, { passive: false });
-}, { passive: false });
-
-// --- Botões de Alinhamento ---
-function executarAlinhamento(fn) {
-  fn(estado.elementosSelecionados);
-  atualizarPosicaoSelecaoVisual();
-  registrarAcaoHistorico();
-  atualizarBotoesHistorico();
-}
-
-// Com encadeamento opcional (?) caso os botões não existam em outras views
-document.getElementById('btn-alinhar-esquerda')?.addEventListener('click', () => executarAlinhamento(alinharEsquerda));
-document.getElementById('btn-alinhar-centro-h')?.addEventListener('click', () => executarAlinhamento(alinharCentroHorizontal));
-document.getElementById('btn-alinhar-direita')?.addEventListener('click',  () => executarAlinhamento(alinharDireita));
-document.getElementById('btn-alinhar-topo')?.addEventListener('click',     () => executarAlinhamento(alinharTopo));
-document.getElementById('btn-alinhar-centro-v')?.addEventListener('click', () => executarAlinhamento(alinharCentroVertical));
-document.getElementById('btn-alinhar-base')?.addEventListener('click',     () => executarAlinhamento(alinharBase));
-document.getElementById('btn-distribuir-h')?.addEventListener('click',     () => executarAlinhamento(distribuirHorizontalmente));
-document.getElementById('btn-distribuir-v')?.addEventListener('click',     () => executarAlinhamento(distribuirVerticalmente));
-
-// Observa o canvas para atualizar o Tracer automaticamente quando uma imagem for adicionada ou removida
-const observerCanvas = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-        if (mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0) {
-          // Verifica se a aba do tracer está aberta no momento
-            if (tabTracer && tabTracer.classList.contains('ativo')) {
-                tracerManager.atualizarLista();
-            }
-        }
-    });
-});
-
-// Começa a observar a adição/remoção de elementos filhos no svgCanvas
-observerCanvas.observe(svgCanvas, { childList: true });
