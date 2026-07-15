@@ -54,6 +54,7 @@ import { agruparElementos, desagruparElementos } from './core/GroupManager.js';
 import { espelharHorizontal, espelharVertical } from "./utils/flipHelpers.js";
 import { salvarRascunho, marcarSalvo } from './utils/autoSave.js';
 import { ImageTracerManager } from './tools/ImageTracerManager.js';
+import { aplicarGradientePreenchimento, obterInfoGradiente, ehGradiente } from './utils/gradientHelpers.js';
 
 const svgCanvas = document.getElementById('canvas');
 
@@ -73,6 +74,13 @@ const btnImportarImagem = document.getElementById('btn-importar-imagem');
 const inputImagem = document.getElementById('input-imagem');
 const inputCorPreenchimento = document.getElementById('cor-preenchimento');
 const inputCorBorda = document.getElementById('cor-borda');
+
+// Controles de tipo de preenchimento (sólido / gradiente linear / gradiente radial)
+const radiosTipoPreenchimento = document.querySelectorAll('input[name="tipo-preenchimento"]');
+const linhaPreenchimentoSolido = document.getElementById('preenchimento-solido-row');
+const linhaPreenchimentoGradiente = document.getElementById('preenchimento-gradiente-row');
+const inputCorGradienteInicio = document.getElementById('cor-gradiente-inicio');
+const inputCorGradienteFim = document.getElementById('cor-gradiente-fim');
 const botoesEstiloLinha = document.querySelectorAll('.btn-line-style');
 const nomeFerramenta = document.getElementById('nome-ferramenta');
 const btnExportar = document.getElementById('btn-exportar');
@@ -278,6 +286,68 @@ inputCorPreenchimento.addEventListener('input', () => {
   });
 });
 
+inputCorPreenchimento.addEventListener('change', () => {
+  registrarAcaoHistorico();
+  atualizarBotoesHistorico();
+});
+
+// --- Preenchimento em Gradiente (linear/radial) ---
+
+/**
+ * Retorna o tipo de preenchimento selecionado no rádio da sidebar
+ * ('solido' | 'linear' | 'radial').
+ */
+function obterTipoPreenchimentoSelecionado() {
+  const radioMarcado = Array.from(radiosTipoPreenchimento).find(r => r.checked);
+  return radioMarcado ? radioMarcado.value : 'solido';
+}
+
+/**
+ * Mostra/esconde as linhas de cor sólida x gradiente conforme o tipo escolhido.
+ */
+function atualizarVisibilidadeControlesPreenchimento(tipo) {
+  const ehGradienteSelecionado = tipo === 'linear' || tipo === 'radial';
+  linhaPreenchimentoSolido.classList.toggle('oculto', ehGradienteSelecionado);
+  linhaPreenchimentoGradiente.classList.toggle('oculto', !ehGradienteSelecionado);
+}
+
+/**
+ * Aplica o preenchimento (sólido ou gradiente, conforme o tipo selecionado)
+ * a todos os elementos atualmente selecionados.
+ */
+function aplicarPreenchimentoAtual() {
+  const tipo = obterTipoPreenchimentoSelecionado();
+
+  if (estado.elementosSelecionados.length === 0) return;
+
+  if (tipo === 'solido') {
+    const cor = inputCorPreenchimento.value;
+    definirCorPreenchimento(cor);
+    estado.elementosSelecionados.forEach(el => el.setAttribute('fill', cor));
+  } else {
+    const corInicio = inputCorGradienteInicio.value;
+    const corFim = inputCorGradienteFim.value;
+    estado.elementosSelecionados.forEach(el => {
+      aplicarGradientePreenchimento(svgCanvas, el, tipo, corInicio, corFim);
+    });
+  }
+
+  registrarAcaoHistorico();
+  atualizarBotoesHistorico();
+  salvarRascunho(svgCanvas, estado, 'editor');
+  mostrarIndicadorNaoSalvo();
+}
+
+radiosTipoPreenchimento.forEach(radio => {
+  radio.addEventListener('change', () => {
+    atualizarVisibilidadeControlesPreenchimento(radio.value);
+    aplicarPreenchimentoAtual();
+  });
+});
+
+inputCorGradienteInicio.addEventListener('input', aplicarPreenchimentoAtual);
+inputCorGradienteFim.addEventListener('input', aplicarPreenchimentoAtual);
+
 // Ouvir mudanças no input de cor de borda da sidebar
 inputCorBorda.addEventListener('input', () => {
   const novaCor = inputCorBorda.value;
@@ -325,6 +395,22 @@ svgCanvas.addEventListener('mouseup', (evento) => {
       inputCorBorda.value = corBordaAtual;
     }
 
+    // Se o preenchimento do objeto selecionado for um gradiente, sincroniza
+    // o alternador Sólido/Gradiente e os color-pickers "De"/"Para".
+    if (ehGradiente(corPreenchimentoAtual)) {
+      const infoGradiente = obterInfoGradiente(svgCanvas, primeiroSelecionado);
+      if (infoGradiente) {
+        const radioAlvo = document.getElementById(`tipo-preenchimento-${infoGradiente.tipo}`);
+        if (radioAlvo) radioAlvo.checked = true;
+        inputCorGradienteInicio.value = infoGradiente.corInicio;
+        inputCorGradienteFim.value = infoGradiente.corFim;
+        atualizarVisibilidadeControlesPreenchimento(infoGradiente.tipo);
+      }
+    } else {
+      document.getElementById('tipo-preenchimento-solido').checked = true;
+      atualizarVisibilidadeControlesPreenchimento('solido');
+    }
+
     // Atualiza visualmente os Sliders de Opacidade na UI
     sliderOpacidadePreenchimento.value = opacidadePreenchimentoAtual;
     sliderOpacidadeBorda.value = opacidadeBordaAtual;
@@ -345,6 +431,9 @@ btnPreenchimentoNenhum.addEventListener('click', () => {
   estado.elementosSelecionados.forEach(el => {
     el.setAttribute('fill', 'none');
   });
+
+  document.getElementById('tipo-preenchimento-solido').checked = true;
+  atualizarVisibilidadeControlesPreenchimento('solido');
   
   registrarAcaoHistorico();
   atualizarBotoesHistorico();
