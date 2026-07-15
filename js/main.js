@@ -20,42 +20,43 @@ import {
   refazerAcao,
   registrarAcaoHistorico,
   atualizarPosicaoSelecaoVisual,
-  definirEspessuraLapis
-} from './core/StateManager.js';
-import { ColorPickerTool } from './tools/ColorPickerTool.js';
-import { Lapis } from './tools/LapisTool.js';
-import { RetanguloTool } from './tools/RetanguloTool.js';
-import { TextoTool } from './tools/TextoTool.js';
-import { exportarDesenho } from './utils/exportHelpers.js';
-import { SelecaoTool } from './tools/SelecaoTool.js';
-import { Selecao } from './core/Selecao.js';
-import { BorrachaTool } from './tools/BorrachaTool.js';
-import { NodeEditTool } from './tools/NodeEditTool.js';
-import { LinhaTool } from './tools/LinhaTool.js';
-import { LinhaCurvadaTool } from './tools/LinhaCurvadaTool.js';
-import { BezierTool } from './tools/BezierTool.js';
-import { ElipseTool } from './tools/ElipseTool.js';
-import { EspiralTool } from './tools/EspiralTool.js';
-import { LupaTool } from './tools/LupaTool.js';
-import { inicializarImportadorImagem } from './tools/ImageImporter.js';
-import { inicializarMenuInicial } from './core/UIManager.js';
-import { duplicarElemento } from './utils/duplicateHelpers.js';
-import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
-import { inicializarMenuContexto } from './contextMenu/index.js';
-import { SideBar } from './core/SideBar.js';
-import { PincelTool } from './tools/PincelTool.js';
-import { CameraSVG } from './core/CameraSVG.js';
-import { ScrollbarSVG } from './core/ScrollbarSVG.js';
-import { obterCoordenadaSVG } from './utils/svgHelpers.js';
-import { HistoryManager } from './core/HistoryManager.js';
-import { Regua } from './core/Regua.js';
-import { LosangoTool } from './tools/LosangoTool.js';
-import { agruparElementos, desagruparElementos } from './core/GroupManager.js';
+  definirEspessuraLapis,
+} from "./core/StateManager.js";
+import { ColorPickerTool } from "./tools/ColorPickerTool.js";
+import { Lapis } from "./tools/LapisTool.js";
+import { RetanguloTool } from "./tools/RetanguloTool.js";
+import { TextoTool } from "./tools/TextoTool.js";
+import { exportarDesenho } from "./utils/exportHelpers.js";
+import { SelecaoTool } from "./tools/SelecaoTool.js";
+import { Selecao } from "./core/Selecao.js";
+import { BorrachaTool } from "./tools/BorrachaTool.js";
+import { NodeEditTool } from "./tools/NodeEditTool.js";
+import { LinhaTool } from "./tools/LinhaTool.js";
+import { LinhaCurvadaTool } from "./tools/LinhaCurvadaTool.js";
+import { BezierTool } from "./tools/BezierTool.js";
+import { ElipseTool } from "./tools/ElipseTool.js";
+import { EspiralTool } from "./tools/EspiralTool.js";
+import { LupaTool } from "./tools/LupaTool.js";
+import { inicializarImportadorImagem } from "./tools/ImageImporter.js";
+import { inicializarMenuInicial } from "./core/UIManager.js";
+import { duplicarElemento } from "./utils/duplicateHelpers.js";
+import { PoligonoPolilinhaTool } from "./tools/PoligonoPolilinhaTool.js";
+import { inicializarMenuContexto } from "./contextMenu/index.js";
+import { SideBar } from "./core/SideBar.js";
+import { PincelTool } from "./tools/PincelTool.js";
+import { CameraSVG } from "./core/CameraSVG.js";
+import { ScrollbarSVG } from "./core/ScrollbarSVG.js";
+import { obterCoordenadaSVG } from "./utils/svgHelpers.js";
+import { HistoryManager } from "./core/HistoryManager.js";
+import { Regua } from "./core/Regua.js";
+import { LosangoTool } from "./tools/LosangoTool.js";
+import { agruparElementos, desagruparElementos } from "./core/GroupManager.js";
 import { espelharHorizontal, espelharVertical } from "./utils/flipHelpers.js";
-import { salvarRascunho, marcarSalvo } from './utils/autoSave.js';
-import { ImageTracerManager } from './tools/ImageTracerManager.js';
+import { salvarRascunho, marcarSalvo } from "./utils/autoSave.js";
+import { ImageTracerManager } from "./tools/ImageTracerManager.js";
+import { MedidorTool } from "./tools/MedidorTool.js";
 
-const svgCanvas = document.getElementById('canvas');
+const svgCanvas = document.getElementById("canvas");
 
 // Instancia HistoryManager
 const historyManager = new HistoryManager(svgCanvas);
@@ -67,136 +68,151 @@ inicializarMenuInicial(svgCanvas, definirCorPreenchimento, definirCorBorda);
 // Inicializar a sidebar
 const barraLateral = new SideBar();
 
-const areaDesenho = document.getElementById('area-desenho');
-const botoesFerramenta = document.querySelectorAll('.btn-ferramenta');
-const btnImportarImagem = document.getElementById('btn-importar-imagem');
-const inputImagem = document.getElementById('input-imagem');
-const inputCorPreenchimento = document.getElementById('cor-preenchimento');
-const inputCorBorda = document.getElementById('cor-borda');
-const botoesEstiloLinha = document.querySelectorAll('.btn-line-style');
-const nomeFerramenta = document.getElementById('nome-ferramenta');
-const btnExportar = document.getElementById('btn-exportar');
-const exportFormat = document.getElementById('export-format');
+const areaDesenho = document.getElementById("area-desenho");
+const botoesFerramenta = document.querySelectorAll(".btn-ferramenta");
+const btnImportarImagem = document.getElementById("btn-importar-imagem");
+const inputImagem = document.getElementById("input-imagem");
+const inputCorPreenchimento = document.getElementById("cor-preenchimento");
+const inputCorBorda = document.getElementById("cor-borda");
+const botoesEstiloLinha = document.querySelectorAll(".btn-line-style");
+const nomeFerramenta = document.getElementById("nome-ferramenta");
+const btnExportar = document.getElementById("btn-exportar");
+const exportFormat = document.getElementById("export-format");
 const inputEspessuraLapis = document.getElementById("espessura-lapis");
 
-const indicadorNaoSalvo = document.getElementById('indicador-nao-salvo');
-function mostrarIndicadorNaoSalvo() { if (indicadorNaoSalvo) indicadorNaoSalvo.classList.remove('oculto'); }
-function ocultarIndicadorNaoSalvo() { if (indicadorNaoSalvo) indicadorNaoSalvo.classList.add('oculto'); }
+const indicadorNaoSalvo = document.getElementById("indicador-nao-salvo");
+function mostrarIndicadorNaoSalvo() {
+  if (indicadorNaoSalvo) indicadorNaoSalvo.classList.remove("oculto");
+}
+function ocultarIndicadorNaoSalvo() {
+  if (indicadorNaoSalvo) indicadorNaoSalvo.classList.add("oculto");
+}
 
 // Botões de histórico
-const btnDesfazer = document.getElementById('btn-desfazer');
-const btnRefazer = document.getElementById('btn-refazer');
+const btnDesfazer = document.getElementById("btn-desfazer");
+const btnRefazer = document.getElementById("btn-refazer");
 
 // Função para atualizar o estado dos botões de histórico
 function atualizarBotoesHistorico() {
-    if (!historyManager) return;
+  if (!historyManager) return;
 
-    const podeDesfazer = historyManager.podeDesfazer();
-    const podeRefazer = historyManager.podeRefazer();
+  const podeDesfazer = historyManager.podeDesfazer();
+  const podeRefazer = historyManager.podeRefazer();
 
-    if (btnDesfazer) {
-        btnDesfazer.disabled = !podeDesfazer;
-        btnDesfazer.title = podeDesfazer ? 'Desfazer (Ctrl+Z)' : 'Nada para desfazer';
-    }
+  if (btnDesfazer) {
+    btnDesfazer.disabled = !podeDesfazer;
+    btnDesfazer.title = podeDesfazer
+      ? "Desfazer (Ctrl+Z)"
+      : "Nada para desfazer";
+  }
 
-    if (btnRefazer) {
-        btnRefazer.disabled = !podeRefazer;
-        btnRefazer.title = podeRefazer ? 'Refazer (Ctrl+Y / Ctrl+Shift+Z)' : 'Nada para refazer';
-    }
+  if (btnRefazer) {
+    btnRefazer.disabled = !podeRefazer;
+    btnRefazer.title = podeRefazer
+      ? "Refazer (Ctrl+Y / Ctrl+Shift+Z)"
+      : "Nada para refazer";
+  }
 }
 
 // Sobrescrever o método salvarEstado do historyManager para atualizar os botões
 const salvarEstadoOriginal = historyManager.salvarEstado.bind(historyManager);
-historyManager.salvarEstado = function() {
-    const resultado = salvarEstadoOriginal();
-    atualizarBotoesHistorico();
-    return resultado;
+historyManager.salvarEstado = function () {
+  const resultado = salvarEstadoOriginal();
+  atualizarBotoesHistorico();
+  return resultado;
 };
 
 const desfazerOriginal = historyManager.desfazer.bind(historyManager);
-historyManager.desfazer = function() {
-    const resultado = desfazerOriginal();
-    atualizarBotoesHistorico();
-    return resultado;
+historyManager.desfazer = function () {
+  const resultado = desfazerOriginal();
+  atualizarBotoesHistorico();
+  return resultado;
 };
 
 const refazerOriginal = historyManager.refazer.bind(historyManager);
-historyManager.refazer = function() {
-    const resultado = refazerOriginal();
-    atualizarBotoesHistorico();
-    return resultado;
+historyManager.refazer = function () {
+  const resultado = refazerOriginal();
+  atualizarBotoesHistorico();
+  return resultado;
 };
 
 // Configurar event listeners dos botões de histórico
 if (btnDesfazer) {
-    btnDesfazer.addEventListener('click', () => {
-        desfazerAcao();
-        atualizarBotoesHistorico();
-    });
+  btnDesfazer.addEventListener("click", () => {
+    desfazerAcao();
+    atualizarBotoesHistorico();
+  });
 }
 
 if (btnRefazer) {
-    btnRefazer.addEventListener('click', () => {
-        refazerAcao();
-        atualizarBotoesHistorico();
-    });
+  btnRefazer.addEventListener("click", () => {
+    refazerAcao();
+    atualizarBotoesHistorico();
+  });
 }
 
 // Novos botões de "Nenhum"
-const btnPreenchimentoNenhum = document.getElementById('btn-preenchimento-nenhum');
-const btnBordaNenhum = document.getElementById('btn-borda-nenhum');
+const btnPreenchimentoNenhum = document.getElementById(
+  "btn-preenchimento-nenhum",
+);
+const btnBordaNenhum = document.getElementById("btn-borda-nenhum");
 
 // Novos Sliders de opacidade
-const sliderOpacidadePreenchimento = document.getElementById('opacity-preenchimento');
-const sliderOpacidadeBorda = document.getElementById('opacity-borda');
+const sliderOpacidadePreenchimento = document.getElementById(
+  "opacity-preenchimento",
+);
+const sliderOpacidadeBorda = document.getElementById("opacity-borda");
 
 // Wrapper para sincronizar perfeitamente as coordenadas do #canvas com o #overlay-canvas
-const canvasContainer = document.createElement('div');
-canvasContainer.style.position = 'relative';
-canvasContainer.style.width = '100%';
-canvasContainer.style.height = '100%';
-canvasContainer.style.paddingTop = '20px';
-canvasContainer.style.paddingLeft = '20px';
+const canvasContainer = document.createElement("div");
+canvasContainer.style.position = "relative";
+canvasContainer.style.width = "100%";
+canvasContainer.style.height = "100%";
+canvasContainer.style.paddingTop = "20px";
+canvasContainer.style.paddingLeft = "20px";
 
 // Encapsulando o svg original
 svgCanvas.parentNode.insertBefore(canvasContainer, svgCanvas);
 canvasContainer.appendChild(svgCanvas);
 
 // Camada de Interação: instanciar o novo SVG de overlay para seleções
-const overlayCanvas = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-overlayCanvas.setAttribute('id', 'overlay-canvas');
-overlayCanvas.setAttribute('width', '100%');
-overlayCanvas.setAttribute('height', '100%');
-overlayCanvas.style.position = 'absolute';
-overlayCanvas.style.top = '0';
-overlayCanvas.style.left = '0';
-overlayCanvas.style.pointerEvents = 'none'; // Coordenado com o principal
+const overlayCanvas = document.createElementNS(
+  "http://www.w3.org/2000/svg",
+  "svg",
+);
+overlayCanvas.setAttribute("id", "overlay-canvas");
+overlayCanvas.setAttribute("width", "100%");
+overlayCanvas.setAttribute("height", "100%");
+overlayCanvas.style.position = "absolute";
+overlayCanvas.style.top = "0";
+overlayCanvas.style.left = "0";
+overlayCanvas.style.pointerEvents = "none"; // Coordenado com o principal
 canvasContainer.appendChild(overlayCanvas);
 
 // Réguas de medida (em pixels) nas bordas do canvas
 const regua = new Regua(canvasContainer, svgCanvas);
-const btnToggleRegua = document.getElementById('btn-toggle-regua');
+const btnToggleRegua = document.getElementById("btn-toggle-regua");
 if (btnToggleRegua) {
-  btnToggleRegua.addEventListener('click', () => {
+  btnToggleRegua.addEventListener("click", () => {
     const ativa = regua.alternar();
-    btnToggleRegua.classList.toggle('ativo', ativa);
+    btnToggleRegua.classList.toggle("ativo", ativa);
   });
 }
 
 // Sincronizar viewBox entre canvas principal e overlay quando necessário
 const observer = new MutationObserver((mutations) => {
   mutations.forEach((mutation) => {
-    if (mutation.attributeName === 'viewBox') {
-      const vb = svgCanvas.getAttribute('viewBox');
+    if (mutation.attributeName === "viewBox") {
+      const vb = svgCanvas.getAttribute("viewBox");
       if (vb) {
-        overlayCanvas.setAttribute('viewBox', vb);
+        overlayCanvas.setAttribute("viewBox", vb);
       } else {
-        overlayCanvas.removeAttribute('viewBox');
+        overlayCanvas.removeAttribute("viewBox");
       }
     }
   });
 });
-observer.observe(svgCanvas, { attributes: true, attributeFilter: ['viewBox'] });
+observer.observe(svgCanvas, { attributes: true, attributeFilter: ["viewBox"] });
 
 // Inicializar a classe de seleção visual
 const selecaoVisual = new Selecao(overlayCanvas);
@@ -225,6 +241,7 @@ const instanciasFerramentas = {
   lapis: new Lapis(svgCanvas),
   losango: new LosangoTool(svgCanvas),
   pincel: new PincelTool(svgCanvas),
+  medidor: new MedidorTool(svgCanvas, overlay, cameraGlobal),
 };
 
 /**
@@ -236,28 +253,28 @@ const instanciasFerramentas = {
 function atualizarBotaoAtivo(nomeDaFerramenta) {
   let btnAtivo = null;
   botoesFerramenta.forEach((btn) => {
-    if (btn.getAttribute('data-ferramenta') === nomeDaFerramenta) {
-      btn.classList.add('ativo');
+    if (btn.getAttribute("data-ferramenta") === nomeDaFerramenta) {
+      btn.classList.add("ativo");
       btnAtivo = btn;
     } else {
-      btn.classList.remove('ativo');
+      btn.classList.remove("ativo");
     }
   });
-  nomeFerramenta.textContent = btnAtivo?.dataset.nome || 'Nenhuma';
+  nomeFerramenta.textContent = btnAtivo?.dataset.nome || "Nenhuma";
 }
 
 // --- Barra de Ferramentas & Modos ---
 botoesFerramenta.forEach((btn) => {
-  btn.addEventListener('click', () => {
-    const ferramentaId = btn.getAttribute('data-ferramenta');
+  btn.addEventListener("click", () => {
+    const ferramentaId = btn.getAttribute("data-ferramenta");
     if (!ferramentaId) return;
 
     const ferramentaInstancia = instanciasFerramentas[ferramentaId] || null;
 
     if (
-      ferramentaId === 'linha' &&
+      ferramentaId === "linha" &&
       estado.ferramentaAtual === ferramentaInstancia &&
-      typeof ferramentaInstancia.openPanel === 'function'
+      typeof ferramentaInstancia.openPanel === "function"
     ) {
       ferramentaInstancia.openPanel();
       return;
@@ -269,33 +286,33 @@ botoesFerramenta.forEach((btn) => {
 });
 
 // Ouvir mudanças no input de cor de preenchimento da sidebar
-inputCorPreenchimento.addEventListener('input', () => {
+inputCorPreenchimento.addEventListener("input", () => {
   const novaCor = inputCorPreenchimento.value;
   definirCorPreenchimento(novaCor);
   // Preenche cada elemento selecionado com a cor desejada
-  estado.elementosSelecionados.forEach(el => {
-    el.setAttribute('fill', novaCor);
+  estado.elementosSelecionados.forEach((el) => {
+    el.setAttribute("fill", novaCor);
   });
 });
 
 // Ouvir mudanças no input de cor de borda da sidebar
-inputCorBorda.addEventListener('input', () => {
+inputCorBorda.addEventListener("input", () => {
   const novaCor = inputCorBorda.value;
   definirCorBorda(novaCor);
   // Colore a borda de cada elemento selecionado com a cor desejada
-  estado.elementosSelecionados.forEach(el => {
-    el.setAttribute('stroke', novaCor);
+  estado.elementosSelecionados.forEach((el) => {
+    el.setAttribute("stroke", novaCor);
   });
 });
 
 function atualizarBotaoEstiloLinhaAtivo(estiloLinha) {
   botoesEstiloLinha.forEach((btn) => {
-    btn.classList.toggle('ativo', btn.dataset.estiloLinha === estiloLinha);
+    btn.classList.toggle("ativo", btn.dataset.estiloLinha === estiloLinha);
   });
 }
 
 botoesEstiloLinha.forEach((btn) => {
-  btn.addEventListener('click', () => {
+  btn.addEventListener("click", () => {
     const estiloLinha = btn.dataset.estiloLinha;
     definirEstiloLinha(estiloLinha);
     atualizarBotaoEstiloLinhaAtivo(estiloLinha);
@@ -303,25 +320,32 @@ botoesEstiloLinha.forEach((btn) => {
 });
 
 // Atualizar os inputs da sidebar quando o usuário selecionar um objeto
-svgCanvas.addEventListener('mouseup', (evento) => {
+svgCanvas.addEventListener("mouseup", (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseUp(evento);
   }
 
   const primeiroSelecionado = estado.elementosSelecionados[0];
   if (primeiroSelecionado) {
-    const corPreenchimentoAtual = primeiroSelecionado.getAttribute('fill') || '#ffffff';
-    const corBordaAtual = primeiroSelecionado.getAttribute('stroke') || '#000000';
-    
+    const corPreenchimentoAtual =
+      primeiroSelecionado.getAttribute("fill") || "#ffffff";
+    const corBordaAtual =
+      primeiroSelecionado.getAttribute("stroke") || "#000000";
+
     // Captura as opacidades existentes (padrão é 1 se não houver atributo)
-    const opacidadePreenchimentoAtual = primeiroSelecionado.getAttribute('fill-opacity') || '1';
-    const opacidadeBordaAtual = primeiroSelecionado.getAttribute('stroke-opacity') || '1';
+    const opacidadePreenchimentoAtual =
+      primeiroSelecionado.getAttribute("fill-opacity") || "1";
+    const opacidadeBordaAtual =
+      primeiroSelecionado.getAttribute("stroke-opacity") || "1";
 
     // Só atualizamos os seletores visuais do HTML se o valor do SVG for uma cor hexadecimal válida.
-    if (corPreenchimentoAtual !== 'none' && corPreenchimentoAtual.startsWith('#')) {
+    if (
+      corPreenchimentoAtual !== "none" &&
+      corPreenchimentoAtual.startsWith("#")
+    ) {
       inputCorPreenchimento.value = corPreenchimentoAtual;
     }
-    if (corBordaAtual !== 'none' && corBordaAtual.startsWith('#')) {
+    if (corBordaAtual !== "none" && corBordaAtual.startsWith("#")) {
       inputCorBorda.value = corBordaAtual;
     }
 
@@ -335,98 +359,98 @@ svgCanvas.addEventListener('mouseup', (evento) => {
   }
 
   // Auto-save silencioso após cada ação de desenho concluída no canvas principal
-  salvarRascunho(svgCanvas, estado, 'editor');
+  salvarRascunho(svgCanvas, estado, "editor");
   mostrarIndicadorNaoSalvo();
 });
 
-btnPreenchimentoNenhum.addEventListener('click', () => {
-  definirCorPreenchimento('none');
-  
-  estado.elementosSelecionados.forEach(el => {
-    el.setAttribute('fill', 'none');
+btnPreenchimentoNenhum.addEventListener("click", () => {
+  definirCorPreenchimento("none");
+
+  estado.elementosSelecionados.forEach((el) => {
+    el.setAttribute("fill", "none");
   });
-  
+
   registrarAcaoHistorico();
   atualizarBotoesHistorico();
 });
 
-btnBordaNenhum.addEventListener('click', () => {
-  definirCorBorda('none');
-  
-  estado.elementosSelecionados.forEach(el => {
-    el.setAttribute('stroke', 'none');
+btnBordaNenhum.addEventListener("click", () => {
+  definirCorBorda("none");
+
+  estado.elementosSelecionados.forEach((el) => {
+    el.setAttribute("stroke", "none");
   });
-  
+
   registrarAcaoHistorico();
   atualizarBotoesHistorico();
 });
 
-sliderOpacidadePreenchimento.addEventListener('input', () => {
+sliderOpacidadePreenchimento.addEventListener("input", () => {
   const valor = sliderOpacidadePreenchimento.value;
-  
-  estado.elementosSelecionados.forEach(el => {
-    el.setAttribute('fill-opacity', valor);
+
+  estado.elementosSelecionados.forEach((el) => {
+    el.setAttribute("fill-opacity", valor);
   });
 });
 
-sliderOpacidadePreenchimento.addEventListener('change', () => {
+sliderOpacidadePreenchimento.addEventListener("change", () => {
   // Salva no histórico apenas quando o usuário soltar o slider
   registrarAcaoHistorico();
   atualizarBotoesHistorico();
 });
 
-sliderOpacidadeBorda.addEventListener('input', () => {
+sliderOpacidadeBorda.addEventListener("input", () => {
   const valor = sliderOpacidadeBorda.value;
-  
-  estado.elementosSelecionados.forEach(el => {
-    el.setAttribute('stroke-opacity', valor);
+
+  estado.elementosSelecionados.forEach((el) => {
+    el.setAttribute("stroke-opacity", valor);
   });
 });
 
-sliderOpacidadeBorda.addEventListener('change', () => {
+sliderOpacidadeBorda.addEventListener("change", () => {
   registrarAcaoHistorico();
   atualizarBotoesHistorico();
 });
 
 // Event listeners globais do SVG (delegados para a ferramenta ativa)
-svgCanvas.addEventListener('mousedown', (evento) => {
+svgCanvas.addEventListener("mousedown", (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseDown(evento);
   }
 });
 
-svgCanvas.addEventListener('mousemove', (evento) => {
+svgCanvas.addEventListener("mousemove", (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseMove(evento);
   }
 });
 
 // O overlay tem pointer-events:none, exceto nos elementos de UI habilitados de forma explícita
-overlayCanvas.addEventListener('mousedown', (evento) => {
+overlayCanvas.addEventListener("mousedown", (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseDown(evento);
   }
 });
 
-overlayCanvas.addEventListener('mousemove', (evento) => {
+overlayCanvas.addEventListener("mousemove", (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseMove(evento);
   }
 });
 
-overlayCanvas.addEventListener('mouseup', (evento) => {
+overlayCanvas.addEventListener("mouseup", (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseUp(evento);
   }
 
   // Auto-save silencioso após ações realizadas via overlay (ex: mover seleções, lápis)
-  salvarRascunho(svgCanvas, estado, 'editor');
+  salvarRascunho(svgCanvas, estado, "editor");
   mostrarIndicadorNaoSalvo();
 });
 
 // Previne o menu de opções do botão direito no canvas
-svgCanvas.addEventListener('contextmenu', (e) => {
-  if (e.target.closest('#canvas')) {
+svgCanvas.addEventListener("contextmenu", (e) => {
+  if (e.target.closest("#canvas")) {
     e.preventDefault();
   }
 });
@@ -437,8 +461,8 @@ inputCorBorda.value = estado.corBorda;
 atualizarBotaoEstiloLinhaAtivo(estado.estiloLinha);
 
 // Exportar / Salvar desenho
-btnExportar.addEventListener('click', () => {
-  const formato = exportFormat.value || 'png';
+btnExportar.addEventListener("click", () => {
+  const formato = exportFormat.value || "png";
   exportarDesenho(svgCanvas, formato);
   marcarSalvo();
   ocultarIndicadorNaoSalvo();
@@ -447,15 +471,15 @@ btnExportar.addEventListener('click', () => {
 const valorEspessura = document.getElementById("valor-espessura-lapis");
 
 inputEspessuraLapis.addEventListener("input", (e) => {
-    definirEspessuraLapis(e.target.value);
-    valorEspessura.textContent = e.target.value;
+  definirEspessuraLapis(e.target.value);
+  valorEspessura.textContent = e.target.value;
 });
 
 // --- Controle de Camadas (Z-Index) ---
-const btnSendToBack = document.getElementById('btn-send-to-back');
-const btnStepBackward = document.getElementById('btn-step-backward');
-const btnStepForward = document.getElementById('btn-step-forward');
-const btnBringToFront = document.getElementById('btn-bring-to-front');
+const btnSendToBack = document.getElementById("btn-send-to-back");
+const btnStepBackward = document.getElementById("btn-step-backward");
+const btnStepForward = document.getElementById("btn-step-forward");
+const btnBringToFront = document.getElementById("btn-bring-to-front");
 
 function moverCamada(acao) {
   const elementos = estado.elementosSelecionados;
@@ -468,20 +492,20 @@ function moverCamada(acao) {
   if (!pai) return;
 
   switch (acao) {
-    case 'fundo':
+    case "fundo":
       pai.prepend(el);
       break;
-    case 'recuar':
+    case "recuar":
       if (el.previousElementSibling) {
         el.previousElementSibling.before(el);
       }
       break;
-    case 'avancar':
+    case "avancar":
       if (el.nextElementSibling) {
         el.nextElementSibling.after(el);
       }
       break;
-    case 'frente':
+    case "frente":
       pai.appendChild(el);
       break;
   }
@@ -490,29 +514,29 @@ function moverCamada(acao) {
   atualizarBotoesHistorico();
 }
 
-btnSendToBack.addEventListener('click', () => moverCamada('fundo'));
-btnStepBackward.addEventListener('click', () => moverCamada('recuar'));
-btnStepForward.addEventListener('click', () => moverCamada('avancar'));
-btnBringToFront.addEventListener('click', () => moverCamada('frente'));
+btnSendToBack.addEventListener("click", () => moverCamada("fundo"));
+btnStepBackward.addEventListener("click", () => moverCamada("recuar"));
+btnStepForward.addEventListener("click", () => moverCamada("avancar"));
+btnBringToFront.addEventListener("click", () => moverCamada("frente"));
 
 // --- Configurar Espelhamento ---
-const btnFlipHorizontal = document.getElementById('btn-flip-horizontal');
-const btnFlipVertical = document.getElementById('btn-flip-vertical');
+const btnFlipHorizontal = document.getElementById("btn-flip-horizontal");
+const btnFlipVertical = document.getElementById("btn-flip-vertical");
 
 btnFlipHorizontal.addEventListener("click", () => {
-    estado.elementosSelecionados.forEach(el => {
-        espelharHorizontal(el);
-    });
-    atualizarPosicaoSelecaoVisual();
-    registrarAcaoHistorico();
+  estado.elementosSelecionados.forEach((el) => {
+    espelharHorizontal(el);
+  });
+  atualizarPosicaoSelecaoVisual();
+  registrarAcaoHistorico();
 });
 
 btnFlipVertical.addEventListener("click", () => {
-    estado.elementosSelecionados.forEach(el => {
-        espelharVertical(el);
-    });
-    atualizarPosicaoSelecaoVisual();
-    registrarAcaoHistorico();
+  estado.elementosSelecionados.forEach((el) => {
+    espelharVertical(el);
+  });
+  atualizarPosicaoSelecaoVisual();
+  registrarAcaoHistorico();
 });
 
 // Atalhos de Teclado (Tool Selection)
@@ -521,12 +545,15 @@ window.addEventListener("keydown", (e) => {
   const elementoAtivo = document.activeElement;
   const tagAtiva = elementoAtivo.tagName.toLocaleLowerCase();
 
-  if (["input", "textarea", "select"].includes(tagAtiva) || elementoAtivo.isContentEditable)
+  if (
+    ["input", "textarea", "select"].includes(tagAtiva) ||
+    elementoAtivo.isContentEditable
+  )
     return;
 
   // Atalhos de teclado para o histórico
   if (e.ctrlKey || e.metaKey) {
-    if (e.key.toLowerCase() === 'g') {
+    if (e.key.toLowerCase() === "g") {
       e.preventDefault();
       if (e.shiftKey) {
         desagruparElementos();
@@ -536,7 +563,7 @@ window.addEventListener("keydown", (e) => {
       atualizarBotoesHistorico();
       return;
     }
-    if (e.key.toLowerCase() === 'z') {
+    if (e.key.toLowerCase() === "z") {
       e.preventDefault();
       if (e.shiftKey) {
         refazerAcao();
@@ -546,20 +573,20 @@ window.addEventListener("keydown", (e) => {
       atualizarBotoesHistorico();
       return;
     }
-    if (e.key.toLowerCase() === 'y') {
+    if (e.key.toLowerCase() === "y") {
       e.preventDefault();
       refazerAcao();
       atualizarBotoesHistorico();
       return;
     }
-    if (e.key === ']' || e.key === '}') {
+    if (e.key === "]" || e.key === "}") {
       e.preventDefault();
-      moverCamada(e.shiftKey ? 'frente' : 'avancar');
+      moverCamada(e.shiftKey ? "frente" : "avancar");
       return;
     }
-    if (e.key === '[' || e.key === '{') {
+    if (e.key === "[" || e.key === "{") {
       e.preventDefault();
-      moverCamada(e.shiftKey ? 'fundo' : 'recuar');
+      moverCamada(e.shiftKey ? "fundo" : "recuar");
       return;
     }
   }
@@ -569,20 +596,22 @@ window.addEventListener("keydown", (e) => {
   // Atalhos com Shift
   if (e.shiftKey) {
     const mapaTeclasShift = {
-      "c": "bezier",
-      "e": "espiral",
+      c: "bezier",
+      e: "espiral",
     };
 
     if (teclaPressionada === "z") {
       e.preventDefault();
-      const btnDrag = document.getElementById('btn-drag');
+      const btnDrag = document.getElementById("btn-drag");
       if (btnDrag) {
         btnDrag.click();
       } else {
-        const botaoZoom = document.querySelector('.btn-ferramenta[data-ferramenta="lupa"]');
+        const botaoZoom = document.querySelector(
+          '.btn-ferramenta[data-ferramenta="lupa"]',
+        );
         if (botaoZoom) {
           botaoZoom.click();
-          setTimeout(() => document.getElementById('btn-drag')?.click(), 0);
+          setTimeout(() => document.getElementById("btn-drag")?.click(), 0);
         }
       }
     } else if (teclaPressionada === "i") {
@@ -599,7 +628,9 @@ window.addEventListener("keydown", (e) => {
       btnToggleRegua?.click();
     } else if (mapaTeclasShift[teclaPressionada]) {
       e.preventDefault();
-      const botao = document.querySelector(`.btn-ferramenta[data-ferramenta="${mapaTeclasShift[teclaPressionada]}"]`);
+      const botao = document.querySelector(
+        `.btn-ferramenta[data-ferramenta="${mapaTeclasShift[teclaPressionada]}"]`,
+      );
       if (botao) {
         botao.click();
       }
@@ -608,26 +639,30 @@ window.addEventListener("keydown", (e) => {
   }
 
   const mapaTeclas = {
-    "s" : "selecao",
-    "r" : "retangulo",
-    "e" : "elipse",
-    "l" : "linha",
-    "c" : "linhaCurvada",
-    "g" : "poligono",
-    "p" : "lapis",
-    "t" : "texto",
-    "i" : "Conta-gotas",
-    "b" : "borracha",
-    "v" : "edicaoVertices",
-    "z" : "lupa",
-    "d" : "pincel",
-    "h" : "losango",
-  }
+    s: "selecao",
+    r: "retangulo",
+    e: "elipse",
+    l: "linha",
+    c: "linhaCurvada",
+    g: "poligono",
+    p: "lapis",
+    t: "texto",
+    i: "Conta-gotas",
+    b: "borracha",
+    v: "edicaoVertices",
+    z: "lupa",
+    d: "pincel",
+    h: "losango",
+    m: "medidor",
+  };
 
   // --- LÓGICA DE DELEÇÃO ---
   if (e.key === "Delete" || e.key === "Backspace") {
-    if (estado.elementosSelecionados && estado.elementosSelecionados.length > 0) {
-      estado.elementosSelecionados.forEach(el => el.remove());
+    if (
+      estado.elementosSelecionados &&
+      estado.elementosSelecionados.length > 0
+    ) {
+      estado.elementosSelecionados.forEach((el) => el.remove());
       definirElementosSelecionados([]);
       atualizarPosicaoSelecaoVisual();
       registrarAcaoHistorico();
@@ -640,7 +675,9 @@ window.addEventListener("keydown", (e) => {
 
   if (ferramentaAlvo) {
     e.preventDefault();
-    const botao = document.querySelector(`.btn-ferramenta[data-ferramenta="${ferramentaAlvo}"]`);
+    const botao = document.querySelector(
+      `.btn-ferramenta[data-ferramenta="${ferramentaAlvo}"]`,
+    );
     if (botao) {
       botao.click();
     }
@@ -658,15 +695,15 @@ function handlerDuplicar() {
   }
 }
 
-document.addEventListener('keydown', (evento) => {
-  if ((evento.ctrlKey || evento.metaKey) && evento.key.toLowerCase() === 'd') {
+document.addEventListener("keydown", (evento) => {
+  if ((evento.ctrlKey || evento.metaKey) && evento.key.toLowerCase() === "d") {
     evento.preventDefault();
     handlerDuplicar();
   }
 });
 
 // Importação de imagens
-btnImportarImagem.addEventListener('click', () => {
+btnImportarImagem.addEventListener("click", () => {
   inputImagem.click();
 });
 
@@ -676,45 +713,53 @@ inicializarImportadorImagem(svgCanvas, inputImagem);
 const tracerManager = new ImageTracerManager(svgCanvas, inputImagem);
 
 // Assiste a aba do Tracer para atualizar a lista de imagens quando ela for ativada
-const tabTracer = document.getElementById('tab-tracer');
+const tabTracer = document.getElementById("tab-tracer");
 if (tabTracer) {
-    const observerTab = new MutationObserver(() => {
-        // Verifica se a classe 'ativo' foi adicionada pela SideBar.js
-        if (tabTracer.classList.contains('ativo')) {
-            tracerManager.atualizarLista();
-        }
-    });
-    observerTab.observe(tabTracer, { attributes: true, attributeFilter: ['class'] });
+  const observerTab = new MutationObserver(() => {
+    // Verifica se a classe 'ativo' foi adicionada pela SideBar.js
+    if (tabTracer.classList.contains("ativo")) {
+      tracerManager.atualizarLista();
+    }
+  });
+  observerTab.observe(tabTracer, {
+    attributes: true,
+    attributeFilter: ["class"],
+  });
 }
 
 // Inicializar o estado dos botões de histórico
 atualizarBotoesHistorico();
 
 // Ctrl + Scroll — Zoom global (funciona com qualquer ferramenta ativa)
-svgCanvas.addEventListener('wheel', (e) => {
-  if (!e.ctrlKey) return;
-  e.preventDefault();
+svgCanvas.addEventListener(
+  "wheel",
+  (e) => {
+    if (!e.ctrlKey) return;
+    e.preventDefault();
 
-  const coords = obterCoordenadaSVG(e, svgCanvas);
-  const fator = 0.1;
-  const escala = e.deltaY > 0
-    ? 1 + fator   // scroll para baixo = zoom out
-    : 1 - fator;  // scroll para cima  = zoom in
+    const coords = obterCoordenadaSVG(e, svgCanvas);
+    const fator = 0.1;
+    const escala =
+      e.deltaY > 0
+        ? 1 + fator // scroll para baixo = zoom out
+        : 1 - fator; // scroll para cima  = zoom in
 
-  cameraGlobal.zoom(escala, coords.x, coords.y);
-  scrollbar.atualizar();
-}, { passive: false });
+    cameraGlobal.zoom(escala, coords.x, coords.y);
+    scrollbar.atualizar();
+  },
+  { passive: false },
+);
 
 // Observa o canvas para atualizar o Tracer automaticamente quando uma imagem for adicionada ou removida
 const observerCanvas = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-        if (mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0) {
-            // Verifica se a aba do tracer está aberta no momento
-            if (tabTracer && tabTracer.classList.contains('ativo')) {
-                tracerManager.atualizarLista();
-            }
-        }
-    });
+  mutations.forEach((mutation) => {
+    if (mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0) {
+      // Verifica se a aba do tracer está aberta no momento
+      if (tabTracer && tabTracer.classList.contains("ativo")) {
+        tracerManager.atualizarLista();
+      }
+    }
+  });
 });
 
 // Começa a observar a adição/remoção de elementos filhos no svgCanvas
