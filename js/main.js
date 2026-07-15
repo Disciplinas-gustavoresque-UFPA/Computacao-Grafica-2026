@@ -54,7 +54,7 @@ import { agruparElementos, desagruparElementos } from './core/GroupManager.js';
 import { espelharHorizontal, espelharVertical } from "./utils/flipHelpers.js";
 import { salvarRascunho, marcarSalvo } from './utils/autoSave.js';
 import { ImageTracerManager } from './tools/ImageTracerManager.js';
-import { aplicarGradientePreenchimento, obterInfoGradiente, ehGradiente } from './utils/gradientHelpers.js';
+import { aplicarGradientePreenchimento, obterInfoGradiente, ehGradiente, definirGradientePadrao } from './utils/gradientHelpers.js';
 
 const svgCanvas = document.getElementById('canvas');
 
@@ -313,29 +313,43 @@ function atualizarVisibilidadeControlesPreenchimento(tipo) {
 
 /**
  * Aplica o preenchimento (sólido ou gradiente, conforme o tipo selecionado)
- * a todos os elementos atualmente selecionados.
+ * a todos os elementos atualmente selecionados. Se não houver nenhum
+ * elemento selecionado, apenas define o preenchimento "corrente", que será
+ * usado automaticamente pelas PRÓXIMAS formas desenhadas.
  */
 function aplicarPreenchimentoAtual() {
   const tipo = obterTipoPreenchimentoSelecionado();
-
-  if (estado.elementosSelecionados.length === 0) return;
+  const haSelecao = estado.elementosSelecionados.length > 0;
 
   if (tipo === 'solido') {
     const cor = inputCorPreenchimento.value;
     definirCorPreenchimento(cor);
-    estado.elementosSelecionados.forEach(el => el.setAttribute('fill', cor));
+    if (haSelecao) {
+      estado.elementosSelecionados.forEach(el => el.setAttribute('fill', cor));
+    }
   } else {
     const corInicio = inputCorGradienteInicio.value;
     const corFim = inputCorGradienteFim.value;
-    estado.elementosSelecionados.forEach(el => {
-      aplicarGradientePreenchimento(svgCanvas, el, tipo, corInicio, corFim);
-    });
+
+    if (haSelecao) {
+      // Cada elemento selecionado ganha (ou atualiza) seu próprio gradiente.
+      estado.elementosSelecionados.forEach(el => {
+        aplicarGradientePreenchimento(svgCanvas, el, tipo, corInicio, corFim);
+      });
+    } else {
+      // Sem seleção: define o gradiente como preenchimento padrão, para que
+      // a próxima forma desenhada já nasça com ele.
+      const referenciaGradiente = definirGradientePadrao(svgCanvas, tipo, corInicio, corFim);
+      definirCorPreenchimento(referenciaGradiente);
+    }
   }
 
-  registrarAcaoHistorico();
-  atualizarBotoesHistorico();
-  salvarRascunho(svgCanvas, estado, 'editor');
-  mostrarIndicadorNaoSalvo();
+  if (haSelecao) {
+    registrarAcaoHistorico();
+    atualizarBotoesHistorico();
+    salvarRascunho(svgCanvas, estado, 'editor');
+    mostrarIndicadorNaoSalvo();
+  }
 }
 
 radiosTipoPreenchimento.forEach(radio => {

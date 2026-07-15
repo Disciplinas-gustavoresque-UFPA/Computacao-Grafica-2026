@@ -14,6 +14,50 @@ const SVG_NS = "http://www.w3.org/2000/svg";
 const REGEX_URL_GRADIENTE = /^url\(#(.+)\)$/;
 
 let contador = 0;
+let idGradientePadrao = null;
+
+/**
+ * Cria/atualiza um único gradiente "padrão", usado como preenchimento
+ * corrente quando NÃO há nenhum objeto selecionado — é o que faz uma nova
+ * forma já nascer com gradiente, do mesmo jeito que hoje ela já nasce com
+ * a cor sólida escolhida no seletor.
+ *
+ * @param {SVGSVGElement} svgCanvas
+ * @param {'linear'|'radial'} tipo
+ * @param {string} corInicio
+ * @param {string} corFim
+ * @returns {string} valor pronto para usar em `fill`, ex: "url(#id)".
+ */
+export function definirGradientePadrao(svgCanvas, tipo, corInicio, corFim) {
+  const defs = obterOuCriarDefs(svgCanvas);
+  const tagEsperada = tipo === "radial" ? "radialGradient" : "linearGradient";
+
+  let gradienteEl = idGradientePadrao ? defs.querySelector(`#${CSS.escape(idGradientePadrao)}`) : null;
+
+  if (!gradienteEl || gradienteEl.tagName !== tagEsperada) {
+    if (gradienteEl) gradienteEl.remove();
+
+    idGradientePadrao = `gradiente-padrao-${Date.now()}-${contador++}`;
+    gradienteEl = document.createElementNS(SVG_NS, tagEsperada);
+    gradienteEl.setAttribute("id", idGradientePadrao);
+
+    if (tipo === "radial") {
+      gradienteEl.setAttribute("cx", "50%");
+      gradienteEl.setAttribute("cy", "50%");
+      gradienteEl.setAttribute("r", "50%");
+    } else {
+      gradienteEl.setAttribute("x1", "0%");
+      gradienteEl.setAttribute("y1", "0%");
+      gradienteEl.setAttribute("x2", "100%");
+      gradienteEl.setAttribute("y2", "0%");
+    }
+
+    defs.appendChild(gradienteEl);
+  }
+
+  atualizarStops(gradienteEl, corInicio, corFim);
+  return `url(#${idGradientePadrao})`;
+}
 
 /**
  * Retorna o <defs> do canvas, criando um novo (como primeiro filho) se
