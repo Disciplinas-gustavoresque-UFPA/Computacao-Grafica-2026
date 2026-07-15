@@ -175,6 +175,73 @@ body {
 }
 
 /* =========================================================
+   Painel de Alinhamento (multi-seleção)
+   ========================================================= */
+.painel-alinhamento {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  border-left: 1px solid var(--cor-borda-ui);
+  border-right: 1px solid var(--cor-borda-ui);
+  animation: fadeInAlign 0.18s ease;
+}
+
+@keyframes fadeInAlign {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.align-label {
+  white-space: nowrap;
+}
+
+.align-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.btn-align {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 4px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--raio-borda);
+  color: var(--cor-texto-secundario);
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.btn-align svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.btn-align:hover {
+  background-color: rgba(74, 144, 217, 0.2);
+  border-color: var(--cor-destaque);
+  color: var(--cor-destaque);
+}
+
+.btn-align:active {
+  transform: scale(0.92);
+  background-color: rgba(74, 144, 217, 0.35);
+}
+
+.align-separator {
+  width: 1px;
+  height: 20px;
+  background: var(--cor-borda-ui);
+  margin: 0 4px;
+}
+
+/* =========================================================
    Workspace: Barra Lateral + Área de Desenho
    Usa CSS Flexbox para layout horizontal
    ========================================================= */
