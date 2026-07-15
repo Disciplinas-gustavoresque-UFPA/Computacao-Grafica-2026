@@ -516,13 +516,15 @@ btnFlipVertical.addEventListener("click", () => {
 });
 
 // Atalhos de Teclado (Tool Selection)
+// Atalhos de Teclado (Tool Selection)
 window.addEventListener("keydown", (e) => {
-  // Prevenção de conflitos
+  // Prevenção de conflitos (ignora atalhos se estiver digitando em campos de texto)
   const elementoAtivo = document.activeElement;
-  const tagAtiva = elementoAtivo.tagName.toLocaleLowerCase();
+  const tagAtiva = elementoAtivo.tagName.toLowerCase();
 
-  if (["input", "textarea", "select"].includes(tagAtiva) || elementoAtivo.isContentEditable)
+  if (["input", "textarea", "select"].includes(tagAtiva) || elementoAtivo.isContentEditable) {
     return;
+  }
 
   // 1. Agrupamos TODA lógica que depende obrigatoriamente de Ctrl / Cmd
   if (e.ctrlKey || e.metaKey) {
@@ -555,30 +557,39 @@ window.addEventListener("keydown", (e) => {
       return;
     }
     
-    // Agora este bloqueio está protegido dentro do bloco "if (e.ctrlKey || e.metaKey)"
-    // Ele impede que Ctrl+C, Ctrl+V ou Ctrl+D vazem para o mapa de ferramentas abaixo,
-    // mas não interfere quando as teclas C, V ou D são pressionadas sozinhas!
+    // Impede que Ctrl+C, Ctrl+V ou Ctrl+D acionem as ferramentas normais
     if (['c', 'v', 'd'].includes(teclaCtrl)) {
       return;
     }
   }
 
-  // --- LÓGICA DE DELEÇÃO CORRIGIDA ---
-    if (e.key === ']' || e.key === '}') {
-      e.preventDefault();
-      moverCamada(e.shiftKey ? 'frente' : 'avancar');
-      return;
+  // --- LÓGICA DE REORGANIZAÇÃO DE CAMADAS ---
+  if (e.key === ']' || e.key === '}') {
+    e.preventDefault();
+    moverCamada(e.shiftKey ? 'frente' : 'avancar');
+    return;
+  }
+  if (e.key === '[' || e.key === '{') {
+    e.preventDefault();
+    moverCamada(e.shiftKey ? 'fundo' : 'recuar');
+    return;
+  }
+
+  // --- LÓGICA DE DELEÇÃO ---
+  if (e.key === "Delete" || e.key === "Backspace") {
+    if (estado.elementosSelecionados && estado.elementosSelecionados.length > 0) {
+      estado.elementosSelecionados.forEach(el => el.remove());
+      definirElementosSelecionados([]);
+      atualizarPosicaoSelecaoVisual();
+      registrarAcaoHistorico();
+      atualizarBotoesHistorico();
     }
-    if (e.key === '[' || e.key === '{') {
-      e.preventDefault();
-      moverCamada(e.shiftKey ? 'fundo' : 'recuar');
-      return;
-    }
+    return;
   }
 
   const teclaPressionada = e.key.toLowerCase();
 
-  // Atalhos com Shift
+  // --- ATALHOS COM SHIFT ---
   if (e.shiftKey) {
     const mapaTeclasShift = {
       "c": "bezier",
@@ -619,6 +630,7 @@ window.addEventListener("keydown", (e) => {
     return;
   }
 
+  // --- ATALHOS SIMPLES (TECLAS ISOLADAS) ---
   const mapaTeclas = {
     "s" : "selecao",
     "r" : "retangulo",
@@ -634,39 +646,9 @@ window.addEventListener("keydown", (e) => {
     "z" : "lupa",
     "d" : "pincel",
     "h" : "losango",
-  }
-
-  // --- LÓGICA DE DELEÇÃO ---
-  if (e.key === "Delete" || e.key === "Backspace") {
-    if (estado.elementosSelecionados && estado.elementosSelecionados.length > 0) {
-      estado.elementosSelecionados.forEach(el => el.remove());
-      definirElementosSelecionados([]);
-      atualizarPosicaoSelecaoVisual();
-      registrarAcaoHistorico();
-      atualizarBotoesHistorico();
-    }
-    return;
-  }
-
-  // 2. Se chegou aqui e Ctrl/Cmd NÃO está ativo, as teclas isoladas seguem normalmente para as ferramentas
-  const mapaTeclas = {
-    "s" : "selecao",
-    "r" : "retangulo",
-    "e" : "elipse",
-    "l" : "linha",
-    "c" : "linhaCurvada", // Agora funciona livremente ao digitar "C" sozinho!
-    "p" : "poligono",
-    "t" : "texto",
-    "i" : "Conta-gotas",
-    "g" : "losango",
   };
 
-  const teclaPressionada = e.key.toLowerCase();
-  const ferramentaAlvo = e.shiftKey && teclaPressionada === 'c'
-    ? 'bezier'
-    : e.shiftKey && teclaPressionada === 'e'
-      ? 'espiral'
-    : mapaTeclas[teclaPressionada];
+  const ferramentaAlvo = mapaTeclas[teclaPressionada];
 
   if (ferramentaAlvo) {
     e.preventDefault();
@@ -676,6 +658,8 @@ window.addEventListener("keydown", (e) => {
     }
   }
 });
+
+
 
 // --- Área de Transferência (Copiar / Colar) ---
 let clipboard = [];       
