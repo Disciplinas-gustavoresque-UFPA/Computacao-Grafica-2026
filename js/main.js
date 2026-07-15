@@ -43,7 +43,6 @@ import { inicializarImportadorImagem } from './tools/ImageImporter.js';
 import { inicializarMenuInicial } from './core/UIManager.js';
 import { duplicarElemento } from './utils/duplicateHelpers.js';
 import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
-import { PageManager } from './core/PageManager.js';
 import { PageRenderer } from './core/PageRenderer.js';
 import { abrirPreviewImpressao, imprimir } from './utils/printHelpers.js';
 import { HistoryManager } from './core/HistoryManager.js';
@@ -195,14 +194,8 @@ const observer = new MutationObserver((mutations) => {
       const vb = svgCanvas.getAttribute('viewBox');
       if (vb) {
         overlayCanvas.setAttribute('viewBox', vb);
-        if (pageManager && pageManager.interactionLayer) {
-          pageManager.interactionLayer.setAttribute('viewBox', vb);
-        }
       } else {
         overlayCanvas.removeAttribute('viewBox');
-        if (pageManager && pageManager.interactionLayer) {
-          pageManager.interactionLayer.removeAttribute('viewBox');
-        }
       }
     }
   });
@@ -216,23 +209,13 @@ definirGerenciadorSelecao(selecaoVisual);
 // Menu de contexto simples em utilitário
 inicializarMenuContexto(svgCanvas);
 
-// Inicializar o gerenciador e renderizador da área da página
+// Inicializar o renderizador da área da página
 const pageRenderer = new PageRenderer(svgCanvas, overlayCanvas);
-const pageManager = new PageManager(overlayCanvas, obterAreaPagina());
-
-pageManager.onMudou = (novaArea) => {
-  definirAreaPagina(novaArea);
-  pageRenderer.atualizar(novaArea);
-  syncPageInputs(novaArea);
-};
-
 pageRenderer.atualizar(obterAreaPagina());
 
 svgCanvas.addEventListener('canvas-cleared', () => {
   const area = obterAreaPagina();
-  pageManager.setAreaPagina(area);
   pageRenderer.atualizar(area);
-  syncPageInputs(area);
   if (cameraGlobal) {
     cameraGlobal.fitToPage(area);
     atualizarIndicadorZoom();
@@ -500,35 +483,6 @@ function atualizarIndicadorZoom() {
   const el = document.getElementById('zoom-indicator');
   if (el) el.textContent = `Zoom: ${Math.round(cameraGlobal.getZoomLevel())}%`;
 }
-
-// Controles de tamanho da página
-const inputPageWidth = document.getElementById('page-width');
-const inputPageHeight = document.getElementById('page-height');
-
-function syncPageInputs(area) {
-  inputPageWidth.value = Math.round(area.width);
-  inputPageHeight.value = Math.round(area.height);
-}
-
-inputPageWidth.addEventListener('change', () => {
-  const w = Math.max(50, parseInt(inputPageWidth.value) || 800);
-  inputPageWidth.value = w;
-  const area = obterAreaPagina();
-  const novaArea = { ...area, width: w };
-  definirAreaPagina(novaArea);
-  pageManager.setAreaPagina(novaArea);
-  pageRenderer.atualizar(novaArea);
-});
-
-inputPageHeight.addEventListener('change', () => {
-  const h = Math.max(50, parseInt(inputPageHeight.value) || 1131);
-  inputPageHeight.value = h;
-  const area = obterAreaPagina();
-  const novaArea = { ...area, height: h };
-  definirAreaPagina(novaArea);
-  pageManager.setAreaPagina(novaArea);
-  pageRenderer.atualizar(novaArea);
-});
 
 const valorEspessura = document.getElementById("valor-espessura-lapis");
 

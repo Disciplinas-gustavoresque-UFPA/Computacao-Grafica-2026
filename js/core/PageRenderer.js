@@ -10,7 +10,6 @@ export class PageRenderer {
     this.overlaySvg.insertBefore(this.grupoOverlay, this.overlaySvg.firstChild);
 
     this.fundoExterno = null;
-    this.bordaPagina = null;
 
     this._criarDefs();
     this._criarElementosOverlay();
@@ -71,16 +70,6 @@ export class PageRenderer {
       'pointer-events': 'none',
     });
     this.grupoOverlay.appendChild(this.fundoExterno);
-
-    this.bordaPagina = criarElementoSVG('rect', {
-      id: 'borda-pagina',
-      fill: 'none',
-      stroke: '#999',
-      'stroke-width': 1,
-      'stroke-dasharray': '6 3',
-      'pointer-events': 'none',
-    });
-    this.grupoOverlay.appendChild(this.bordaPagina);
   }
 
   atualizar(areaPagina) {
@@ -94,11 +83,6 @@ export class PageRenderer {
     this.fundoExterno.setAttribute('y', 0);
     this.fundoExterno.setAttribute('width', canvasWidth * 3);
     this.fundoExterno.setAttribute('height', canvasHeight * 3);
-
-    this.bordaPagina.setAttribute('x', areaPagina.x);
-    this.bordaPagina.setAttribute('y', areaPagina.y);
-    this.bordaPagina.setAttribute('width', areaPagina.width);
-    this.bordaPagina.setAttribute('height', areaPagina.height);
   }
 
   _garantirBgPagina(areaPagina) {
