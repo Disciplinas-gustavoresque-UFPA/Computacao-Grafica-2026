@@ -99,6 +99,9 @@ export class PoligonoPolilinhaTool extends ToolBase {
         if (evento.key === 'Enter') {
             this.finalizarPoligono();
         }
+        if (evento.key === 'Escape') {
+            this.resetarDesenho();
+        }
     }
 
     /**
