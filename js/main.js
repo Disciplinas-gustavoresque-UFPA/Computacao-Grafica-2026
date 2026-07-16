@@ -24,6 +24,7 @@ import {
   definirCallbackPainelAlinhamento,
   atualizarPosicaoSelecaoVisual,
   definirEspessuraLapis,
+  adicionarCorRecente, 
 } from "./core/StateManager.js";
 import { rgbToHex } from "./utils/colorHelpers.js";
 import { ColorPickerTool } from "./tools/ColorPickerTool.js";
@@ -1186,6 +1187,75 @@ if (tabTracer) {
   });
 }
 
+const containerCoresRecentes = document.getElementById("cores-recentes-container");
+
+// 1. Função de Renderização Corrigida (com "Ar" e verificações robustas)
+function renderizarCoresRecentes(cores) {
+  if (!containerCoresRecentes) return;
+  
+  containerCoresRecentes.innerHTML = ""; // Limpa a UI antiga
+  
+  cores.forEach(cor => {
+    const botaoCor = document.createElement("button");
+    botaoCor.className = "cor-recente-item";
+    botaoCor.style.backgroundColor = cor;
+    
+    // Tooltip com dica de usabilidade
+    botaoCor.title = `Cor ${cor}\n• Clique para Preenchimento\n• Shift + Clique para Borda`;
+    
+    botaoCor.addEventListener("click", (evento) => {
+      const eBorda = evento.shiftKey;
+      
+      if (eBorda) {
+        // Aplica na Borda
+        definirCorBorda(cor);
+        if (inputCorBorda) inputCorBorda.value = cor;
+        if (popupCorBorda) popupCorBorda.value = cor;
+        
+        estado.elementosSelecionados.forEach(el => {
+          el.setAttribute("stroke", cor);
+        });
+      } else {
+        // Aplica no Preenchimento
+        definirCorPreenchimento(cor);
+        if (inputCorPreenchimento) inputCorPreenchimento.value = cor;
+        if (popupCorPreenchimento) popupCorPreenchimento.value = cor;
+        
+        estado.elementosSelecionados.forEach(el => {
+          el.setAttribute("fill", cor);
+        });
+      }
+      
+      // Salva no histórico de ações do canvas
+      if (typeof registrarAcaoHistorico === 'function') registrarAcaoHistorico();
+      if (typeof atualizarBotoesHistorico === 'function') atualizarBotoesHistorico();
+    });
+    
+    containerCoresRecentes.appendChild(botaoCor);
+  });
+}
+// Escuta as atualizações do estado para redesenhar a UI
+document.addEventListener('cores-recentes-mudou', (e) => {
+  renderizarCoresRecentes(e.detail.cores);
+});
+
+// Captura quando o usuário altera a cor no input principal para salvar no histórico
+inputCorPreenchimento.addEventListener("change", () => {
+  adicionarCorRecente(inputCorPreenchimento.value);
+});
+
+inputCorBorda.addEventListener("change", () => {
+  adicionarCorRecente(inputCorBorda.value);
+});
+
+// Captura também as mudanças que vêm do popup flutuante
+popupCorPreenchimento.addEventListener("change", () => {
+  adicionarCorRecente(popupCorPreenchimento.value);
+});
+
+popupCorBorda.addEventListener("change", () => {
+  adicionarCorRecente(popupCorBorda.value);
+});
 // Inicializar o estado dos botões de histórico
 atualizarBotoesHistorico();
 
