@@ -6,6 +6,8 @@
  * Sentido único: elemento → controles (sem efeitos colaterais no SVG).
  */
 
+import { ehGradiente, obterInfoGradiente } from "../utils/gradientHelpers.js";
+
 /**
  * Normaliza qualquer valor de cor SVG para formato #rrggbb,
  * compatível com input[type="color"].
@@ -25,15 +27,29 @@ export function normalizarHex(cor) {
 }
 
 /**
+ * Marca o rádio correspondente ao tipo de preenchimento ('solido' | 'linear' | 'radial').
+ *
+ * @param {HTMLInputElement[]} radios
+ * @param {string} tipo
+ */
+function definirTipoPreenchimentoRadio(radios, tipo) {
+  radios.forEach(radio => {
+    radio.checked = radio.value === tipo;
+  });
+}
+
+/**
  * Lê os atributos do elemento SVG e popula todos os controles do menu.
  *
  * @param {SVGElement} el - Elemento sendo inspecionado
  * @param {Object} controles - Referências ao DOM do menu (retorno de criarMenuContexto)
+ * @param {SVGSVGElement} [svgCanvas] - Canvas raiz, necessário para ler gradientes existentes
  */
-export function sincronizarControles(el, controles) {
+export function sincronizarControles(el, controles, svgCanvas) {
   const {
     sliderOpacidade, valorOpacidade,
     inputFill, btnFillNone,
+    radiosFillTipo, corWrapperSolido, gradRow, inputGradInicio, inputGradFim,
     inputStroke, btnStrokeNone,
     sliderEspessura, valorEspessura,
     dashBtns,
@@ -52,10 +68,27 @@ export function sincronizarControles(el, controles) {
   if (fill === 'none') {
     inputFill.disabled = true;
     btnFillNone.classList.add('menu-contexto__none-btn--ativo');
+    definirTipoPreenchimentoRadio(radiosFillTipo, 'solido');
+    corWrapperSolido.hidden = false;
+    gradRow.hidden = true;
+  } else if (ehGradiente(fill)) {
+    inputFill.disabled = false;
+    btnFillNone.classList.remove('menu-contexto__none-btn--ativo');
+    const info = svgCanvas ? obterInfoGradiente(svgCanvas, el) : null;
+    definirTipoPreenchimentoRadio(radiosFillTipo, info ? info.tipo : 'linear');
+    corWrapperSolido.hidden = true;
+    gradRow.hidden = false;
+    if (info) {
+      inputGradInicio.value = info.corInicio;
+      inputGradFim.value = info.corFim;
+    }
   } else {
     inputFill.disabled = false;
     btnFillNone.classList.remove('menu-contexto__none-btn--ativo');
     if (fill) inputFill.value = normalizarHex(fill);
+    definirTipoPreenchimentoRadio(radiosFillTipo, 'solido');
+    corWrapperSolido.hidden = false;
+    gradRow.hidden = true;
   }
 
   // Cor da borda
