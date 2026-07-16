@@ -86,6 +86,14 @@ function criarAcaoBtn(texto, acao) {
   return btn;
 }
 
+function criarGradienteStopLabel(texto, inputColor) {
+  const lbl = document.createElement('label');
+  lbl.className = 'menu-contexto__gradiente-label';
+  lbl.appendChild(document.createTextNode(texto));
+  lbl.appendChild(inputColor);
+  return lbl;
+}
+
 // --- Builder principal ---
 
 /**
@@ -116,7 +124,41 @@ export function criarMenuContexto() {
   inputFill.type = 'color'; inputFill.value = '#4a90d9';
   const btnFillNone = criarBtnNone('Nenhum');
   const grupoFill = criarGrupo('Preenchimento');
-  grupoFill.appendChild(criarCorWrapper(inputFill, btnFillNone));
+
+  // Alternador Sólida / Gradiente Linear / Gradiente Radial
+  const radiosFillTipo = [];
+  const fillTypeRow = document.createElement('div');
+  fillTypeRow.className = 'menu-contexto__fill-type-row';
+  fillTypeRow.setAttribute('role', 'radiogroup');
+  fillTypeRow.setAttribute('aria-label', 'Tipo de preenchimento');
+  [['solido', 'Sólida'], ['linear', 'Linear'], ['radial', 'Radial']].forEach(([valor, label], i) => {
+    const lbl = document.createElement('label');
+    const radio = document.createElement('input');
+    radio.type = 'radio';
+    radio.name = 'menu-contexto-tipo-preenchimento';
+    radio.value = valor;
+    if (i === 0) radio.checked = true;
+    lbl.appendChild(radio);
+    lbl.appendChild(document.createTextNode(label));
+    fillTypeRow.appendChild(lbl);
+    radiosFillTipo.push(radio);
+  });
+  grupoFill.appendChild(fillTypeRow);
+
+  const corWrapperSolido = criarCorWrapper(inputFill, btnFillNone);
+  grupoFill.appendChild(corWrapperSolido);
+
+  const inputGradInicio = document.createElement('input');
+  inputGradInicio.type = 'color'; inputGradInicio.value = '#4a90d9';
+  const inputGradFim = document.createElement('input');
+  inputGradFim.type = 'color'; inputGradFim.value = '#ffffff';
+  const gradRow = document.createElement('div');
+  gradRow.className = 'menu-contexto__cor-wrapper menu-contexto__gradiente-row';
+  gradRow.hidden = true;
+  gradRow.appendChild(criarGradienteStopLabel('De', inputGradInicio));
+  gradRow.appendChild(criarGradienteStopLabel('Para', inputGradFim));
+  grupoFill.appendChild(gradRow);
+
   secaoEstilo.appendChild(grupoFill);
 
   const inputStroke = document.createElement('input');
@@ -190,6 +232,7 @@ export function criarMenuContexto() {
     menu,
     sliderOpacidade, valorOpacidade,
     inputFill, btnFillNone,
+    radiosFillTipo, corWrapperSolido, gradRow, inputGradInicio, inputGradFim,
     inputStroke, btnStrokeNone,
     sliderEspessura, valorEspessura,
     dashBtns,
