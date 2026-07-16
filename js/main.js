@@ -67,7 +67,8 @@ import {
 import { salvarRascunho, marcarSalvo } from "./utils/autoSave.js";
 import { ImageTracerManager } from "./tools/ImageTracerManager.js";
 import { MedidorTool } from "./tools/MedidorTool.js";
-import { ToolbarGroup } from './core/ToolbarGroup.js';
+import { ToolbarGroup } from "./core/ToolbarGroup.js";
+import { PaletaImg } from "./tools/PaletasImg.js";
 
 const svgCanvas = document.getElementById("canvas");
 
@@ -89,7 +90,9 @@ const inputImagem = document.getElementById("input-imagem");
 const inputCorPreenchimento = document.getElementById("cor-preenchimento");
 const inputCorBorda = document.getElementById("cor-borda");
 const popupCores = document.getElementById("popup-cores");
-const popupCorPreenchimento = document.getElementById("popup-cor-preenchimento");
+const popupCorPreenchimento = document.getElementById(
+  "popup-cor-preenchimento",
+);
 const popupCorBorda = document.getElementById("popup-cor-borda");
 const popupStrokeWidth = document.getElementById("popup-stroke-width");
 const popupBotoesEstilo = document.querySelectorAll(".btn-estilo-borda");
@@ -100,6 +103,10 @@ const exportFormat = document.getElementById("export-format");
 const inputEspessuraLapis = document.getElementById("espessura-lapis");
 
 const indicadorNaoSalvo = document.getElementById("indicador-nao-salvo");
+
+const painelPaleta = document.getElementById("paleta-cores");
+const paletaImg = new PaletaImg(painelPaleta);
+
 function mostrarIndicadorNaoSalvo() {
   if (indicadorNaoSalvo) indicadorNaoSalvo.classList.remove("oculto");
 }
@@ -195,14 +202,17 @@ svgCanvas.parentNode.insertBefore(canvasContainer, svgCanvas);
 canvasContainer.appendChild(svgCanvas);
 
 // Camada de Interação: instanciar o novo SVG de overlay para seleções
-const overlayCanvas = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-overlayCanvas.setAttribute('id', 'overlay-canvas');
-overlayCanvas.setAttribute('width', '100%');
-overlayCanvas.setAttribute('height', '100%');
-overlayCanvas.style.position = 'absolute';
-overlayCanvas.style.top = '0';
-overlayCanvas.style.left = '0';
-overlayCanvas.style.pointerEvents = 'none'; // Coordenado com o principal
+const overlayCanvas = document.createElementNS(
+  "http://www.w3.org/2000/svg",
+  "svg",
+);
+overlayCanvas.setAttribute("id", "overlay-canvas");
+overlayCanvas.setAttribute("width", "100%");
+overlayCanvas.setAttribute("height", "100%");
+overlayCanvas.style.position = "absolute";
+overlayCanvas.style.top = "0";
+overlayCanvas.style.left = "0";
+overlayCanvas.style.pointerEvents = "none"; // Coordenado com o principal
 canvasContainer.appendChild(overlayCanvas);
 
 // Réguas de medida (em pixels) nas bordas do canvas
@@ -301,47 +311,56 @@ botoesFerramenta.forEach((btn) => {
 // --- Popup de Cores ---
 
 function normalizarCorHex(cor, fallback) {
-  if (!cor || cor === 'none' || cor === 'transparent') return fallback;
-  if (cor.startsWith('#')) return cor.length === 4
-    ? '#' + cor.slice(1).split('').map(c => c + c).join('')
-    : cor;
-  if (cor.startsWith('rgb')) return rgbToHex(cor);
+  if (!cor || cor === "none" || cor === "transparent") return fallback;
+  if (cor.startsWith("#"))
+    return cor.length === 4
+      ? "#" +
+          cor
+            .slice(1)
+            .split("")
+            .map((c) => c + c)
+            .join("")
+      : cor;
+  if (cor.startsWith("rgb")) return rgbToHex(cor);
   return fallback;
 }
 
 function atualizarBotaoEstiloAtivo(estilo) {
-  popupBotoesEstilo.forEach(btn => {
-    btn.classList.toggle('ativo', btn.getAttribute('data-dash') === estilo);
+  popupBotoesEstilo.forEach((btn) => {
+    btn.classList.toggle("ativo", btn.getAttribute("data-dash") === estilo);
   });
 }
 
 function detectarEstiloBorda(el) {
-  const linecap = el.getAttribute('stroke-linecap');
-  const dash = el.getAttribute('stroke-dasharray');
-  if (linecap === 'round' && dash && dash.startsWith('0 ')) return 'dot';
-  if (!dash || dash === 'none') return 'none';
+  const linecap = el.getAttribute("stroke-linecap");
+  const dash = el.getAttribute("stroke-dasharray");
+  if (linecap === "round" && dash && dash.startsWith("0 ")) return "dot";
+  if (!dash || dash === "none") return "none";
   return dash;
 }
 
 function aplicarEstiloBorda(el, estilo) {
-  if (estilo === 'none') {
-    el.removeAttribute('stroke-dasharray');
-    el.removeAttribute('stroke-linecap');
-  } else if (estilo === 'dot') {
-    const sw = Math.max(1, Number(el.getAttribute('stroke-width') || 2));
-    el.setAttribute('stroke-linecap', 'round');
-    el.setAttribute('stroke-dasharray', `0 ${sw * 2.5}`);
+  if (estilo === "none") {
+    el.removeAttribute("stroke-dasharray");
+    el.removeAttribute("stroke-linecap");
+  } else if (estilo === "dot") {
+    const sw = Math.max(1, Number(el.getAttribute("stroke-width") || 2));
+    el.setAttribute("stroke-linecap", "round");
+    el.setAttribute("stroke-dasharray", `0 ${sw * 2.5}`);
   } else {
-    el.setAttribute('stroke-dasharray', estilo);
-    el.removeAttribute('stroke-linecap');
+    el.setAttribute("stroke-dasharray", estilo);
+    el.removeAttribute("stroke-linecap");
   }
 }
 
 function sincronizarInputsCores(elementos) {
   const el = elementos[0];
-  const fill = normalizarCorHex(el.getAttribute('fill'), estado.corPreenchimento);
-  const stroke = normalizarCorHex(el.getAttribute('stroke'), estado.corBorda);
-  const strokeWidth = el.getAttribute('stroke-width') || '2';
+  const fill = normalizarCorHex(
+    el.getAttribute("fill"),
+    estado.corPreenchimento,
+  );
+  const stroke = normalizarCorHex(el.getAttribute("stroke"), estado.corBorda);
+  const strokeWidth = el.getAttribute("stroke-width") || "2";
 
   popupCorPreenchimento.value = fill;
   popupCorBorda.value = stroke;
@@ -354,47 +373,53 @@ function sincronizarInputsCores(elementos) {
   definirCorBorda(stroke);
 }
 
-document.addEventListener('selecao-mudou', (e) => {
+document.addEventListener("selecao-mudou", (e) => {
   const elementos = e.detail.elementos;
   if (elementos.length > 0) {
     sincronizarInputsCores(elementos);
-    popupCores.classList.add('visivel');
+    popupCores.classList.add("visivel");
   } else {
-    popupCores.classList.remove('visivel');
+    popupCores.classList.remove("visivel");
     popupCorPreenchimento.value = estado.corPreenchimento;
     popupCorBorda.value = estado.corBorda;
   }
 });
 
-popupCorPreenchimento.addEventListener('input', () => {
+popupCorPreenchimento.addEventListener("input", () => {
   const novaCor = popupCorPreenchimento.value;
   definirCorPreenchimento(novaCor);
   inputCorPreenchimento.value = novaCor;
-  estado.elementosSelecionados.forEach(el => el.setAttribute('fill', novaCor));
+  estado.elementosSelecionados.forEach((el) =>
+    el.setAttribute("fill", novaCor),
+  );
 });
 
-popupCorBorda.addEventListener('input', () => {
+popupCorBorda.addEventListener("input", () => {
   const novaCor = popupCorBorda.value;
   definirCorBorda(novaCor);
   inputCorBorda.value = novaCor;
-  estado.elementosSelecionados.forEach(el => el.setAttribute('stroke', novaCor));
+  estado.elementosSelecionados.forEach((el) =>
+    el.setAttribute("stroke", novaCor),
+  );
 });
 
-popupStrokeWidth.addEventListener('input', () => {
+popupStrokeWidth.addEventListener("input", () => {
   const largura = Math.max(0, Number(popupStrokeWidth.value));
-  estado.elementosSelecionados.forEach(el => {
-    el.setAttribute('stroke-width', largura);
+  estado.elementosSelecionados.forEach((el) => {
+    el.setAttribute("stroke-width", largura);
     // Pontilhado: recalcula o espaço entre pontos para manter a aparência
-    if (detectarEstiloBorda(el) === 'dot') {
-      el.setAttribute('stroke-dasharray', `0 ${Math.max(1, largura) * 2.5}`);
+    if (detectarEstiloBorda(el) === "dot") {
+      el.setAttribute("stroke-dasharray", `0 ${Math.max(1, largura) * 2.5}`);
     }
   });
 });
 
-popupBotoesEstilo.forEach(btn => {
-  btn.addEventListener('click', () => {
-    const estilo = btn.getAttribute('data-dash');
-    estado.elementosSelecionados.forEach(el => aplicarEstiloBorda(el, estilo));
+popupBotoesEstilo.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const estilo = btn.getAttribute("data-dash");
+    estado.elementosSelecionados.forEach((el) =>
+      aplicarEstiloBorda(el, estilo),
+    );
     atualizarBotaoEstiloAtivo(estilo);
   });
 });
@@ -442,12 +467,16 @@ svgCanvas.addEventListener("mouseup", (evento) => {
 
   const primeiroSelecionado = estado.elementosSelecionados[0];
   if (primeiroSelecionado) {
-    const corPreenchimentoAtual = primeiroSelecionado.getAttribute('fill') || '#ffffff';
-    const corBordaAtual = primeiroSelecionado.getAttribute('stroke') || '#000000';
-    
+    const corPreenchimentoAtual =
+      primeiroSelecionado.getAttribute("fill") || "#ffffff";
+    const corBordaAtual =
+      primeiroSelecionado.getAttribute("stroke") || "#000000";
+
     // Captura as opacidades existentes (padrão é 1 se não houver atributo)
-    const opacidadePreenchimentoAtual = primeiroSelecionado.getAttribute('fill-opacity') || '1';
-    const opacidadeBordaAtual = primeiroSelecionado.getAttribute('stroke-opacity') || '1';
+    const opacidadePreenchimentoAtual =
+      primeiroSelecionado.getAttribute("fill-opacity") || "1";
+    const opacidadeBordaAtual =
+      primeiroSelecionado.getAttribute("stroke-opacity") || "1";
 
     // Só atualizamos os seletores visuais do HTML se o valor do SVG for uma cor hexadecimal válida.
     if (
@@ -474,37 +503,37 @@ svgCanvas.addEventListener("mouseup", (evento) => {
   mostrarIndicadorNaoSalvo();
 });
 
-btnPreenchimentoNenhum.addEventListener('click', () => {
-  definirCorPreenchimento('none');
-  
-  estado.elementosSelecionados.forEach(el => {
-    el.setAttribute('fill', 'none');
+btnPreenchimentoNenhum.addEventListener("click", () => {
+  definirCorPreenchimento("none");
+
+  estado.elementosSelecionados.forEach((el) => {
+    el.setAttribute("fill", "none");
   });
-  
+
   registrarAcaoHistorico();
   atualizarBotoesHistorico();
 });
 
-btnBordaNenhum.addEventListener('click', () => {
-  definirCorBorda('none');
-  
-  estado.elementosSelecionados.forEach(el => {
-    el.setAttribute('stroke', 'none');
+btnBordaNenhum.addEventListener("click", () => {
+  definirCorBorda("none");
+
+  estado.elementosSelecionados.forEach((el) => {
+    el.setAttribute("stroke", "none");
   });
-  
+
   registrarAcaoHistorico();
   atualizarBotoesHistorico();
 });
 
 sliderOpacidadePreenchimento.addEventListener("input", () => {
   const valor = sliderOpacidadePreenchimento.value;
-  
-  estado.elementosSelecionados.forEach(el => {
-    el.setAttribute('fill-opacity', valor);
+
+  estado.elementosSelecionados.forEach((el) => {
+    el.setAttribute("fill-opacity", valor);
   });
 });
 
-sliderOpacidadePreenchimento.addEventListener('change', () => {
+sliderOpacidadePreenchimento.addEventListener("change", () => {
   // Salva no histórico apenas quando o usuário soltar o slider
   registrarAcaoHistorico();
   atualizarBotoesHistorico();
@@ -512,9 +541,9 @@ sliderOpacidadePreenchimento.addEventListener('change', () => {
 
 sliderOpacidadeBorda.addEventListener("input", () => {
   const valor = sliderOpacidadeBorda.value;
-  
-  estado.elementosSelecionados.forEach(el => {
-    el.setAttribute('stroke-opacity', valor);
+
+  estado.elementosSelecionados.forEach((el) => {
+    el.setAttribute("stroke-opacity", valor);
   });
 });
 
@@ -537,7 +566,10 @@ svgCanvas.addEventListener("mousemove", (evento) => {
 });
 
 svgCanvas.addEventListener("dblclick", (evento) => {
-  if (estado.ferramentaAtual && typeof estado.ferramentaAtual.onDblClick === 'function') {
+  if (
+    estado.ferramentaAtual &&
+    typeof estado.ferramentaAtual.onDblClick === "function"
+  ) {
     estado.ferramentaAtual.onDblClick(evento);
   }
 });
@@ -584,12 +616,11 @@ btnExportar.addEventListener("click", () => {
   exportarDesenho(svgCanvas, formato);
 });
 
-const valorEspessura =
-    document.getElementById("valor-espessura-lapis");
+const valorEspessura = document.getElementById("valor-espessura-lapis");
 
 inputEspessuraLapis.addEventListener("input", (e) => {
-    definirEspessuraLapis(e.target.value);
-    valorEspessura.textContent = e.target.value;
+  definirEspessuraLapis(e.target.value);
+  valorEspessura.textContent = e.target.value;
 });
 
 // --- Controle de Camadas (Z-Index) ---
@@ -711,7 +742,7 @@ window.addEventListener("keydown", (e) => {
     }
     // Ctrl+C / Ctrl+V / Ctrl+D são tratados em outro listener — apenas impede
     // que caiam no mapa de atalhos de ferramenta abaixo.
-    if (['c', 'v', 'd'].includes(e.key.toLowerCase())) {
+    if (["c", "v", "d"].includes(e.key.toLowerCase())) {
       return;
     }
   }
@@ -810,9 +841,9 @@ window.addEventListener("keydown", (e) => {
 });
 
 // --- Área de Transferência (Copiar / Colar) ---
-let clipboard = [];       
-let pasteCount = 0;       
-const PASTE_OFFSET = 20;  
+let clipboard = [];
+let pasteCount = 0;
+const PASTE_OFFSET = 20;
 
 // --- Duplicar elemento ---
 function handlerDuplicar() {
@@ -825,36 +856,36 @@ function handlerDuplicar() {
   }
 }
 
-document.addEventListener('keydown', (evento) => {
+document.addEventListener("keydown", (evento) => {
   if (!(evento.ctrlKey || evento.metaKey)) return;
 
   const tecla = evento.key.toLowerCase();
 
   // Ctrl+D — Duplicar
-  if (tecla === 'd') {
+  if (tecla === "d") {
     evento.preventDefault();
     handlerDuplicar();
     return;
   }
 
   // Ctrl+C — Copiar elementos selecionados para a área de transferência interna
-  if (tecla === 'c') {
+  if (tecla === "c") {
     if (estado.elementosSelecionados.length === 0) return;
     evento.preventDefault();
-    clipboard = estado.elementosSelecionados.map(el => el.cloneNode(true));
+    clipboard = estado.elementosSelecionados.map((el) => el.cloneNode(true));
     pasteCount = 0;
     return;
   }
 
   // Ctrl+V — Colar elementos da área de transferência interna
-  if (tecla === 'v') {
+  if (tecla === "v") {
     if (clipboard.length === 0) return;
     evento.preventDefault();
     pasteCount++;
     const offset = PASTE_OFFSET * pasteCount;
     const novosElementos = [];
 
-    clipboard.forEach(original => {
+    clipboard.forEach((original) => {
       const clone = duplicarElemento(original, svgCanvas, offset, offset);
       if (clone) {
         novosElementos.push(clone);
@@ -882,13 +913,16 @@ const tracerManager = new ImageTracerManager(svgCanvas, inputImagem);
 // Assiste a aba do Tracer para atualizar a lista de imagens quando ela for ativada
 const tabTracer = document.getElementById("tab-tracer");
 if (tabTracer) {
-    const observerTab = new MutationObserver(() => {
-      // Verifica se a classe 'ativo' foi adicionada pela SideBar.js
-        if (tabTracer.classList.contains('ativo')) {
-            tracerManager.atualizarLista();
-        }
-    });
-    observerTab.observe(tabTracer, { attributes: true, attributeFilter: ['class'] });
+  const observerTab = new MutationObserver(() => {
+    // Verifica se a classe 'ativo' foi adicionada pela SideBar.js
+    if (tabTracer.classList.contains("ativo")) {
+      tracerManager.atualizarLista();
+    }
+  });
+  observerTab.observe(tabTracer, {
+    attributes: true,
+    attributeFilter: ["class"],
+  });
 }
 
 // Inicializar o estado dos botões de histórico
@@ -908,6 +942,8 @@ svgCanvas.addEventListener(
         ? 1 + fator // scroll para baixo = zoom out
         : 1 - fator; // scroll para cima  = zoom in
 
-  cameraGlobal.zoom(escala, coords.x, coords.y);
-  scrollbar.atualizar();
-}, { passive: false });
+    cameraGlobal.zoom(escala, coords.x, coords.y);
+    scrollbar.atualizar();
+  },
+  { passive: false },
+);
