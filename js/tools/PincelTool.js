@@ -44,6 +44,7 @@ export class PincelTool extends ToolBase {
 
         // Agrupa todos os segmentos do traço em um único <g>
         this.grupo = document.createElementNS(SVG_NS, 'g');
+        this.grupo.dataset.shape = 'pincel';
         this.grupo.setAttribute('stroke-linecap', 'round');
         this.svgCanvas.appendChild(this.grupo);
     }
