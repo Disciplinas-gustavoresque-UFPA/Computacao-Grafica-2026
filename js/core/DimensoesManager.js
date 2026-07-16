@@ -9,6 +9,57 @@ export class DimensoesManager {
     this.inputLargura = document.getElementById('input-largura');
     this.inputAltura  = document.getElementById('input-altura');
     this.btnCadeado   = document.getElementById('btn-cadeado');
+
+    this.registrarEventos();
+  }
+
+  registrarEventos() {
+    this.inputLargura.addEventListener('change', () => this.mudarLargura());
+    this.inputAltura.addEventListener('change',  () => this.mudarAltura());
+  }
+
+  mudarLargura() {
+    if (this.proporcaoTravada) {
+      const novaLargura = parseFloat(this.inputLargura.value);
+      this.inputAltura.value = Number((novaLargura / this.proporcaoOriginal).toFixed(2));
+    }
+    this.aplicarDimensoesNoElemento();
+  }
+
+  mudarAltura() {
+    if (this.proporcaoTravada) {
+      const novaAltura = parseFloat(this.inputAltura.value);
+      this.inputLargura.value = Number((novaAltura * this.proporcaoOriginal).toFixed(2));
+    }
+    this.aplicarDimensoesNoElemento();
+  }
+
+  aplicarDimensoesNoElemento() {
+    const el = estado.elementosSelecionados[0];
+    if (!el) return;
+
+    const largura = parseFloat(this.inputLargura.value);
+    const altura  = parseFloat(this.inputAltura.value);
+    if (isNaN(largura) || isNaN(altura) || largura <= 0 || altura <= 0) return;
+
+    this.aplicarDimensoes(el, largura, altura);
+    
+    this.selecaoVisual.desenhar(estado.elementosSelecionados);
+  }
+
+  aplicarDimensoes(el, largura, altura) {
+    const tag = el.tagName.toLowerCase();
+    if (tag === 'rect' || tag === 'image') {
+      el.setAttribute('width',  String(largura));
+      el.setAttribute('height', String(altura));
+    } else if (tag === 'circle') {
+      // Usa a largura como diâmetro (cadeado garante que L === A quando travado)
+      el.setAttribute('r', String(largura / 2));
+    } else if (tag === 'ellipse') {
+      el.setAttribute('rx', String(largura / 2));
+      el.setAttribute('ry', String(altura  / 2));
+    }
+    // line/path/g tem um redimensionamento mais complicado, então é melhor abrir outra issue pra isso
   }
 
   //Pega a altura e a largura do elemento selecion (só pra um elemento, por hora)
