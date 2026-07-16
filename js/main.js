@@ -180,11 +180,23 @@ if (btnToggleRegua) {
 // Grid
 const gridManager = new GridManager(canvasContainer);
 const btnToggleGrid = document.getElementById('btn-toggle-grid');
+const selectGridType = document.getElementById('grid-type');
+const inputGridSize = document.getElementById('grid-size');
+const inputGridColor = document.getElementById('grid-color');
+const inputGridOpacity = document.getElementById('grid-opacity');
+
 if (btnToggleGrid) {
   btnToggleGrid.addEventListener('click', () => {
     const isAtivo = gridManager.alternar();
     btnToggleGrid.classList.toggle('ativo', isAtivo);
   });
+}
+
+if (selectGridType) {
+  selectGridType.addEventListener('change', (e) => gridManager.atualizarConfig('tipo', e.target.value));
+  inputGridSize.addEventListener('input', (e) => gridManager.atualizarConfig('tamanho', parseInt(e.target.value) || 1));
+  inputGridColor.addEventListener('input', (e) => gridManager.atualizarConfig('corHex', e.target.value));
+  inputGridOpacity.addEventListener('input', (e) => gridManager.atualizarConfig('opacidade', parseFloat(e.target.value)));
 }
 
 // Sincronizar viewBox entre canvas principal e overlay quando necessário

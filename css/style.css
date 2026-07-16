@@ -886,8 +886,16 @@ body {
 
 #grid-overlay.ativo {
   display: block;
+}
 
-  /* --- TESTE --- */
-  background-color: rgba(255, 0, 0, 0.1); 
-  border: 5px solid red;
+.grid-uniform {
+  background-image: 
+    linear-gradient(to right, var(--cor-grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--cor-grid) 1px, transparent 1px);
+}
+.grid-column {
+  background-image: linear-gradient(to right, var(--cor-grid) 0, var(--cor-grid) calc(100% - 10px), transparent calc(100% - 10px), transparent 100%);
+}
+.grid-row {
+  background-image: linear-gradient(to bottom, var(--cor-grid) 0, var(--cor-grid) calc(100% - 10px), transparent calc(100% - 10px), transparent 100%);
 }
