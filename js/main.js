@@ -86,6 +86,9 @@ const indicadorNaoSalvo = document.getElementById("indicador-nao-salvo");
 function mostrarIndicadorNaoSalvo() {
   if (indicadorNaoSalvo) indicadorNaoSalvo.classList.remove("oculto");
 }
+function ocultarIndicadorNaoSalvo() {
+  if (indicadorNaoSalvo) indicadorNaoSalvo.classList.add("oculto");
+}
 
 // Botões de histórico
 const btnDesfazer = document.getElementById("btn-desfazer");
@@ -171,7 +174,7 @@ overlayCanvas.setAttribute('height', '100%');
 overlayCanvas.style.position = 'absolute';
 overlayCanvas.style.top = '0';
 overlayCanvas.style.left = '0';
-overlayCanvas.style.pointerEvents = 'none';
+overlayCanvas.style.pointerEvents = 'none'; // Coordenado com o principal
 canvasContainer.appendChild(overlayCanvas);
 
 // Réguas de medida
@@ -306,8 +309,8 @@ svgCanvas.addEventListener("mouseup", (evento) => {
       inputCorBorda.value = corBordaAtual;
     }
 
-    sliderOpacidadePreenchimento.value = opacidadePreenchimentoAtual;
-    sliderOpacidadeBorda.value = opacidadeBordaAtual;
+    if (sliderOpacidadePreenchimento) sliderOpacidadePreenchimento.value = opacidadePreenchimentoAtual;
+    if (sliderOpacidadeBorda) sliderOpacidadeBorda.value = opacidadeBordaAtual;
     if (txtOpacidadePreenchimento) txtOpacidadePreenchimento.textContent = `${Math.round(opacidadePreenchimentoAtual * 100)}%`;
     if (txtOpacidadeBorda) txtOpacidadeBorda.textContent = `${Math.round(opacidadeBordaAtual * 100)}%`;
 
@@ -322,44 +325,53 @@ svgCanvas.addEventListener("mouseup", (evento) => {
 });
 
 // --- Listeners de Cor Nula e Opacidade ---
-btnPreenchimentoNenhum.addEventListener('click', () => {
-  definirCorPreenchimento('none');
-  estado.elementosSelecionados.forEach(el => el.setAttribute('fill', 'none'));
-  registrarAcaoHistorico();
-  atualizarBotoesHistorico();
-});
+if (btnPreenchimentoNenhum) {
+  btnPreenchimentoNenhum.addEventListener('click', () => {
+    definirCorPreenchimento('none');
+    estado.elementosSelecionados.forEach(el => el.setAttribute('fill', 'none'));
+    registrarAcaoHistorico();
+    atualizarBotoesHistorico();
+  });
+}
 
-btnBordaNenhum.addEventListener('click', () => {
-  definirCorBorda('none');
-  estado.elementosSelecionados.forEach(el => el.setAttribute('stroke', 'none'));
-  registrarAcaoHistorico();
-  atualizarBotoesHistorico();
-});
+if (btnBordaNenhum) {
+  btnBordaNenhum.addEventListener('click', () => {
+    definirCorBorda('none');
+    estado.elementosSelecionados.forEach(el => el.setAttribute('stroke', 'none'));
+    registrarAcaoHistorico();
+    atualizarBotoesHistorico();
+  });
+}
 
-sliderOpacidadePreenchimento.addEventListener("input", () => {
-  const valor = sliderOpacidadePreenchimento.value;
-  definirOpacidadePreenchimento(valor);
-  if (txtOpacidadePreenchimento) txtOpacidadePreenchimento.textContent = `${Math.round(valor * 100)}%`;
-  estado.elementosSelecionados.forEach(el => el.setAttribute('fill-opacity', valor));
-});
+if (sliderOpacidadePreenchimento) {
+  sliderOpacidadePreenchimento.addEventListener("input", () => {
+    const valor = sliderOpacidadePreenchimento.value;
+    definirOpacidadePreenchimento(valor);
+    if (txtOpacidadePreenchimento) txtOpacidadePreenchimento.textContent = `${Math.round(valor * 100)}%`;
+    estado.elementosSelecionados.forEach(el => el.setAttribute('fill-opacity', valor));
+  });
 
-sliderOpacidadePreenchimento.addEventListener('change', () => {
-  registrarAcaoHistorico();
-  atualizarBotoesHistorico();
-});
+  sliderOpacidadePreenchimento.addEventListener('change', () => {
+    registrarAcaoHistorico();
+    atualizarBotoesHistorico();
+  });
+}
 
-sliderOpacidadeBorda.addEventListener("input", () => {
-  const valor = sliderOpacidadeBorda.value;
-  definirOpacidadeBorda(valor);
-  if (txtOpacidadeBorda) txtOpacidadeBorda.textContent = `${Math.round(valor * 100)}%`;
-  estado.elementosSelecionados.forEach(el => el.setAttribute('stroke-opacity', valor));
-});
+if (sliderOpacidadeBorda) {
+  sliderOpacidadeBorda.addEventListener("input", () => {
+    const valor = sliderOpacidadeBorda.value;
+    definirOpacidadeBorda(valor);
+    if (txtOpacidadeBorda) txtOpacidadeBorda.textContent = `${Math.round(valor * 100)}%`;
+    estado.elementosSelecionados.forEach(el => el.setAttribute('stroke-opacity', valor));
+  });
 
-sliderOpacidadeBorda.addEventListener("change", () => {
-  registrarAcaoHistorico();
-  atualizarBotoesHistorico();
-});
+  sliderOpacidadeBorda.addEventListener("change", () => {
+    registrarAcaoHistorico();
+    atualizarBotoesHistorico();
+  });
+}
 
+// Event listeners globais do SVG (delegados para a ferramenta ativa)
 svgCanvas.addEventListener("mousedown", (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseDown(evento);
@@ -369,6 +381,12 @@ svgCanvas.addEventListener("mousedown", (evento) => {
 svgCanvas.addEventListener("mousemove", (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseMove(evento);
+  }
+});
+
+svgCanvas.addEventListener("dblclick", (evento) => {
+  if (estado.ferramentaAtual && typeof estado.ferramentaAtual.onDblClick === 'function') {
+    estado.ferramentaAtual.onDblClick(evento);
   }
 });
 
@@ -393,7 +411,9 @@ overlayCanvas.addEventListener("mouseup", (evento) => {
 });
 
 svgCanvas.addEventListener("contextmenu", (e) => {
-  if (e.target.closest("#canvas")) e.preventDefault();
+  if (e.target.closest("#canvas")) {
+    e.preventDefault();
+  }
 });
 
 inputCorPreenchimento.value = estado.corPreenchimento;
@@ -413,7 +433,7 @@ if (inputEspessuraLapis) {
   });
 }
 
-// --- Camadas e Alinhamento ---
+// --- Controle de Camadas (Z-Index) ---
 const btnSendToBack = document.getElementById("btn-send-to-back");
 const btnStepBackward = document.getElementById("btn-step-backward");
 const btnStepForward = document.getElementById("btn-step-forward");
@@ -422,8 +442,10 @@ const btnBringToFront = document.getElementById("btn-bring-to-front");
 function moverCamada(acao) {
   const elementos = estado.elementosSelecionados;
   if (!elementos || elementos.length === 0) return;
+
   const el = elementos[0];
   if (!el) return;
+
   const pai = el.parentNode;
   if (!pai) return;
 
@@ -433,6 +455,7 @@ function moverCamada(acao) {
     case "avancar": if (el.nextElementSibling) el.nextElementSibling.after(el); break;
     case "frente": pai.appendChild(el); break;
   }
+
   registrarAcaoHistorico();
   atualizarBotoesHistorico();
 }
@@ -465,6 +488,7 @@ if (btnFlipVertical) {
 window.addEventListener("keydown", (e) => {
   const elementoAtivo = document.activeElement;
   const tagAtiva = elementoAtivo.tagName.toLocaleLowerCase();
+
   if (["input", "textarea", "select"].includes(tagAtiva) || elementoAtivo.isContentEditable) return;
 
   if (e.ctrlKey || e.metaKey) {
@@ -507,9 +531,19 @@ window.addEventListener("keydown", (e) => {
 
   if (e.shiftKey) {
     const mapaTeclasShift = { c: "bezier", e: "espiral" };
+
     if (teclaPressionada === "z") {
       e.preventDefault();
-      document.getElementById("btn-drag")?.click();
+      const btnDrag = document.getElementById("btn-drag");
+      if (btnDrag) {
+        btnDrag.click();
+      } else {
+        const botaoZoom = document.querySelector('.btn-ferramenta[data-ferramenta="lupa"]');
+        if (botaoZoom) {
+          botaoZoom.click();
+          setTimeout(() => document.getElementById("btn-drag")?.click(), 0);
+        }
+      }
     } else if (teclaPressionada === "i") {
       e.preventDefault();
       btnImportarImagem?.click();
@@ -533,7 +567,7 @@ window.addEventListener("keydown", (e) => {
     s: "selecao", r: "retangulo", e: "elipse", l: "linha",
     c: "linhaCurvada", g: "poligono", p: "lapis", t: "texto",
     i: "Conta-gotas", b: "borracha", v: "edicaoVertices", z: "lupa",
-    d: "pincel", h: "losango", m: "medidor"
+    d: "pincel", h: "losango", m: "medidor",
   };
 
   if (e.key === "Delete" || e.key === "Backspace") {
@@ -630,5 +664,7 @@ svgCanvas.addEventListener("wheel", (e) => {
   const escala = e.deltaY > 0 ? 1 + fator : 1 - fator;
 
   cameraGlobal.zoom(escala, coords.x, coords.y);
-  if (scrollbar && typeof scrollbar.atualizar === 'function') scrollbar.atualizar();
+  if (scrollbar && typeof scrollbar.atualizar === 'function') {
+      scrollbar.atualizar();
+  }
 }, { passive: false });

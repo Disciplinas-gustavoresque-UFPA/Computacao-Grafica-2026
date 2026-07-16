@@ -1,6 +1,6 @@
 import { ToolBase } from "./ToolBase.js";
 import { criarElementoSVG, obterCoordenadaSVG } from '../utils/svgHelpers.js';
-import { estado } from '../core/StateManager.js';
+import { estado, registrarAcaoHistorico } from '../core/StateManager.js';
 
 export class PoligonoPolilinhaTool extends ToolBase {
     constructor(svgCanvas) {
@@ -98,6 +98,9 @@ export class PoligonoPolilinhaTool extends ToolBase {
         if (evento.key === 'Enter') {
             this.finalizarPoligono();
         }
+        if (evento.key === 'Escape') {
+            this.resetarDesenho();
+        }
     }
 
     /**
@@ -129,19 +132,20 @@ export class PoligonoPolilinhaTool extends ToolBase {
             this.svgCanvas.removeChild(this.polylineElement);
         }
 
-        // Cria o elemento 'polygon' definitivo
+        // Cria o elemento 'polygon' definitivo com suporte a opacidade Alpha
         const poligonoFinal = criarElementoSVG('polygon', {
             points: this.formatarPoints(),
             stroke: estado.corBorda,
-            'stroke-opacity': estado.opacidadeBorda, // Injetado
+            'stroke-opacity': estado.opacidadeBorda,
             'stroke-width': 2,
             'data-shape': 'poligono',
             fill: estado.corPreenchimento,
-            'fill-opacity': estado.opacidadePreenchimento // Injetado
+            'fill-opacity': estado.opacidadePreenchimento
         });
 
         this.svgCanvas.appendChild(poligonoFinal);
-
+        registrarAcaoHistorico();
+        
         // Limpa o estado interno para o próximo desenho
         this.polylineElement = null;
         this.vertices = [];

@@ -77,6 +77,43 @@ body {
   padding: 2px;
 }
 
+.line-style-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-line-style {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 28px;
+  border: 1px solid var(--cor-borda-ui);
+  border-radius: var(--raio-borda);
+  background: transparent;
+  color: var(--cor-texto-secundario);
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.btn-line-style svg {
+  width: 32px;
+  height: 12px;
+}
+
+.btn-line-style line {
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.btn-line-style:hover,
+.btn-line-style.ativo {
+  background-color: rgba(74, 144, 217, 0.2);
+  border-color: var(--cor-destaque);
+  color: var(--cor-destaque);
+}
+
 #ferramenta-atual-label {
   margin-left: auto;
   font-size: 12px;
@@ -108,6 +145,7 @@ body {
   cursor: pointer;
   font-size: 12px;
   transition: all 0.2s;
+  position: relative;
 }
 
 .btn-layer:hover {
@@ -120,9 +158,89 @@ body {
   transform: scale(0.95);
 }
 
+.btn-layer.ativo {
+  background-color: rgba(74, 144, 217, 0.35);
+  border-color: var(--cor-destaque);
+  color: var(--cor-destaque);
+}
+
+.view-controls {
+  display: flex;
+  gap: 4px;
+  margin-left: 16px;
+  border-left: 1px solid var(--cor-borda-ui);
+  padding-left: 16px;
+}
+
+/* =========================================================
+   Painel de Alinhamento (multi-seleção)
+   ========================================================= */
+.painel-alinhamento {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  border-left: 1px solid var(--cor-borda-ui);
+  border-right: 1px solid var(--cor-borda-ui);
+  animation: fadeInAlign 0.18s ease;
+}
+
+@keyframes fadeInAlign {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.align-label {
+  white-space: nowrap;
+}
+
+.align-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.btn-align {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 4px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--raio-borda);
+  color: var(--cor-texto-secundario);
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.btn-align svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.btn-align:hover {
+  background-color: rgba(74, 144, 217, 0.2);
+  border-color: var(--cor-destaque);
+  color: var(--cor-destaque);
+}
+
+.btn-align:active {
+  transform: scale(0.92);
+  background-color: rgba(74, 144, 217, 0.35);
+}
+
+.align-separator {
+  width: 1px;
+  height: 20px;
+  background: var(--cor-borda-ui);
+  margin: 0 4px;
+}
+
 /* =========================================================
    Workspace: Barra Lateral + Área de Desenho
-   Usa CSS Flexbox para layout horizontal
    ========================================================= */
 #workspace {
   display: flex;
@@ -147,34 +265,23 @@ body {
   z-index: 5;
 }
 
-/* From Uiverse.io by adamgiebl */ 
 .cssbuttons-io-button,
 #btn-primeiros-passos {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-
   height: 36px;
   padding: 0 14px;
-
   background: rgba(255,255,255,0.06);
-
   color: var(--cor-texto);
-
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 10px;
-
   font-size: 13px;
   font-weight: 500;
-
   cursor: pointer;
-
-  transition:
-    background-color .2s ease,
-    border-color .2s ease,
-    box-shadow .2s ease,
-    transform .15s ease;
+  position: relative;
+  transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease, transform .15s ease;
 }
 
 .cssbuttons-io-button svg,
@@ -226,12 +333,9 @@ body {
   box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.25);
 }
 
-.btn-ferramenta[data-tooltip]::after {
+[data-tooltip]::after {
   content: attr(data-tooltip);
   position: absolute;
-  left: calc(100% + 10px);
-  top: 50%;
-  transform: translateY(-50%) translateX(-4px);
   background-color: var(--cor-fundo-painel);
   color: var(--cor-texto);
   border: 1px solid var(--cor-destaque);
@@ -242,20 +346,44 @@ body {
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.15s ease, transform 0.15s ease;
-  z-index: 100;
+  z-index: 1000;
+}
+
+[data-tooltip]:hover::after {
+  opacity: 1;
+}
+
+.btn-ferramenta[data-tooltip]::after {
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%) translateX(-4px);
 }
 
 .btn-ferramenta[data-tooltip]:hover::after {
-  opacity: 1;
   transform: translateY(-50%) translateX(0);
 }
 
+.btn-history[data-tooltip]::after,
+.btn-layer[data-tooltip]::after,
+.btn-exportar[data-tooltip]::after,
+.btn-menu[data-tooltip]::after,
+.btn-ajuda[data-tooltip]::after {
+  left: 50%;
+  top: calc(100% + 8px);
+  transform: translateX(-50%) translateY(-4px);
+}
+
+.btn-history[data-tooltip]:hover::after,
+.btn-layer[data-tooltip]:hover::after,
+.btn-exportar[data-tooltip]:hover::after,
+.btn-menu[data-tooltip]:hover::after,
+.btn-ajuda[data-tooltip]:hover::after {
+  transform: translateX(-50%) translateY(0);
+}
 
 /* =========================================================
    Área Exportação
    ========================================================= */
-/*select de formato de exportação */
-
 .select-wrapper {
     position: relative;
     display: inline-block;
@@ -269,36 +397,24 @@ body {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-
   height: 36px;
   padding: 0 36px 0 12px;
-
   background: transparent;
   color: var(--cor-texto);
-
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 10px;
-
   font-size: 13px;
   font-weight: 500;
-
   cursor: pointer;
-
-  transition:
-    border-color .2s ease,
-    box-shadow .2s ease,
-    background-color .2s ease;
-
+  transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
   outline: none;
 }
-
 
 .select-format option {
     background-color: var(--cor-fundo-painel);
     color: var(--cor-texto);
 }
 
-/* Minimal Chevron */
 .select-arrow {
     position: absolute;
     right: 10px;
@@ -321,6 +437,8 @@ body {
   align-items: center;
   justify-content: center;
   padding: 24px;
+  position: relative;
+  z-index: 1;
 }
 
 #canvas {
@@ -333,15 +451,88 @@ body {
   height: 100%;
 }
 
+/* =========================================================
+   Réguas de Medida
+   ========================================================= */
+.regua {
+  position: absolute;
+  background-color: rgba(15, 52, 96, 0.9);
+  color: var(--cor-texto-secundario);
+  font-size: 10px;
+  font-family: sans-serif;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.regua-horizontal {
+  top: 0;
+  left: var(--espessura-regua, 20px);
+  right: 0;
+  height: var(--espessura-regua, 20px);
+}
+
+.regua-vertical {
+  top: var(--espessura-regua, 20px);
+  left: 0;
+  bottom: 0;
+  width: var(--espessura-regua, 20px);
+}
+
+.regua-canto {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--espessura-regua, 20px);
+  height: var(--espessura-regua, 20px);
+  background-color: var(--cor-fundo-barra);
+  border-right: 1px solid var(--cor-borda-ui);
+  border-bottom: 1px solid var(--cor-borda-ui);
+  z-index: 2;
+}
+
+.regua-marcador {
+  position: absolute;
+  height: 100%;
+  border-left: 1px solid var(--cor-destaque);
+}
+
+.regua-vertical .regua-marcador {
+  height: auto;
+  width: 100%;
+  border-left: none;
+  border-top: 1px solid var(--cor-destaque);
+}
+
+.regua-rotulo {
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  white-space: nowrap;
+}
+
+.regua-vertical .regua-rotulo {
+  top: 3px;
+  left: 2px;
+  transform-origin: left top;
+  transform: rotate(-90deg);
+}
+
 /* =====================================================
    Menu de Opções da Lupa/Zoom e Node
    ====================================================*/
-.node-handle:hover {
-    fill: #4a90d9; /* Inverte a cor ao passar o mouse */
+.node-handle:hover,
+.skew-handle:hover {
+    fill: #4a90d9;
     stroke: white;
 }
 
-#zoom-options {
+.skew-handle {
+    cursor: ew-resize;
+}
+
+#zoom-options,
+#line-options {
   position: absolute;
   background: var(--cor-fundo-barra);
   border: 1px solid var(--cor-borda-ui);
@@ -350,17 +541,21 @@ body {
   border-radius: var(--raio-borda);
   flex-direction: column;
   gap: 4px;
+  z-index: 20;
 }
 
-#zoom-options.hidden {
+#zoom-options.hidden,
+#line-options.hidden {
   display: none;
 }
 
-#zoom-options:not(.hidden) {
+#zoom-options:not(.hidden),
+#line-options:not(.hidden) {
   display: flex;
 }
 
-#zoom-options button {
+#zoom-options button,
+#line-options .btn-line-style {
   background-color: #4a90d9;
   width: 36px;
   height: 36px;
@@ -368,13 +563,26 @@ body {
   border-radius: var(--raio-borda);
 }
 
-#zoom-options button:hover {
+#zoom-options button:hover,
+#line-options .btn-line-style:hover {
   border-color: var(--cor-destaque);
 }
 
-#zoom-options button.ativo {
+#zoom-options button.ativo,
+#line-options .btn-line-style.ativo {
   background: rgba(0, 38, 255, 0.35);
   border-color: var(--cor-destaque);
+}
+
+#line-options .line-style-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+#line-options .btn-line-style svg {
+  width: 28px;
+  height: 12px;
 }
 
 #zoom-indicator {
@@ -397,7 +605,6 @@ body {
 /* =========================================================
    Tela Inicial e Menu de Opções
    ========================================================= */
-
 .oculto {
   display: none !important;
 }
@@ -439,7 +646,6 @@ body {
   margin-bottom: 8px;
 }
 
-/* Reutilizando a estrutura de botão para o menu */
 .btn-menu {
   background-color: transparent;
   color: var(--cor-texto);
@@ -450,6 +656,7 @@ body {
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: inherit;
+  position: relative;
 }
 
 .btn-menu:hover {
@@ -458,7 +665,6 @@ body {
   color: var(--cor-destaque);
 }
 
-/* O botão de criar novo documento merece destaque */
 #btn-novo-doc {
   background-color: var(--cor-destaque);
   color: #fff;
@@ -490,6 +696,7 @@ body {
     padding: 6px 10px;
     cursor: pointer;
     transition: all 0.2s ease;
+    position: relative;
 }
 
 .btn-history:hover {
@@ -502,7 +709,6 @@ body {
     transform: scale(0.95);
 }
 
-/* Indicador visual de que há ação disponível */
 .btn-history:not(:disabled) {
     color: var(--cor-texto);
 }
@@ -522,57 +728,54 @@ body {
 /* =========================================================
    Barra Lateral
    ========================================================= */
-
-/* Nova Barra Lateral Direita */
 #barra-configuracoes {
   width: 300px;
   height: auto;
-  background-color: #f4f4f4;
-  border-left: 1px solid #ccc;
+  background-color: var(--cor-fundo-painel);
+  border-left: 1px solid var(--cor-borda-ui);
   display: flex;
   flex-direction: column;
-  color: #0f3460;
+  color: var(--cor-texto);
   flex-shrink: 0;
-  
-  /* Transição por margem faz o Canvas redimensionar dinamicamente */
-  transition: margin-right 0.3s ease; 
-  margin-right: 0; 
+  transition: margin-right 0.3s ease;
+  margin-right: 0;
 }
 
-/* Quando escondida, puxa a barra para fora e cede o espaço no Flexbox */
 #barra-configuracoes.escondida {
-  margin-right: -300px; 
+  margin-right: -300px;
 }
 
-/* Estilo do botão de toggle posicionado dinamicamente */
 #btn-toggle-sidebar {
   position: absolute;
   right: 300px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: #eee;
-  border: 1px solid #ddd;
+  top: 28px;
+  transform: rotate(0deg);
+  background: var(--cor-fundo-barra);
+  border: 1px solid var(--cor-borda-ui);
+  color: var(--cor-texto);
   border-radius: 5px 0 0 5px;
   cursor: pointer;
   padding: 10px 5px;
   z-index: 10;
-  transition: right 0.3s ease, transform 0.3s ease;
+  transition: right 0.3s ease, transform 0.3s ease, background-color 0.2s ease;
 }
 
-/* Rotaciona a setinha quando esconder */
+#btn-toggle-sidebar:hover {
+  background: rgba(74, 144, 217, 0.2);
+  color: var(--cor-destaque);
+}
+
 #btn-toggle-sidebar.sidebar-escondida {
   right: 0;
   transform: translateY(-50%) rotate(180deg);
 }
 
-/* Navegação das Abas */
 .tabs-nav {
   display: flex;
-  background-color: #e0e0e0;
-  border-bottom: 1px solid #ccc;
+  background-color: var(--cor-fundo-painel);
+  border-bottom: 1px solid var(--cor-borda-ui);
 }
 
-/* Botão das abas */
 .tab-btn {
   flex: 1;
   padding: 10px;
@@ -580,91 +783,205 @@ body {
   border: none;
   background: none;
   font-size: 1.2rem;
+  color: var(--cor-texto-secundario);
 }
 
-/* Destaca a aba que está clicada */
 .tab-btn.ativo {
-  background-color: #f4f4f4;
-  border-bottom: 2px solid #4a90d9;
+  background-color: var(--cor-fundo-painel);
+  border-bottom: 2px solid var(--cor-destaque);
+  color: var(--cor-destaque);
 }
 
-/* Container do conteúdo */
 .tabs-container {
-  overflow-y: scroll; 
+  overflow-y: auto;
   overflow-x: hidden;
+  padding: 18px 16px;
 }
+
 .tab-content {
   display: none;
-  height: auto;
 }
 
 .tab-content.ativo {
   display: block;
 }
 
-.node-handle:hover {
-    fill: #4a90d9; /* Inverte a cor ao passar o mouse */
-    stroke: white;
+.tab-content h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--cor-texto);
 }
 
-/*Controles de Cor Nula e Opacidade (Alpha)*/
-.grupo-controle-estilo {
+/* Grupo cor + opacidade unificado */
+.color-control-group {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 8px 0;
-}
-
-.row-estilo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.row-estilo label {
-  display: flex;
-  align-items: center;
   gap: 8px;
-  cursor: pointer;
+  margin-bottom: 16px;
 }
 
-.btn-color-none {
-  width: 28px;
+.grupo-titulo {
+  font-size: 12px;
+  color: var(--cor-texto-secundario);
+}
+
+.color-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+input[type="color"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 36px;
   height: 28px;
   border: 1px solid var(--cor-borda-ui);
   border-radius: var(--raio-borda);
-  background: linear-gradient(45deg, transparent 45%, #ff4a4a 45%, #ff4a4a 55%, transparent 55%), #ffffff;
+  padding: 0;
+  background: none;
   cursor: pointer;
-  font-size: 0; /* Esconde o texto do emoji */
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 2px;
+}
+
+input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: 4px;
+}
+
+.btn-color-none {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  border: 1px solid var(--cor-borda-ui);
+  border-radius: var(--raio-borda);
+  background: linear-gradient(45deg, transparent 47%, #ff4a4a 47%, #ff4a4a 53%, transparent 53%), var(--cor-fundo-painel);
+  cursor: pointer;
+  font-size: 0;
   transition: transform 0.1s, border-color 0.15s;
 }
 
 .btn-color-none:hover {
-  transform: scale(1.1);
+  transform: scale(1.05);
   border-color: var(--cor-destaque);
 }
 
-.slider-container {
+.opacity-slider-wrapper {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  flex: 1;
+  min-width: 150px;
 }
 
-.label-slider {
-  font-size: 11px;
+.opacity-slider-wrapper label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  font-size: 12px;
+  color: var(--cor-texto-secundario);
+  white-space: nowrap;
+  min-width: 0;
+}
+
+/* Sliders customizados para controles fluidos */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: 1;
+  min-width: 0;
+  width: auto;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--cor-borda-ui);
+  accent-color: var(--cor-destaque);
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--cor-borda-ui);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  margin-top: -6px;
+  border-radius: 50%;
+  background: var(--cor-destaque);
+  border: 2px solid var(--cor-fundo-painel);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+input[type="range"]::-moz-range-track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--cor-borda-ui);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--cor-destaque);
+  border: 2px solid var(--cor-fundo-painel);
+  cursor: pointer;
+}
+
+/* Espessura do Lápis */
+#barra-configuracoes > label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-top: 1px solid var(--cor-borda-ui);
+  font-size: 12px;
   color: var(--cor-texto-secundario);
 }
 
-.label-slider strong {
-  color: var(--cor-destaque);
+#valor-espessura-lapis {
+    color: var(--cor-texto);
+    font-weight: 500;
+    min-width: 24px;
+    text-align: right;
 }
 
-.slider-container input[type="range"] {
-  width: 100%;
-  height: 6px;
-  background: var(--cor-borda-ui);
-  border-radius: 3px;
-  outline: none;
-  accent-color: var(--cor-destaque); /* Deixa a bolinha e o progresso azuis */
-  cursor: pointer;
+.btn-line-style svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* --- Indicador de Não Salvo --- */
+.indicador-nao-salvo {
+    font-size: 11px;
+    color: #e8a838;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    pointer-events: none;
+    margin-left: auto;
+    margin-right: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.indicador-nao-salvo.oculto {
+    display: flex !important;
+    opacity: 0;
+    visibility: hidden;
 }

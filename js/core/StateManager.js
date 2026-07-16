@@ -18,9 +18,9 @@ export const estado = {
   corPreenchimento: '#4a90d9',
   corBorda: '#1a1a2e',
   opacidadePreenchimento: '1', // Padrão: 100% opaco
-  opacidadeBorda: '1',         // Padrão: 100% opaco
+  opacidadeBorda: '1',        // Padrão: 100% opaco
   estiloLinha: 'continua',
-  interfaceAtual: 'inicio', 
+  interfaceAtual: 'inicio', // Nova flag para sabermos onde o usuário está
   elementosSelecionados: [],
   espessuraLapis: 2,
 };
