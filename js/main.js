@@ -12,6 +12,8 @@ import {
   definirFerramenta,
   definirCorPreenchimento,
   definirCorBorda,
+  definirOpacidadePreenchimento,
+  definirOpacidadeBorda,
   definirEstiloLinha,
   definirGerenciadorSelecao,
   definirElementosSelecionados,
@@ -98,6 +100,7 @@ const nomeFerramenta = document.getElementById("nome-ferramenta");
 const btnExportar = document.getElementById("btn-exportar");
 const exportFormat = document.getElementById("export-format");
 const inputEspessuraLapis = document.getElementById("espessura-lapis");
+
 
 const indicadorNaoSalvo = document.getElementById("indicador-nao-salvo");
 function mostrarIndicadorNaoSalvo() {
@@ -342,16 +345,27 @@ function sincronizarInputsCores(elementos) {
   const fill = normalizarCorHex(el.getAttribute('fill'), estado.corPreenchimento);
   const stroke = normalizarCorHex(el.getAttribute('stroke'), estado.corBorda);
   const strokeWidth = el.getAttribute('stroke-width') || '2';
+  const fillOpacity = el.getAttribute('fill-opacity') || '1';
+  const strokeOpacity = el.getAttribute('stroke-opacity') || '1';
 
   popupCorPreenchimento.value = fill;
   popupCorBorda.value = stroke;
   inputCorPreenchimento.value = fill;
   inputCorBorda.value = stroke;
   popupStrokeWidth.value = strokeWidth;
+  
+  // Atualiza sliders e labels
+  if (sliderOpacidadePreenchimento) sliderOpacidadePreenchimento.value = fillOpacity;
+  if (sliderOpacidadeBorda) sliderOpacidadeBorda.value = strokeOpacity;
+  if (txtOpacidadePreenchimento) txtOpacidadePreenchimento.textContent = `${Math.round(fillOpacity * 100)}%`;
+  if (txtOpacidadeBorda) txtOpacidadeBorda.textContent = `${Math.round(strokeOpacity * 100)}%`;
+  
   atualizarBotaoEstiloAtivo(detectarEstiloBorda(el));
 
   definirCorPreenchimento(fill);
   definirCorBorda(stroke);
+  definirOpacidadePreenchimento(fillOpacity);
+  definirOpacidadeBorda(strokeOpacity);
 }
 
 document.addEventListener('selecao-mudou', (e) => {
@@ -444,32 +458,27 @@ svgCanvas.addEventListener("mouseup", (evento) => {
   if (primeiroSelecionado) {
     const corPreenchimentoAtual = primeiroSelecionado.getAttribute('fill') || '#ffffff';
     const corBordaAtual = primeiroSelecionado.getAttribute('stroke') || '#000000';
-    
-    // Captura as opacidades existentes (padrão é 1 se não houver atributo)
     const opacidadePreenchimentoAtual = primeiroSelecionado.getAttribute('fill-opacity') || '1';
     const opacidadeBordaAtual = primeiroSelecionado.getAttribute('stroke-opacity') || '1';
 
-    // Só atualizamos os seletores visuais do HTML se o valor do SVG for uma cor hexadecimal válida.
-    if (
-      corPreenchimentoAtual !== "none" &&
-      corPreenchimentoAtual.startsWith("#")
-    ) {
+    if (corPreenchimentoAtual !== "none" && corPreenchimentoAtual.startsWith("#")) {
       inputCorPreenchimento.value = corPreenchimentoAtual;
     }
     if (corBordaAtual !== "none" && corBordaAtual.startsWith("#")) {
       inputCorBorda.value = corBordaAtual;
     }
 
-    // Atualiza visualmente os Sliders de Opacidade na UI
-    sliderOpacidadePreenchimento.value = opacidadePreenchimentoAtual;
-    sliderOpacidadeBorda.value = opacidadeBordaAtual;
+    if (sliderOpacidadePreenchimento) sliderOpacidadePreenchimento.value = opacidadePreenchimentoAtual;
+    if (sliderOpacidadeBorda) sliderOpacidadeBorda.value = opacidadeBordaAtual;
+    if (txtOpacidadePreenchimento) txtOpacidadePreenchimento.textContent = `${Math.round(opacidadePreenchimentoAtual * 100)}%`;
+    if (txtOpacidadeBorda) txtOpacidadeBorda.textContent = `${Math.round(opacidadeBordaAtual * 100)}%`;
 
-    // Atualiza também os valores armazenados no StateManager para consistência
     definirCorPreenchimento(corPreenchimentoAtual);
     definirCorBorda(corBordaAtual);
+    definirOpacidadePreenchimento(opacidadePreenchimentoAtual);
+    definirOpacidadeBorda(opacidadeBordaAtual);
   }
 
-  // Auto-save silencioso após cada ação de desenho concluída no canvas principal
   salvarRascunho(svgCanvas, estado, "editor");
   mostrarIndicadorNaoSalvo();
 });
@@ -495,6 +504,41 @@ btnBordaNenhum.addEventListener('click', () => {
   registrarAcaoHistorico();
   atualizarBotoesHistorico();
 });
+
+// listeners de opacidade
+if (sliderOpacidadePreenchimento) {
+  sliderOpacidadePreenchimento.addEventListener("input", () => {
+    const valor = sliderOpacidadePreenchimento.value;
+    definirOpacidadePreenchimento(valor);
+    if (txtOpacidadePreenchimento) txtOpacidadePreenchimento.textContent = `${Math.round(valor * 100)}%`;
+    
+    estado.elementosSelecionados.forEach(el => {
+      el.setAttribute('fill-opacity', valor);
+    });
+  });
+
+  sliderOpacidadePreenchimento.addEventListener('change', () => {
+    registrarAcaoHistorico();
+    atualizarBotoesHistorico();
+  });
+}
+
+if (sliderOpacidadeBorda) {
+  sliderOpacidadeBorda.addEventListener("input", () => {
+    const valor = sliderOpacidadeBorda.value;
+    definirOpacidadeBorda(valor);
+    if (txtOpacidadeBorda) txtOpacidadeBorda.textContent = `${Math.round(valor * 100)}%`;
+    
+    estado.elementosSelecionados.forEach(el => {
+      el.setAttribute('stroke-opacity', valor);
+    });
+  });
+
+  sliderOpacidadeBorda.addEventListener("change", () => {
+    registrarAcaoHistorico();
+    atualizarBotoesHistorico();
+  });
+}
 
 sliderOpacidadePreenchimento.addEventListener("input", () => {
   const valor = sliderOpacidadePreenchimento.value;
@@ -869,6 +913,9 @@ document.addEventListener('keydown', (evento) => {
     return;
   }
 });
+
+const txtOpacidadePreenchimento = document.getElementById('val-opacity-fill');
+const txtOpacidadeBorda = document.getElementById('val-opacity-stroke');
 
 // Importação de imagens
 btnImportarImagem.addEventListener("click", () => {

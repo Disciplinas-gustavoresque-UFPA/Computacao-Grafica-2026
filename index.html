@@ -194,7 +194,7 @@
         <button id="btn-criar-retangulo" class="btn-ferramenta" data-ferramenta="retangulo" data-nome="Retângulo" data-tooltip="Retângulo (R)" title="Retângulo (R)">
           <i class="ti ti-rectangle"></i>
         </button>
-<button id="btn-criar-losango" class="btn-ferramenta" data-ferramenta="losango" data-nome="Losango" data-tooltip="Losango (H)" title="Losango (H)">
+        <button id="btn-criar-losango" class="btn-ferramenta" data-ferramenta="losango" data-nome="Losango" data-tooltip="Losango (H)" title="Losango (H)">
           <i class="ti ti-diamonds"></i>
         </button>
         <button id="btn-criar-elipse" class="btn-ferramenta" data-ferramenta="elipse" data-nome="Elipse" data-tooltip="Elipse (E)" title="Elipse (E)">
@@ -254,7 +254,6 @@
         <button id="btn-pincel" class="btn-ferramenta" data-ferramenta="pincel" data-nome="Pincel" data-tooltip="Pincel dinâmico (D)" title="Pincel dinâmico (D)">
           <i class="ti ti-brush"></i>
         </button>
-        </button>
 
         <button id="btn-zoom-click" class="btn-ferramenta" data-ferramenta="lupa" data-nome="Zoom" data-tooltip="Zoom (Z)" title="Zoom (Z)">
           <i class="ti ti-zoom"></i>
@@ -305,43 +304,39 @@
               <span class="grupo-titulo">Preenchimento:</span>
               <div class="color-row">
                 <input type="color" id="cor-preenchimento" value="#4a90d9" />
-                <button id="btn-preenchimento-nenhum" class="btn-color-none" title="Sem preenchimento" aria-label="Remover preenchimento">
-              </button>
-              <div class="opacity-slider-wrapper">
-                <label>
-                  Opacidade:
-                  <input type="range" id="opacity-preenchimento" min="0" max="1" step="0.1" value="1" />
-                </label>
+                <button id="btn-preenchimento-nenhum" class="btn-color-none" title="Sem preenchimento" aria-label="Remover preenchimento">❌</button>
+                <div class="opacity-slider-wrapper">
+                  <label>
+                    Opacidade (<span id="val-opacity-fill">100%</span>):
+                    <input type="range" id="opacity-preenchimento" min="0" max="1" step="0.1" value="1" />
+                  </label>
+                </div>
               </div>
             </div>
-          </div>
-
 
             <div class="color-control-group" style="margin-top: 16px;">
               <span class="grupo-titulo">Borda:</span>
               <div class="color-row">
                 <input type="color" id="cor-borda" value="#1a1a2e" />
-                <button id="btn-borda-nenhum" class="btn-color-none" title="Sem borda" aria-label="Remover borda">
-              </button>
-              <div class="opacity-slider-wrapper">
-                <label>
-                  Opacidade:
-                  <input type="range" id="opacity-borda" min="0" max="1" step="0.1" value="1" />
-                </label>
+                <button id="btn-borda-nenhum" class="btn-color-none" title="Sem borda" aria-label="Remover borda">❌</button>
+                <div class="opacity-slider-wrapper">
+                  <label>
+                    Opacidade (<span id="val-opacity-stroke">100%</span>):
+                    <input type="range" id="opacity-borda" min="0" max="1" step="0.1" value="1" />
+                  </label>
+                </div>
               </div>
             </div>
-            <label> Espessura do Lápis:
-              <input type="range" id="espessura-lapis" min="1" max="100" value="2">
 
+            <label style="display: flex; align-items: center; gap: 10px; margin-top: 16px;"> Espessura do Lápis:
+              <input type="range" id="espessura-lapis" min="1" max="100" value="2">
               <span id="valor-espessura-lapis">2</span> px
             </label>
           </div>
 
           <div id="tab-tracer" class="tab-content" style="height: 100%; box-sizing: border-box;">
-
             <h3>Vetorizar Imagem</h3>
             
-            <!-- Estado vazio: Nenhuma imagem -->
             <div id="tracer-empty-state" class="oculto">
                 <p style="font-size: 0.9em; color: #666; margin-bottom: 10px;">
                     Nenhuma imagem rasterizada encontrada no canvas.
@@ -349,11 +344,9 @@
                 <button id="btn-tracer-importar" class="btn-menu">Importar Imagem</button>
             </div>
 
-            <!-- Lista de imagens e configurações -->
             <div id="tracer-conteudo">
                 <label class="propriedade-label">Selecione a imagem:</label>
                 <div id="tracer-lista-imagens" class="lista-imagens-container" style="max-height: 100px; overflow-y: auto; margin-bottom: 15px; border: 1px solid #ccc; padding: 5px;">
-                    <!-- Lista injetada via JS -->
                 </div>
 
                 <label for="tracer-preset" class="propriedade-label">Predefinição de estilo:</label>
@@ -370,9 +363,7 @@
                     </svg>
                 </div>
 
-                <!-- Painel de Configurações Avançadas (Ocupa o espaço restante e rola internamente) -->
                 <div id="tracer-advanced-panel" style="display: none; border-top: 1px solid #ddd; padding-top: 10px; margin-bottom: 15px; flex: 1; min-height: 0; overflow-y: auto; padding-right: 5px;">
-                    
                     <h4 style="margin: 5px 0; font-size: 0.9em; color: #4a90d9; text-transform: uppercase; letter-spacing: 0.5px;">Paleta de Cores</h4>
                     <div style="margin-bottom: 10px;">
                         <label style="display:block; font-size:0.85em; margin-bottom: 4px;">Máx. de Cores: <strong id="val-tracer-colors">16</strong></label>
@@ -398,7 +389,7 @@
                     </div>
                     <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
                         <input type="checkbox" id="tracer-rightangle" style="cursor: pointer;">
-                        <label for="tracer-rightangle" style="font-size:0.85em; cursor:pointer; user-select: none;">Forçar/Realçar ângulos retos</label>
+                        <label for="tracer-rightangle" style="font-size:0.85em; cursor:pointer; user-select: none;">Forçar/Realçar angles retos</label>
                     </div>
 
                     <h4 style="margin: 15px 0 5px 0; font-size: 0.9em; color: #4a90d9; text-transform: uppercase; letter-spacing: 0.5px;">Filtros (Pré-processo)</h4>

@@ -1251,3 +1251,59 @@ input[type="range"]::-moz-range-thumb {
   opacity: 1;
   transform: translateY(-50%) translateX(0);
 }
+/*Controles de Opacidade e Feedback Alpha*/
+
+.opacity-slider-wrapper {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 140px;
+}
+
+.opacity-slider-wrapper label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  font-size: 12px;
+  color: var(--cor-texto-secundario);
+  white-space: nowrap;
+}
+
+/* Customização dos Sliders de Range */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--cor-borda-ui);
+  accent-color: var(--cor-destaque);
+  cursor: pointer;
+}
+
+/* Estilização da Bolinha de Arraste (Navegadores Webkit) */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 16px;
+  border-radius: var(--raio-borda);
+  background: var(--cor-destaque);
+  border: 1px solid var(--cor-fundo-app);
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+/* Estilização da Bolinha de Arraste (Firefox) */
+input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 16px;
+  border-radius: var(--raio-borda);
+  background: var(--cor-destaque);
+  border: 1px solid var(--cor-fundo-app);
+  cursor: pointer;
+}

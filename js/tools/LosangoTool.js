@@ -27,14 +27,16 @@ export class LosangoTool extends ToolBase {
     this.startY = pt.y;
 
     // Cria o elemento SVG <polygon> dinamicamente
-    this.losnElement = criarElementoSVG('polygon', {
+      this.losnElement = criarElementoSVG('polygon', {
       x: this.startX,
       y: this.startY,
       'data-shape': 'losango',
       width: 0,
       height: 0,
       fill: estado.corPreenchimento,
+      'fill-opacity': estado.opacidadePreenchimento || '1', 
       stroke: estado.corBorda,
+      'stroke-opacity': estado.opacidadeBorda || '1',     
       'stroke-width': 2
     });
 
