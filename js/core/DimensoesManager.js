@@ -33,19 +33,36 @@ export class DimensoesManager {
   }
 
   mudarLargura() {
+    const novaLargura = this.avaliarExpressao(this.inputLargura.value);
+    if (!novaLargura) return;
+    this.inputLargura.value = Number(novaLargura.toFixed(2));
+  
     if (this.proporcaoTravada) {
-      const novaLargura = parseFloat(this.inputLargura.value);
       this.inputAltura.value = Number((novaLargura / this.proporcaoOriginal).toFixed(2));
     }
     this.aplicarDimensoesNoElemento();
   }
-
+  
   mudarAltura() {
+    const novaAltura = this.avaliarExpressao(this.inputAltura.value);
+    if (!novaAltura) return;
+    this.inputAltura.value = Number(novaAltura.toFixed(2));
+  
     if (this.proporcaoTravada) {
-      const novaAltura = parseFloat(this.inputAltura.value);
       this.inputLargura.value = Number((novaAltura * this.proporcaoOriginal).toFixed(2));
     }
     this.aplicarDimensoesNoElemento();
+  }
+
+  avaliarExpressao(expressao) {
+    // Apenas números e operadores matemáticos básicos
+    const segura = String(expressao).replace(/[^0-9+\-*/.()]/g, '');
+    try {
+      const resultado = Function('"use strict"; return (' + segura + ')')();
+      return isFinite(resultado) && resultado > 0 ? resultado : null;
+    } catch {
+      return null;
+    }
   }
 
   aplicarDimensoesNoElemento() {
