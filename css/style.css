@@ -1033,3 +1033,75 @@ input[type="range"]::-moz-range-thumb {
     opacity: 0;
     visibility: hidden;
 }
+
+
+/* =========================================================
+   Grupos de Ferramentas da Sidebar
+   ========================================================= */
+.btn-grupo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background-color: transparent;
+  color: var(--cor-texto);
+  border: 1px solid var(--cor-borda-ui);
+  border-radius: var(--raio-borda);
+  font-size: 18px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  position: relative;
+}
+
+.btn-grupo:hover {
+  background-color: rgba(74, 144, 217, 0.2);
+  border-color: var(--cor-destaque);
+  color: var(--cor-destaque);
+}
+
+.btn-grupo.ativo {
+  background-color: rgba(74, 144, 217, 0.35);
+  border-color: var(--cor-destaque);
+  color: var(--cor-destaque);
+  box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.25);
+}
+
+.grupo-ferramentas {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 4px 0;
+  border-left: 2px solid var(--cor-destaque);
+  margin-left: 4px;
+}
+
+.grupo-ferramentas.escondido {
+  display: none;
+}
+
+.btn-grupo[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%) translateX(-4px);
+  background-color: var(--cor-fundo-painel);
+  color: var(--cor-texto);
+  border: 1px solid var(--cor-destaque);
+  border-radius: var(--raio-borda);
+  padding: 4px 8px;
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 100;
+}
+
+.btn-grupo[data-tooltip]:hover::after {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
