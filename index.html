@@ -421,9 +421,40 @@
                 <button id="btn-tracer-aplicar" class="btn-menu">Aplicar Vetorização</button>
             </div>
           </div>
-
           <div id="tab-camadas" class="tab-content"></div>
         </div>
+        <nav class="sub-tabs-nav">
+          <button class="sub-tab-btn ativo" data-target="tab-paletas">
+            Paletas
+          </button>
+      </nav>
+        <div id="tab-paletas" class="sub-tab-content ativo">
+            <div class="paletas-toolbar">
+              <button
+                id="btn-importar-paletas"
+                class="sub-btn-content"
+                title="Importar imagem de paletas"
+              >
+                Importar
+              </button>
+
+              <button
+                id="btn-remover-paletas"
+                class="sub-btn-content"
+                title="Remover paletas selecionada"
+                disabled
+              >
+                Remover
+              </button>
+
+              <input
+                id="input-arquivo-referencia"
+                type="file"
+                accept="image/*"
+                hidden
+              />
+            </div>
+          <div id="paleta-cores"></div>
       </aside>
 
     </div><!-- /#workspace -->
