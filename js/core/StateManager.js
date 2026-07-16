@@ -13,13 +13,15 @@
  * - interfaceAtual {string}         - Flag para sabermos a tela onde o usuário está.
  */
 
-/** @type {{ ferramentaAtual: import('../tools/ToolBase.js').ToolBase|null, corPreenchimento: string, corBorda: string, estiloLinha: string, elementosSelecionados: SVGElement[], interfaceAtual: string }} */
+/** @type {{ ferramentaAtual: import('../tools/ToolBase.js').ToolBase|null, corPreenchimento: string, corBorda: string, opacidadePreenchimento: string, opacidadeBorda: string, estiloLinha: string, elementosSelecionados: SVGElement[], interfaceAtual: string }} */
 export const estado = {
   ferramentaAtual: null,
   corPreenchimento: '#4a90d9',
   corBorda: '#1a1a2e',
+  opacidadePreenchimento: '1', // Adicionado: 100% opaco por padrão
+  opacidadeBorda: '1',        // Adicionado: 100% opaco por padrão
   estiloLinha: 'continua',
-  interfaceAtual: 'inicio', // Nova flag para sabermos onde o usuário está
+  interfaceAtual: 'inicio', 
   elementosSelecionados: [],
   espessuraLapis: 2,
 };
@@ -196,4 +198,20 @@ export function desfazerAcao() {
 
 export function refazerAcao() {
   if (gerenciadorHistorico) gerenciadorHistorico.refazer();
+}
+
+/**
+ * Define a opacidade do preenchimento ativa.
+ * @param {string|number} opacidade - Valor entre '0' e '1'
+ */
+export function definirOpacidadePreenchimento(opacidade) {
+  estado.opacidadePreenchimento = String(opacidade);
+}
+
+/**
+ * Define a opacidade da borda ativa.
+ * @param {string|number} opacidade - Valor entre '0' e '1'
+ */
+export function definirOpacidadeBorda(opacidade) {
+  estado.opacidadeBorda = String(opacidade);
 }
