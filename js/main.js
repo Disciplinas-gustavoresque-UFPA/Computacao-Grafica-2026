@@ -494,11 +494,39 @@ svgCanvas.addEventListener("mouseup", (evento) => {
       inputCorBorda.value = corBordaAtual;
     }
 
-    if (sliderOpacidadePreenchimento) sliderOpacidadePreenchimento.value = opacidadePreenchimentoAtual;
-    if (sliderOpacidadeBorda) sliderOpacidadeBorda.value = opacidadeBordaAtual;
-    if (txtOpacidadePreenchimento) txtOpacidadePreenchimento.textContent = `${Math.round(opacidadePreenchimentoAtual * 100)}%`;
-    if (txtOpacidadeBorda) txtOpacidadeBorda.textContent = `${Math.round(opacidadeBordaAtual * 100)}%`;
+    // Se o preenchimento do objeto selecionado for um gradiente, sincroniza
+    // o alternador Sólido/Gradiente e os color-pickers "De"/"Para".
+    if (typeof ehGradiente === 'function' && ehGradiente(corPreenchimentoAtual)) {
+      const infoGradiente = obterInfoGradiente(svgCanvas, primeiroSelecionado);
+      if (infoGradiente) {
+        const radioAlvo = document.getElementById(`tipo-preenchimento-${infoGradiente.tipo}`);
+        if (radioAlvo) radioAlvo.checked = true;
+        if (inputCorGradienteInicio) inputCorGradienteInicio.value = infoGradiente.corInicio;
+        if (inputCorGradienteFim) inputCorGradienteFim.value = infoGradiente.corFim;
+        atualizarVisibilidadeControlesPreenchimento(infoGradiente.tipo);
+      }
+    } else {
+      const radioSolido = document.getElementById("tipo-preenchimento-solido");
+      if (radioSolido) radioSolido.checked = true;
+      if (typeof atualizarVisibilidadeControlesPreenchimento === 'function') {
+        atualizarVisibilidadeControlesPreenchimento("solido");
+      }
+    }
 
+    // Atualiza visualmente os Sliders de Opacidade na UI com segurança
+    if (sliderOpacidadePreenchimento) {
+      sliderOpacidadePreenchimento.value = opacidadePreenchimentoAtual;
+    }
+    if (sliderOpacidadeBorda) {
+      sliderOpacidadeBorda.value = opacidadeBordaAtual;
+    }
+    if (txtOpacidadePreenchimento) {
+      txtOpacidadePreenchimento.textContent = `${Math.round(opacidadePreenchimentoAtual * 100)}%`;
+    }
+    if (txtOpacidadeBorda) {
+      txtOpacidadeBorda.textContent = `${Math.round(opacidadeBordaAtual * 100)}%`;
+    }
+    
     definirCorPreenchimento(corPreenchimentoAtual);
     definirCorBorda(corBordaAtual);
     definirOpacidadePreenchimento(opacidadePreenchimentoAtual);
