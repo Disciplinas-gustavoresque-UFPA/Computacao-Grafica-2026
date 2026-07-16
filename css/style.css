@@ -574,13 +574,13 @@ body {
 #zoom-options,
 #line-options {
   position: absolute;
-  background: var(--cor-fundo-barra);
+  background: var(--cor-fundo-painel);
   border: 1px solid var(--cor-borda-ui);
   box-shadow: var(--sombra-padrao);
   padding: 6px;
   border-radius: var(--raio-borda);
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
   z-index: 20;
 }
 
@@ -594,23 +594,57 @@ body {
   display: flex;
 }
 
-#zoom-options button,
 #line-options .btn-line-style {
-  background-color: #4a90d9;
-  width: 36px;
-  height: 36px;
-  border: 1px solid transparent;
+  width: 44px;
+  height: 34px;
+  background: var(--cor-fundo-app);
+  border: 1px solid var(--cor-borda-ui);
   border-radius: var(--raio-borda);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
-#zoom-options button:hover,
+#line-options .btn-line-style svg {
+  width: 30px;
+  height: 12px;
+}
+
+#line-options .btn-line-style line {
+  stroke: var(--cor-texto);
+  stroke-width: 2;
+}
+
 #line-options .btn-line-style:hover {
   border-color: var(--cor-destaque);
 }
 
-#zoom-options button.ativo,
 #line-options .btn-line-style.ativo {
-  background: rgba(0, 38, 255, 0.35);
+  background: rgba(74, 144, 217, 0.2);
+  border-color: var(--cor-destaque);
+}
+
+#line-options .btn-line-style.ativo line {
+  stroke: var(--cor-destaque);
+}
+
+#zoom-options button {
+  background-color: transparent;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--cor-borda-ui);
+  border-radius: var(--raio-borda);
+  color: var(--cor-texto);
+}
+
+#zoom-options button:hover {
+  border-color: var(--cor-destaque);
+}
+
+#zoom-options button.ativo {
+  background: rgba(74, 144, 217, 0.2);
   border-color: var(--cor-destaque);
 }
 
@@ -1006,9 +1040,14 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .btn-line-style svg {
-    display: block;
-    width: 100%;
-    height: 100%;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.btn-ferramenta i.ti {
+  font-size: 20px;
+  line-height: 1;
 }
 
 /* --- Indicador de Não Salvo --- */
