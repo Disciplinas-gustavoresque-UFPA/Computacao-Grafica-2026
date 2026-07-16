@@ -66,6 +66,7 @@ import {
 import { salvarRascunho, marcarSalvo } from "./utils/autoSave.js";
 import { ImageTracerManager } from "./tools/ImageTracerManager.js";
 import { MedidorTool } from "./tools/MedidorTool.js";
+import { ToolbarGroup } from './core/ToolbarGroup.js';
 
 const svgCanvas = document.getElementById("canvas");
 
@@ -78,6 +79,7 @@ inicializarMenuInicial(svgCanvas);
 
 // Inicializar a sidebar
 const barraLateral = new SideBar();
+const toolbarGroup = new ToolbarGroup();
 
 const areaDesenho = document.getElementById("area-desenho");
 const botoesFerramenta = document.querySelectorAll(".btn-ferramenta");
