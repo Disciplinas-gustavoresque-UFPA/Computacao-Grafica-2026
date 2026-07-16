@@ -5,19 +5,17 @@ import { registrarAcaoHistorico } from '../core/StateManager.js';
 import { definirElementosSelecionados } from '../core/StateManager.js';
 
 /**
- * FerramentaRetangulo
- *
- * Ferramenta responsável por desenhar retângulos no canvas SVG.
+ * Ferramenta/Tool responsável por desenhar losangos no canvas SVG.
  * Herda de ToolBase.
  */
-export class RetanguloTool extends ToolBase {
+export class LosangoTool extends ToolBase {
   constructor(svgCanvas) {
     super();
     this.svgCanvas = svgCanvas;
     this.isDrawing = false;
     this.startX = 0;
     this.startY = 0;
-    this.rectElement = null;
+    this.losnElement = null;
   }
 
   onMouseDown(evento) {
@@ -28,10 +26,11 @@ export class RetanguloTool extends ToolBase {
     this.startX = pt.x;
     this.startY = pt.y;
 
-    // Cria o elemento SVG <rect> dinamicamente
-      this.rectElement = criarElementoSVG('rect', {
+    // Cria o elemento SVG <polygon> dinamicamente
+      this.losnElement = criarElementoSVG('polygon', {
       x: this.startX,
       y: this.startY,
+      'data-shape': 'losango',
       width: 0,
       height: 0,
       fill: estado.corPreenchimento,
@@ -41,11 +40,11 @@ export class RetanguloTool extends ToolBase {
       'stroke-width': 2
     });
 
-    this.svgCanvas.appendChild(this.rectElement);
+    this.svgCanvas.appendChild(this.losnElement);
   }
 
   onMouseMove(evento) {
-    if (!this.isDrawing || !this.rectElement) return;
+    if (!this.isDrawing || !this.losnElement) return;
 
     const pt = obterCoordenadaSVG(evento, this.svgCanvas);
 
@@ -57,27 +56,35 @@ export class RetanguloTool extends ToolBase {
     const novoX = pt.x < this.startX ? pt.x : this.startX;
     const novoY = pt.y < this.startY ? pt.y : this.startY;
 
-    this.rectElement.setAttribute('x', novoX);
-    this.rectElement.setAttribute('y', novoY);
-    this.rectElement.setAttribute('width', width);
-    this.rectElement.setAttribute('height', height);
+    this.losnElement.setAttribute('x', novoX);
+    this.losnElement.setAttribute('y', novoY);
+    this.losnElement.setAttribute('width', width);
+    this.losnElement.setAttribute('height', height);
+
+    // Cálculo e definição dos vértices do losango
+    const centroX = novoX + width / 2;
+    const centroY = novoY + height / 2;
+
+    // Ordem dos pontos: Topo, Direita, Base, Esquerda
+    const pontos = `${centroX},${novoY} ${novoX + width},${centroY} ${centroX},${novoY + height} ${novoX},${centroY}`;
+    this.losnElement.setAttribute('points', pontos);
   }
 
   onMouseUp(evento) {
     // Finaliza a operação de desenho
     this.isDrawing = false;
-    this.rectElement = null;
-    
+    this.losnElement = null;
+
     // Integração com o History Manager
     registrarAcaoHistorico();
   }
 
   onDesativar() {
     // Se a ferramenta for desativada no meio do desenho, cancela
-    if (this.isDrawing && this.rectElement) {
-      this.rectElement.remove();
+    if (this.isDrawing && this.losnElement) {
+      this.losnElement.remove();
       this.isDrawing = false;
-      this.rectElement = null;
+      this.losnElement = null;
     }
   }
 }
