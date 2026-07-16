@@ -72,6 +72,12 @@ import { salvarRascunho, marcarSalvo } from "./utils/autoSave.js";
 import { ImageTracerManager } from "./tools/ImageTracerManager.js";
 import { MedidorTool } from "./tools/MedidorTool.js";
 import { ToolbarGroup } from './core/ToolbarGroup.js';
+import {
+  aplicarGradientePreenchimento,
+  obterInfoGradiente,
+  ehGradiente,
+  definirGradientePadrao,
+} from "./utils/gradientHelpers.js";
 
 const svgCanvas = document.getElementById("canvas");
 
@@ -92,8 +98,20 @@ const btnImportarImagem = document.getElementById("btn-importar-imagem");
 const inputImagem = document.getElementById("input-imagem");
 const inputCorPreenchimento = document.getElementById("cor-preenchimento");
 const inputCorBorda = document.getElementById("cor-borda");
+
+// Controles de tipo de preenchimento (sólido / gradiente linear / gradiente radial)
+const radiosTipoPreenchimento = document.querySelectorAll('input[name="tipo-preenchimento"]');
+const linhaPreenchimentoSolido = document.getElementById("preenchimento-solido-row");
+const linhaPreenchimentoGradiente = document.getElementById("preenchimento-gradiente-row");
+const inputCorGradienteInicio = document.getElementById("cor-gradiente-inicio");
+const inputCorGradienteFim = document.getElementById("cor-gradiente-fim");
+
 const popupCores = document.getElementById("popup-cores");
 const popupCorPreenchimento = document.getElementById("popup-cor-preenchimento");
+const popupFillTipo = document.getElementById("popup-fill-tipo");
+const popupGradienteCores = document.getElementById("popup-gradiente-cores");
+const popupCorGradienteInicio = document.getElementById("popup-cor-gradiente-inicio");
+const popupCorGradienteFim = document.getElementById("popup-cor-gradiente-fim");
 const popupCorBorda = document.getElementById("popup-cor-borda");
 const popupStrokeWidth = document.getElementById("popup-stroke-width");
 const popupBotoesEstilo = document.querySelectorAll(".btn-estilo-borda");
@@ -238,7 +256,6 @@ observer.observe(svgCanvas, { attributes: true, attributeFilter: ["viewBox"] });
 const selecaoVisual = new Selecao(overlayCanvas);
 definirGerenciadorSelecao(selecaoVisual);
 
-<<<<<<< HEAD
 // Menu de contexto simples em utilitário
 inicializarMenuContexto(svgCanvas);
 
@@ -255,10 +272,7 @@ svgCanvas.addEventListener('canvas-cleared', () => {
   }
 });
 
-// Câmera global (compartilhada entre ferramentas e zoom via scroll)
-=======
-// Instâncias das ferramentas disponíveis com todas as implementações da main
->>>>>>> main
+// Instâncias das ferramentas disponíveis com todas as implementações
 const cameraGlobal = new CameraSVG([svgCanvas, overlayCanvas]);
 const scrollbar = new ScrollbarSVG(canvasContainer, svgCanvas, cameraGlobal);
 
@@ -304,14 +318,8 @@ function atualizarBotaoAtivo(nomeDaFerramenta) {
 
 // --- Barra de Ferramentas & Modos ---
 botoesFerramenta.forEach((btn) => {
-<<<<<<< HEAD
   btn.addEventListener('click', () => {
     const ferramentaId = btn.getAttribute('data-ferramenta');
-
-=======
-  btn.addEventListener("click", () => {
-    const ferramentaId = btn.getAttribute("data-ferramenta");
->>>>>>> main
     if (!ferramentaId) return;
 
     const ferramentaInstancia = instanciasFerramentas[ferramentaId] || null;
@@ -371,18 +379,50 @@ function aplicarEstiloBorda(el, estilo) {
 
 function sincronizarInputsCores(elementos) {
   const el = elementos[0];
-  const fill = normalizarCorHex(el.getAttribute('fill'), estado.corPreenchimento);
+  const fillAttr = el.getAttribute('fill');
   const stroke = normalizarCorHex(el.getAttribute('stroke'), estado.corBorda);
   const strokeWidth = el.getAttribute('stroke-width') || '2';
 
-  popupCorPreenchimento.value = fill;
+  if (ehGradiente(fillAttr)) {
+    const info = obterInfoGradiente(svgCanvas, el);
+    const tipo = info ? info.tipo : 'linear';
+
+    popupFillTipo.value = tipo;
+    popupCorPreenchimento.classList.add('oculto');
+    popupGradienteCores.classList.remove('oculto');
+
+    if (info) {
+      popupCorGradienteInicio.value = info.corInicio;
+      popupCorGradienteFim.value = info.corFim;
+      inputCorGradienteInicio.value = info.corInicio;
+      inputCorGradienteFim.value = info.corFim;
+    }
+
+    const radioAlvo = document.getElementById(`tipo-preenchimento-${tipo}`);
+    if (radioAlvo) radioAlvo.checked = true;
+    atualizarVisibilidadeControlesPreenchimento(tipo);
+
+    definirCorPreenchimento(fillAttr);
+  } else {
+    const fill = normalizarCorHex(fillAttr, estado.corPreenchimento);
+
+    popupFillTipo.value = 'solido';
+    popupCorPreenchimento.classList.remove('oculto');
+    popupGradienteCores.classList.add('oculto');
+    popupCorPreenchimento.value = fill;
+    inputCorPreenchimento.value = fill;
+
+    document.getElementById('tipo-preenchimento-solido').checked = true;
+    atualizarVisibilidadeControlesPreenchimento('solido');
+
+    definirCorPreenchimento(fill);
+  }
+
   popupCorBorda.value = stroke;
-  inputCorPreenchimento.value = fill;
   inputCorBorda.value = stroke;
   popupStrokeWidth.value = strokeWidth;
   atualizarBotaoEstiloAtivo(detectarEstiloBorda(el));
 
-  definirCorPreenchimento(fill);
   definirCorBorda(stroke);
 }
 
@@ -393,7 +433,12 @@ document.addEventListener('selecao-mudou', (e) => {
     popupCores.classList.add('visivel');
   } else {
     popupCores.classList.remove('visivel');
-    popupCorPreenchimento.value = estado.corPreenchimento;
+    popupFillTipo.value = 'solido';
+    popupCorPreenchimento.classList.remove('oculto');
+    popupGradienteCores.classList.add('oculto');
+    if (!ehGradiente(estado.corPreenchimento) && estado.corPreenchimento !== 'none') {
+      popupCorPreenchimento.value = estado.corPreenchimento;
+    }
     popupCorBorda.value = estado.corBorda;
   }
 });
@@ -404,6 +449,42 @@ popupCorPreenchimento.addEventListener('input', () => {
   inputCorPreenchimento.value = novaCor;
   estado.elementosSelecionados.forEach(el => el.setAttribute('fill', novaCor));
 });
+
+/**
+ * Aplica o preenchimento escolhido no popup (sólido ou gradiente) aos
+ * elementos selecionados, e mantém a sidebar sincronizada com a mesma
+ * escolha.
+ */
+function aplicarPreenchimentoPopup() {
+  const tipo = popupFillTipo.value;
+
+  if (tipo === 'solido') {
+    const cor = popupCorPreenchimento.value;
+    definirCorPreenchimento(cor);
+    inputCorPreenchimento.value = cor;
+    estado.elementosSelecionados.forEach(el => el.setAttribute('fill', cor));
+  } else {
+    const corInicio = popupCorGradienteInicio.value;
+    const corFim = popupCorGradienteFim.value;
+    estado.elementosSelecionados.forEach(el => {
+      aplicarGradientePreenchimento(svgCanvas, el, tipo, corInicio, corFim);
+    });
+    inputCorGradienteInicio.value = corInicio;
+    inputCorGradienteFim.value = corFim;
+  }
+
+  popupCorPreenchimento.classList.toggle('oculto', tipo !== 'solido');
+  popupGradienteCores.classList.toggle('oculto', tipo === 'solido');
+
+  // Mantém o painel lateral sincronizado com a mesma escolha
+  const radioAlvo = document.getElementById(`tipo-preenchimento-${tipo}`);
+  if (radioAlvo) radioAlvo.checked = true;
+  atualizarVisibilidadeControlesPreenchimento(tipo);
+}
+
+popupFillTipo.addEventListener('change', aplicarPreenchimentoPopup);
+popupCorGradienteInicio.addEventListener('input', aplicarPreenchimentoPopup);
+popupCorGradienteFim.addEventListener('input', aplicarPreenchimentoPopup);
 
 popupCorBorda.addEventListener('input', () => {
   const novaCor = popupCorBorda.value;
@@ -440,6 +521,82 @@ inputCorPreenchimento.addEventListener("input", () => {
     el.setAttribute("fill", novaCor);
   });
 });
+
+inputCorPreenchimento.addEventListener("change", () => {
+  registrarAcaoHistorico();
+  atualizarBotoesHistorico();
+});
+
+// --- Preenchimento em Gradiente (linear/radial) ---
+
+/**
+ * Retorna o tipo de preenchimento selecionado no rádio da sidebar
+ * ('solido' | 'linear' | 'radial').
+ */
+function obterTipoPreenchimentoSelecionado() {
+  const radioMarcado = Array.from(radiosTipoPreenchimento).find(r => r.checked);
+  return radioMarcado ? radioMarcado.value : "solido";
+}
+
+/**
+ * Mostra/esconde as linhas de cor sólida x gradiente conforme o tipo escolhido.
+ */
+function atualizarVisibilidadeControlesPreenchimento(tipo) {
+  const ehGradienteSelecionado = tipo === "linear" || tipo === "radial";
+  linhaPreenchimentoSolido.classList.toggle("oculto", ehGradienteSelecionado);
+  linhaPreenchimentoGradiente.classList.toggle("oculto", !ehGradienteSelecionado);
+}
+
+/**
+ * Aplica o preenchimento (sólido ou gradiente, conforme o tipo selecionado)
+ * a todos os elementos atualmente selecionados. Se não houver nenhum
+ * elemento selecionado, apenas define o preenchimento "corrente", que será
+ * usado automaticamente pelas PRÓXIMAS formas desenhadas.
+ */
+function aplicarPreenchimentoAtual() {
+  const tipo = obterTipoPreenchimentoSelecionado();
+  const haSelecao = estado.elementosSelecionados.length > 0;
+
+  if (tipo === "solido") {
+    const cor = inputCorPreenchimento.value;
+    definirCorPreenchimento(cor);
+    if (haSelecao) {
+      estado.elementosSelecionados.forEach(el => el.setAttribute("fill", cor));
+    }
+  } else {
+    const corInicio = inputCorGradienteInicio.value;
+    const corFim = inputCorGradienteFim.value;
+
+    if (haSelecao) {
+      // Cada elemento selecionado ganha (ou atualiza) seu próprio gradiente.
+      estado.elementosSelecionados.forEach(el => {
+        aplicarGradientePreenchimento(svgCanvas, el, tipo, corInicio, corFim);
+      });
+    } else {
+      // Sem seleção: define o gradiente como preenchimento padrão, para que
+      // a próxima forma desenhada já nasça com ele.
+      const referenciaGradiente = definirGradientePadrao(svgCanvas, tipo, corInicio, corFim);
+      definirCorPreenchimento(referenciaGradiente);
+    }
+  }
+
+  if (haSelecao) {
+    registrarAcaoHistorico();
+    atualizarBotoesHistorico();
+    salvarRascunho(svgCanvas, estado, "editor");
+    mostrarIndicadorNaoSalvo();
+  }
+}
+
+radiosTipoPreenchimento.forEach(radio => {
+  radio.addEventListener("change", () => {
+    atualizarVisibilidadeControlesPreenchimento(radio.value);
+    aplicarPreenchimentoAtual();
+  });
+});
+
+inputCorGradienteInicio.addEventListener("input", aplicarPreenchimentoAtual);
+inputCorGradienteFim.addEventListener("input", aplicarPreenchimentoAtual);
 
 // Ouvir mudanças no input de cor de borda da sidebar
 inputCorBorda.addEventListener("input", () => {
@@ -492,6 +649,22 @@ svgCanvas.addEventListener("mouseup", (evento) => {
       inputCorBorda.value = corBordaAtual;
     }
 
+    // Se o preenchimento do objeto selecionado for um gradiente, sincroniza
+    // o alternador Sólido/Gradiente e os color-pickers "De"/"Para".
+    if (ehGradiente(corPreenchimentoAtual)) {
+      const infoGradiente = obterInfoGradiente(svgCanvas, primeiroSelecionado);
+      if (infoGradiente) {
+        const radioAlvo = document.getElementById(`tipo-preenchimento-${infoGradiente.tipo}`);
+        if (radioAlvo) radioAlvo.checked = true;
+        inputCorGradienteInicio.value = infoGradiente.corInicio;
+        inputCorGradienteFim.value = infoGradiente.corFim;
+        atualizarVisibilidadeControlesPreenchimento(infoGradiente.tipo);
+      }
+    } else {
+      document.getElementById("tipo-preenchimento-solido").checked = true;
+      atualizarVisibilidadeControlesPreenchimento("solido");
+    }
+
     // Atualiza visualmente os Sliders de Opacidade na UI
     sliderOpacidadePreenchimento.value = opacidadePreenchimentoAtual;
     sliderOpacidadeBorda.value = opacidadeBordaAtual;
@@ -513,6 +686,9 @@ btnPreenchimentoNenhum.addEventListener('click', () => {
     el.setAttribute('fill', 'none');
   });
 
+  document.getElementById("tipo-preenchimento-solido").checked = true;
+  atualizarVisibilidadeControlesPreenchimento("solido");
+  
   registrarAcaoHistorico();
   atualizarBotoesHistorico();
 });
@@ -606,49 +782,40 @@ svgCanvas.addEventListener("contextmenu", (e) => {
 // Inicializa os valores dos inputs com os valores padrão do estado
 inputCorPreenchimento.value = estado.corPreenchimento;
 inputCorBorda.value = estado.corBorda;
+popupFillTipo.value = 'solido';
 popupCorPreenchimento.value = estado.corPreenchimento;
 popupCorBorda.value = estado.corBorda;
 atualizarBotaoEstiloLinhaAtivo(estado.estiloLinha);
 
-// Exportar / Salvar desenho
-<<<<<<< HEAD
-btnExportar.addEventListener('click', () => {
-  const formato = exportFormat.value || 'png';
-  exportarDesenho(svgCanvas, formato, { areaPagina: obterAreaPagina() });
-  marcarSalvo();
-  ocultarIndicadorNaoSalvo();
-});
+	// Exportar / Salvar desenho
+	btnExportar.addEventListener('click', () => {
+	  const formato = exportFormat.value || 'png';
+	  exportarDesenho(svgCanvas, formato, { areaPagina: obterAreaPagina() });
+	  marcarSalvo();
+	  ocultarIndicadorNaoSalvo();
+	});
 
-// Imprimir
-const btnImprimir = document.getElementById('btn-imprimir');
-btnImprimir.addEventListener('click', () => {
-  abrirPreviewImpressao(svgCanvas, obterAreaPagina());
-});
+	// Imprimir
+	const btnImprimir = document.getElementById('btn-imprimir');
+	btnImprimir.addEventListener('click', () => {
+	  abrirPreviewImpressao(svgCanvas, obterAreaPagina());
+	});
 
-// Ajustar zoom à página
-const btnFitPage = document.getElementById('btn-fit-page');
-btnFitPage.addEventListener('click', () => {
-  if (cameraGlobal) {
-    cameraGlobal.fitToPage(obterAreaPagina());
-    atualizarIndicadorZoom();
-  }
-});
+	// Ajustar zoom à página
+	const btnFitPage = document.getElementById('btn-fit-page');
+	btnFitPage.addEventListener('click', () => {
+	  if (cameraGlobal) {
+	    cameraGlobal.fitToPage(obterAreaPagina());
+	    atualizarIndicadorZoom();
+	  }
+	});
 
-function atualizarIndicadorZoom() {
-  const el = document.getElementById('zoom-indicator');
-  if (el) el.textContent = `Zoom: ${Math.round(cameraGlobal.getZoomLevel())}%`;
-}
+	function atualizarIndicadorZoom() {
+	  const el = document.getElementById('zoom-indicator');
+	  if (el) el.textContent = `Zoom: ${Math.round(cameraGlobal.getZoomLevel())}%`;
+	}
 
-const valorEspessura = document.getElementById("valor-espessura-lapis");
-=======
-btnExportar.addEventListener("click", () => {
-  const formato = exportFormat.value || "png";
-  exportarDesenho(svgCanvas, formato);
-});
-
-const valorEspessura =
-    document.getElementById("valor-espessura-lapis");
->>>>>>> main
+	const valorEspessura = document.getElementById("valor-espessura-lapis");
 
 inputEspessuraLapis.addEventListener("input", (e) => {
     definirEspessuraLapis(e.target.value);
@@ -728,14 +895,10 @@ window.addEventListener("keydown", (e) => {
   const tagAtiva = elementoAtivo.tagName.toLocaleLowerCase();
 
   // Se o foco estiver em um input, textArea, select ou contentEditable, ignora o atalho.
-<<<<<<< HEAD
-  if (["input", "textarea", "select"].includes(tagAtiva) || elementoAtivo.isContentEditable)
-=======
-  if (
-    ["input", "textarea", "select"].includes(tagAtiva) ||
-    elementoAtivo.isContentEditable
-  )
->>>>>>> main
+	  if (
+	    ["input", "textarea", "select"].includes(tagAtiva) ||
+	    elementoAtivo.isContentEditable
+	  )
     return;
 
   // Ctrl+Shift+P: Imprimir
@@ -883,16 +1046,12 @@ window.addEventListener("keydown", (e) => {
   }
 });
 
-<<<<<<< HEAD
-// --- Duplicar elemento (Ctrl+D) ---
-=======
 // --- Área de Transferência (Copiar / Colar) ---
 let clipboard = [];       
 let pasteCount = 0;       
 const PASTE_OFFSET = 20;  
 
-// --- Duplicar elemento ---
->>>>>>> main
+// --- Duplicar elemento (Ctrl+D) ---
 function handlerDuplicar() {
   const el = estado.elementosSelecionados[0];
   if (el) {
