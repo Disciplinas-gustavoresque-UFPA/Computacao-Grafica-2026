@@ -232,7 +232,7 @@ export function adicionarCorRecente(cor) {
   // Adiciona no início da lista
   estado.coresRecentes.unshift(cor);
   
-  // Limita o histórico a, por exemplo, 10 cores
+  // Limita o histórico a 10 cores
   if (estado.coresRecentes.length > 10) {
     estado.coresRecentes.pop();
   }
