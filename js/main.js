@@ -78,6 +78,7 @@ import {
   ehGradiente,
   definirGradientePadrao,
 } from "./utils/gradientHelpers.js";
+import { DimensoesManager } from './core/DimensoesManager.js';
 
 const svgCanvas = document.getElementById("canvas");
 
@@ -263,6 +264,9 @@ observer.observe(svgCanvas, { attributes: true, attributeFilter: ["viewBox"] });
 // Inicializar a classe de seleção visual
 const selecaoVisual = new Selecao(overlayCanvas);
 definirGerenciadorSelecao(selecaoVisual);
+
+// O dimensoes é instanciado aqui pra poder redesenhar a borda azul depois de redimensionar um elemento
+const dimensoesManager = new DimensoesManager(selecaoVisual);
 
 // Instâncias das ferramentas disponíveis com todas as implementações da main
 const cameraGlobal = new CameraSVG([svgCanvas, overlayCanvas]);
@@ -814,6 +818,10 @@ sliderOpacidadeBorda.addEventListener("change", () => {
 svgCanvas.addEventListener("mousedown", (evento) => {
   if (estado.ferramentaAtual) {
     estado.ferramentaAtual.onMouseDown(evento);
+
+    if (estado.ferramentaAtual === instanciasFerramentas['selecao']){
+      dimensoesManager.atualizarInputs();
+    }
   }
 });
 
@@ -835,7 +843,7 @@ svgCanvas.addEventListener("dblclick", (evento) => {
 // O overlay tem pointer-events:none, exceto nos elementos de UI habilitados de forma explícita
 overlayCanvas.addEventListener("mousedown", (evento) => {
   if (estado.ferramentaAtual) {
-    estado.ferramentaAtual.onMouseDown(evento);
+    estado.ferramentaAtual.onMouseDown(evento); 
   }
 });
 

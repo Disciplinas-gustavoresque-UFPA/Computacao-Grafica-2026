@@ -1567,3 +1567,23 @@ input[type="range"]::-moz-range-thumb {
 .paleta-swatch:hover {
   transform: scaleY(1.2);
 }
+
+.dimensoes {
+  display: flex;          /* Transforma o container num flexbox (coloca lado a lado) */
+  align-items: center;    /* Centraliza os itens verticalmente */
+  flex-wrap: nowrap;      /* Impede que os itens quebrem para a linha de baixo */
+  gap: 10px;
+}
+
+.dimensoes-label {
+  display: flex;
+  align-items: center;  /* Centraliza a letra e a caixa na mesma altura */
+  gap: 5px;             /* Dá um pequeno espaço entre o "L :" e o input */
+  white-space: nowrap;  /* Impede a quebra de linha de forma forçada */
+  margin: 0;            /* Remove margens padrão que possam atrapalhar */
+}
+
+.dimensoes-input {
+  width: 100%;
+  max-width: 70px;
+}
