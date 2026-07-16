@@ -1,4 +1,4 @@
-import { estado } from './StateManager.js';
+import { estado, registrarAcaoHistorico } from './StateManager.js';
 
 export class DimensoesManager {
   constructor(selecaoVisual) {
@@ -72,6 +72,8 @@ export class DimensoesManager {
 
     this.aplicarDimensoes(el, largura, altura);
     this.selecaoVisual.desenhar(estado.elementosSelecionados);
+
+    registrarAcaoHistorico();
   }
 
   aplicarDimensoes(el, largura, altura) {
@@ -104,9 +106,15 @@ export class DimensoesManager {
     const selecionados = estado.elementosSelecionados;
     if (selecionados.length === 1) {
       const dimensoes = this.lerDimensoes(selecionados[0]);
+
       if (dimensoes) {
         this.inputLargura.value = Number(dimensoes.largura.toFixed(2));
         this.inputAltura.value  = Number(dimensoes.altura.toFixed(2));
+
+        //Se estiver travado, recalcula a proporção baseada no novo elemento
+        if (this.proporcaoTravada && dimensoes.altura !== 0) {
+          this.proporcaoOriginal = dimensoes.largura / dimensoes.altura;
+        }
         return;
       }
     }
