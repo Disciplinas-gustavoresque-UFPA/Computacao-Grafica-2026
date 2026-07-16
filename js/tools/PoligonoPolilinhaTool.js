@@ -137,9 +137,11 @@ export class PoligonoPolilinhaTool extends ToolBase {
         const poligonoFinal = criarElementoSVG('polygon', {
             points: this.formatarPoints(),
             stroke: estado.corBorda,
+            'stroke-opacity': estado.opacidadeBorda || '1', 
             'stroke-width': 2,
             'data-shape': 'poligono',
-            fill: estado.corPreenchimento || 'transparent'
+            fill: estado.corPreenchimento,
+            'fill-opacity': estado.opacidadePreenchimento || '1' 
         });
 
         this.svgCanvas.appendChild(poligonoFinal);

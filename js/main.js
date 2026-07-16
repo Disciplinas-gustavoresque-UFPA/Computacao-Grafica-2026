@@ -12,6 +12,8 @@ import {
   definirFerramenta,
   definirCorPreenchimento,
   definirCorBorda,
+  definirOpacidadePreenchimento,
+  definirOpacidadeBorda,
   definirEstiloLinha,
   definirGerenciadorSelecao,
   definirElementosSelecionados,
@@ -116,6 +118,7 @@ const nomeFerramenta = document.getElementById("nome-ferramenta");
 const btnExportar = document.getElementById("btn-exportar");
 const exportFormat = document.getElementById("export-format");
 const inputEspessuraLapis = document.getElementById("espessura-lapis");
+
 
 const indicadorNaoSalvo = document.getElementById("indicador-nao-salvo");
 function mostrarIndicadorNaoSalvo() {
@@ -360,6 +363,8 @@ function sincronizarInputsCores(elementos) {
   const fillAttr = el.getAttribute('fill');
   const stroke = normalizarCorHex(el.getAttribute('stroke'), estado.corBorda);
   const strokeWidth = el.getAttribute('stroke-width') || '2';
+  const fillOpacity = el.getAttribute('fill-opacity') || '1';
+  const strokeOpacity = el.getAttribute('stroke-opacity') || '1';
 
   if (ehGradiente(fillAttr)) {
     const info = obterInfoGradiente(svgCanvas, el);
@@ -399,9 +404,44 @@ function sincronizarInputsCores(elementos) {
   popupCorBorda.value = stroke;
   inputCorBorda.value = stroke;
   popupStrokeWidth.value = strokeWidth;
+  
+// Se o preenchimento do objeto selecionado for um gradiente, sincroniza
+    // o alternador Sólido/Gradiente e os color-pickers "De"/"Para".
+    if (typeof ehGradiente === 'function' && ehGradiente(corPreenchimentoAtual)) {
+      const infoGradiente = obterInfoGradiente(svgCanvas, primeiroSelecionado);
+      if (infoGradiente) {
+        const radioAlvo = document.getElementById(`tipo-preenchimento-${infoGradiente.tipo}`);
+        if (radioAlvo) radioAlvo.checked = true;
+        if (inputCorGradienteInicio) inputCorGradienteInicio.value = infoGradiente.corInicio;
+        if (inputCorGradienteFim) inputCorGradienteFim.value = infoGradiente.corFim;
+        atualizarVisibilidadeControlesPreenchimento(infoGradiente.tipo);
+      }
+    } else {
+      const radioSolido = document.getElementById("tipo-preenchimento-solido");
+      if (radioSolido) radioSolido.checked = true;
+      if (typeof atualizarVisibilidadeControlesPreenchimento === 'function') {
+        atualizarVisibilidadeControlesPreenchimento("solido");
+      }
+    }
+
+    // Atualiza visualmente os Sliders de Opacidade na UI com segurança (sua branch)
+    if (sliderOpacidadePreenchimento) {
+      sliderOpacidadePreenchimento.value = opacidadePreenchimentoAtual;
+    }
+    if (sliderOpacidadeBorda) {
+      sliderOpacidadeBorda.value = opacidadeBordaAtual;
+    }
+    if (txtOpacidadePreenchimento) {
+      txtOpacidadePreenchimento.textContent = `${Math.round(opacidadePreenchimentoAtual * 100)}%`;
+    }
+    if (txtOpacidadeBorda) {
+      txtOpacidadeBorda.textContent = `${Math.round(opacidadeBordaAtual * 100)}%`;
+    }
   atualizarBotaoEstiloAtivo(detectarEstiloBorda(el));
 
   definirCorBorda(stroke);
+  definirOpacidadePreenchimento(fillOpacity);
+  definirOpacidadeBorda(strokeOpacity);
 }
 
 document.addEventListener('selecao-mudou', (e) => {
@@ -611,16 +651,10 @@ svgCanvas.addEventListener("mouseup", (evento) => {
   if (primeiroSelecionado) {
     const corPreenchimentoAtual = primeiroSelecionado.getAttribute('fill') || '#ffffff';
     const corBordaAtual = primeiroSelecionado.getAttribute('stroke') || '#000000';
-    
-    // Captura as opacidades existentes (padrão é 1 se não houver atributo)
     const opacidadePreenchimentoAtual = primeiroSelecionado.getAttribute('fill-opacity') || '1';
     const opacidadeBordaAtual = primeiroSelecionado.getAttribute('stroke-opacity') || '1';
 
-    // Só atualizamos os seletores visuais do HTML se o valor do SVG for uma cor hexadecimal válida.
-    if (
-      corPreenchimentoAtual !== "none" &&
-      corPreenchimentoAtual.startsWith("#")
-    ) {
+    if (corPreenchimentoAtual !== "none" && corPreenchimentoAtual.startsWith("#")) {
       inputCorPreenchimento.value = corPreenchimentoAtual;
     }
     if (corBordaAtual !== "none" && corBordaAtual.startsWith("#")) {
@@ -629,30 +663,43 @@ svgCanvas.addEventListener("mouseup", (evento) => {
 
     // Se o preenchimento do objeto selecionado for um gradiente, sincroniza
     // o alternador Sólido/Gradiente e os color-pickers "De"/"Para".
-    if (ehGradiente(corPreenchimentoAtual)) {
+    if (typeof ehGradiente === 'function' && ehGradiente(corPreenchimentoAtual)) {
       const infoGradiente = obterInfoGradiente(svgCanvas, primeiroSelecionado);
       if (infoGradiente) {
         const radioAlvo = document.getElementById(`tipo-preenchimento-${infoGradiente.tipo}`);
         if (radioAlvo) radioAlvo.checked = true;
-        inputCorGradienteInicio.value = infoGradiente.corInicio;
-        inputCorGradienteFim.value = infoGradiente.corFim;
+        if (inputCorGradienteInicio) inputCorGradienteInicio.value = infoGradiente.corInicio;
+        if (inputCorGradienteFim) inputCorGradienteFim.value = infoGradiente.corFim;
         atualizarVisibilidadeControlesPreenchimento(infoGradiente.tipo);
       }
     } else {
-      document.getElementById("tipo-preenchimento-solido").checked = true;
-      atualizarVisibilidadeControlesPreenchimento("solido");
+      const radioSolido = document.getElementById("tipo-preenchimento-solido");
+      if (radioSolido) radioSolido.checked = true;
+      if (typeof atualizarVisibilidadeControlesPreenchimento === 'function') {
+        atualizarVisibilidadeControlesPreenchimento("solido");
+      }
     }
 
-    // Atualiza visualmente os Sliders de Opacidade na UI
-    sliderOpacidadePreenchimento.value = opacidadePreenchimentoAtual;
-    sliderOpacidadeBorda.value = opacidadeBordaAtual;
-
-    // Atualiza também os valores armazenados no StateManager para consistência
+    // Atualiza visualmente os Sliders de Opacidade na UI com segurança
+    if (sliderOpacidadePreenchimento) {
+      sliderOpacidadePreenchimento.value = opacidadePreenchimentoAtual;
+    }
+    if (sliderOpacidadeBorda) {
+      sliderOpacidadeBorda.value = opacidadeBordaAtual;
+    }
+    if (txtOpacidadePreenchimento) {
+      txtOpacidadePreenchimento.textContent = `${Math.round(opacidadePreenchimentoAtual * 100)}%`;
+    }
+    if (txtOpacidadeBorda) {
+      txtOpacidadeBorda.textContent = `${Math.round(opacidadeBordaAtual * 100)}%`;
+    }
+    
     definirCorPreenchimento(corPreenchimentoAtual);
     definirCorBorda(corBordaAtual);
+    definirOpacidadePreenchimento(opacidadePreenchimentoAtual);
+    definirOpacidadeBorda(opacidadeBordaAtual);
   }
 
-  // Auto-save silencioso após cada ação de desenho concluída no canvas principal
   salvarRascunho(svgCanvas, estado, "editor");
   mostrarIndicadorNaoSalvo();
 });
@@ -681,6 +728,41 @@ btnBordaNenhum.addEventListener('click', () => {
   registrarAcaoHistorico();
   atualizarBotoesHistorico();
 });
+
+// listeners de opacidade
+if (sliderOpacidadePreenchimento) {
+  sliderOpacidadePreenchimento.addEventListener("input", () => {
+    const valor = sliderOpacidadePreenchimento.value;
+    definirOpacidadePreenchimento(valor);
+    if (txtOpacidadePreenchimento) txtOpacidadePreenchimento.textContent = `${Math.round(valor * 100)}%`;
+    
+    estado.elementosSelecionados.forEach(el => {
+      el.setAttribute('fill-opacity', valor);
+    });
+  });
+
+  sliderOpacidadePreenchimento.addEventListener('change', () => {
+    registrarAcaoHistorico();
+    atualizarBotoesHistorico();
+  });
+}
+
+if (sliderOpacidadeBorda) {
+  sliderOpacidadeBorda.addEventListener("input", () => {
+    const valor = sliderOpacidadeBorda.value;
+    definirOpacidadeBorda(valor);
+    if (txtOpacidadeBorda) txtOpacidadeBorda.textContent = `${Math.round(valor * 100)}%`;
+    
+    estado.elementosSelecionados.forEach(el => {
+      el.setAttribute('stroke-opacity', valor);
+    });
+  });
+
+  sliderOpacidadeBorda.addEventListener("change", () => {
+    registrarAcaoHistorico();
+    atualizarBotoesHistorico();
+  });
+}
 
 sliderOpacidadePreenchimento.addEventListener("input", () => {
   const valor = sliderOpacidadePreenchimento.value;
@@ -1056,6 +1138,9 @@ document.addEventListener('keydown', (evento) => {
     return;
   }
 });
+
+const txtOpacidadePreenchimento = document.getElementById('val-opacity-fill');
+const txtOpacidadeBorda = document.getElementById('val-opacity-stroke');
 
 // Importação de imagens
 btnImportarImagem.addEventListener("click", () => {
