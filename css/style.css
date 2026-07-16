@@ -899,3 +899,14 @@ body {
 .grid-row {
   background-image: linear-gradient(to bottom, var(--cor-grid) 0, var(--cor-grid) calc(100% - 10px), transparent calc(100% - 10px), transparent 100%);
 }
+
+#barra-configuracoes .select-format{
+  color:#fff;
+  border: #ccc;
+  background-color: #0f3460;
+}
+
+#barra-configurações .select-format option {
+  background-color: #fff;
+  color: #0f3460;
+}
