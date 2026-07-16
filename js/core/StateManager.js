@@ -28,6 +28,7 @@ export const estado = {
 };
 
 let gerenciadorSelecaoVisual = null;
+let callbackPainelAlinhamento = null;
 
 
 export function definirEspessuraLapis(espessura) {
@@ -36,6 +37,16 @@ export function definirEspessuraLapis(espessura) {
 
 export function definirGerenciadorSelecao(selecao) {
   gerenciadorSelecaoVisual = selecao;
+}
+
+export function definirCallbackPainelAlinhamento(fn) {
+  callbackPainelAlinhamento = fn;
+}
+
+function _notificarPainelAlinhamento() {
+  if (typeof callbackPainelAlinhamento === 'function') {
+    callbackPainelAlinhamento(estado.elementosSelecionados.length);
+  }
 }
 
 export function atualizarPosicaoSelecaoVisual() {
@@ -107,6 +118,11 @@ export function definirElementosSelecionados(elementos) {
   if (gerenciadorSelecaoVisual) {
     gerenciadorSelecaoVisual.desenhar(estado.elementosSelecionados);
   }
+
+  document.dispatchEvent(new CustomEvent('selecao-mudou', {
+    detail: { elementos: estado.elementosSelecionados }
+  }));
+  _notificarPainelAlinhamento();
 }
 
 /**
@@ -128,6 +144,10 @@ export function adicionarElementoSelecao(elemento) {
     if (gerenciadorSelecaoVisual) {
       gerenciadorSelecaoVisual.desenhar(estado.elementosSelecionados);
     }
+    document.dispatchEvent(new CustomEvent('selecao-mudou', {
+      detail: { elementos: estado.elementosSelecionados }
+    }));
+    _notificarPainelAlinhamento();
   }
 }
 
@@ -141,6 +161,10 @@ export function removerElementoSelecao(elemento) {
   if (gerenciadorSelecaoVisual) {
     gerenciadorSelecaoVisual.desenhar(estado.elementosSelecionados);
   }
+  document.dispatchEvent(new CustomEvent('selecao-mudou', {
+    detail: { elementos: estado.elementosSelecionados }
+  }));
+  _notificarPainelAlinhamento();
 }
 
 export function definirInterface(novaInterface) {
