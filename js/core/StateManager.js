@@ -24,6 +24,7 @@ export const estado = {
   interfaceAtual: 'inicio', 
   elementosSelecionados: [],
   espessuraLapis: 2,
+  coresRecentes: [],
 };
 
 let gerenciadorSelecaoVisual = null;
@@ -214,4 +215,30 @@ export function definirOpacidadePreenchimento(opacidade) {
  */
 export function definirOpacidadeBorda(opacidade) {
   estado.opacidadeBorda = String(opacidade);
+}
+
+/**
+ * Adiciona uma cor ao histórico de recentes se ela já não for a última adicionada.
+ * @param {string} cor - Hexadecimal da cor
+ */
+export function adicionarCorRecente(cor) {
+  if (!cor || cor === 'none' || cor === 'transparent') return;
+  
+  cor = cor.toLowerCase();
+  
+  // Remove a cor se ela já existir na lista (para movê-la para o topo)
+  estado.coresRecentes = estado.coresRecentes.filter(c => c !== cor);
+  
+  // Adiciona no início da lista
+  estado.coresRecentes.unshift(cor);
+  
+  // Limita o histórico a, por exemplo, 10 cores
+  if (estado.coresRecentes.length > 10) {
+    estado.coresRecentes.pop();
+  }
+
+  // Dispara um evento para avisar a UI que a lista mudou
+  document.dispatchEvent(new CustomEvent('cores-recentes-mudou', {
+    detail: { cores: estado.coresRecentes }
+  }));
 }
