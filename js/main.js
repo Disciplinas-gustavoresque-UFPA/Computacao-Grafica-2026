@@ -194,8 +194,13 @@ if (btnToggleGrid) {
 
 if (selectGridType) {
   selectGridType.addEventListener('change', (e) => gridManager.atualizarConfig('tipo', e.target.value));
-  inputGridSize.addEventListener('input', (e) => gridManager.atualizarConfig('tamanho', parseInt(e.target.value) || 1));
-  inputGridColor.addEventListener('input', (e) => gridManager.atualizarConfig('corHex', e.target.value));
+
+  inputGridSize.addEventListener('change', (e) => {
+    gridManager.atualizarConfig('tamanho', parseInt(e.target.value) || 1);
+    e.target.value = gridManager.config.tamanho;  inputGridColor.addEventListener('input', (e) => gridManager.atualizarConfig('corHex', e.target.value));
+  });
+
+    inputGridColor.addEventListener('input', (e) => gridManager.atualizarConfig('corHex', e.target.value));
   inputGridOpacity.addEventListener('input', (e) => gridManager.atualizarConfig('opacidade', parseFloat(e.target.value)));
 }
 

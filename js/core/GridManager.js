@@ -17,6 +17,15 @@ export class GridManager {
   }
 
   atualizarConfig(chave, valor) {
+    if (chave == 'tamanho' && valor < 5) {
+      valor = 5;
+    }
+
+    if (chave === 'opacidade') {
+      if (valor < 0) valor = 0
+      if (valor > 1) valor = 1
+    }
+
     this.config[chave] = valor;
     this.aplicarEstilos();
   }
