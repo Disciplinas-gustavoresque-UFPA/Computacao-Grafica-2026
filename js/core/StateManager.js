@@ -15,16 +15,19 @@
  * - espessuraLapis {number}        - Espessura do traço da ferramenta lápis.
  */
 
-/** @type {{ ferramentaAtual: import('../tools/ToolBase.js').ToolBase|null, corPreenchimento: string, corBorda: string, estiloLinha: string, elementosSelecionados: SVGElement[], interfaceAtual: string, areaPagina: {x: number, y: number, width: number, height: number} }} */
+/** @type {{ ferramentaAtual: import('../tools/ToolBase.js').ToolBase|null, corPreenchimento: string, corBorda: string, opacidadePreenchimento: string, opacidadeBorda: string, estiloLinha: string, elementosSelecionados: SVGElement[], interfaceAtual: string }} */
 export const estado = {
   ferramentaAtual: null,
   corPreenchimento: '#4a90d9',
   corBorda: '#1a1a2e',
+  opacidadePreenchimento: '1', // Adicionado: 100% opaco por padrão
+  opacidadeBorda: '1',        // Adicionado: 100% opaco por padrão
   estiloLinha: 'continua',
-  interfaceAtual: 'inicio',
+  interfaceAtual: 'inicio', 
   elementosSelecionados: [],
   areaPagina: { x: 0, y: 0, width: 800, height: 1131 },
   espessuraLapis: 2,
+  coresRecentes: [],
 };
 
 let gerenciadorSelecaoVisual = null;
@@ -229,4 +232,46 @@ export function desfazerAcao() {
 
 export function refazerAcao() {
   if (gerenciadorHistorico) gerenciadorHistorico.refazer();
+}
+
+/**
+ * Define a opacidade do preenchimento ativa.
+ * @param {string|number} opacidade - Valor entre '0' e '1'
+ */
+export function definirOpacidadePreenchimento(opacidade) {
+  estado.opacidadePreenchimento = String(opacidade);
+}
+
+/**
+ * Define a opacidade da borda ativa.
+ * @param {string|number} opacidade - Valor entre '0' e '1'
+ */
+export function definirOpacidadeBorda(opacidade) {
+  estado.opacidadeBorda = String(opacidade);
+}
+
+/**
+ * Adiciona uma cor ao histórico de recentes se ela já não for a última adicionada.
+ * @param {string} cor - Hexadecimal da cor
+ */
+export function adicionarCorRecente(cor) {
+  if (!cor || cor === 'none' || cor === 'transparent') return;
+  
+  cor = cor.toLowerCase();
+  
+  // Remove a cor se ela já existir na lista (para movê-la para o topo)
+  estado.coresRecentes = estado.coresRecentes.filter(c => c !== cor);
+  
+  // Adiciona no início da lista
+  estado.coresRecentes.unshift(cor);
+  
+  // Limita o histórico a, por exemplo, 10 cores
+  if (estado.coresRecentes.length > 10) {
+    estado.coresRecentes.pop();
+  }
+
+  // Dispara um evento para avisar a UI que a lista mudou
+  document.dispatchEvent(new CustomEvent('cores-recentes-mudou', {
+    detail: { cores: estado.coresRecentes }
+  }));
 }

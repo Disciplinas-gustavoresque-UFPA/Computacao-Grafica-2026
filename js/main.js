@@ -12,6 +12,8 @@ import {
   definirFerramenta,
   definirCorPreenchimento,
   definirCorBorda,
+  definirOpacidadePreenchimento,
+  definirOpacidadeBorda,
   definirEstiloLinha,
   definirGerenciadorSelecao,
   definirElementosSelecionados,
@@ -24,39 +26,40 @@ import {
   definirCallbackPainelAlinhamento,
   atualizarPosicaoSelecaoVisual,
   definirEspessuraLapis,
-} from './core/StateManager.js';
-import { rgbToHex } from './utils/colorHelpers.js';
-import { ColorPickerTool } from './tools/ColorPickerTool.js';
-import { Lapis } from './tools/LapisTool.js';
-import { RetanguloTool } from './tools/RetanguloTool.js';
-import { TextoTool } from './tools/TextoTool.js';
-import { exportarDesenho } from './utils/exportHelpers.js';
-import { SelecaoTool } from './tools/SelecaoTool.js';
-import { Selecao } from './core/Selecao.js';
-import { BorrachaTool } from './tools/BorrachaTool.js';
-import { NodeEditTool } from './tools/NodeEditTool.js';
-import { LinhaTool } from './tools/LinhaTool.js';
-import { LinhaCurvadaTool } from './tools/LinhaCurvadaTool.js';
-import { BezierTool } from './tools/BezierTool.js';
-import { ElipseTool } from './tools/ElipseTool.js';
-import { EspiralTool } from './tools/EspiralTool.js';
-import { LupaTool } from './tools/LupaTool.js';
-import { inicializarImportadorImagem } from './tools/ImageImporter.js';
-import { inicializarMenuInicial } from './core/UIManager.js';
-import { duplicarElemento } from './utils/duplicateHelpers.js';
-import { PoligonoPolilinhaTool } from './tools/PoligonoPolilinhaTool.js';
-import { PageRenderer } from './core/PageRenderer.js';
-import { abrirPreviewImpressao, imprimir } from './utils/printHelpers.js';
-import { HistoryManager } from './core/HistoryManager.js';
-import { SideBar } from './core/SideBar.js';
-import { PincelTool } from './tools/PincelTool.js';
-import { CameraSVG } from './core/CameraSVG.js';
-import { obterCoordenadaSVG } from './utils/svgHelpers.js';
-import { agruparElementos, desagruparElementos } from './core/GroupManager.js';
-import { inicializarMenuContexto } from './contextMenu/index.js';
-import { ScrollbarSVG } from './core/ScrollbarSVG.js';
-import { Regua } from './core/Regua.js';
-import { LosangoTool } from './tools/LosangoTool.js';
+adicionarCorRecente, 
+} from "./core/StateManager.js";
+import { rgbToHex } from "./utils/colorHelpers.js";
+import { ColorPickerTool } from "./tools/ColorPickerTool.js";
+import { Lapis } from "./tools/LapisTool.js";
+import { RetanguloTool } from "./tools/RetanguloTool.js";
+import { TextoTool } from "./tools/TextoTool.js";
+import { exportarDesenho } from "./utils/exportHelpers.js";
+import { SelecaoTool } from "./tools/SelecaoTool.js";
+import { Selecao } from "./core/Selecao.js";
+import { BorrachaTool } from "./tools/BorrachaTool.js";
+import { NodeEditTool } from "./tools/NodeEditTool.js";
+import { LinhaTool } from "./tools/LinhaTool.js";
+import { LinhaCurvadaTool } from "./tools/LinhaCurvadaTool.js";
+import { BezierTool } from "./tools/BezierTool.js";
+import { ElipseTool } from "./tools/ElipseTool.js";
+import { EspiralTool } from "./tools/EspiralTool.js";
+import { LupaTool } from "./tools/LupaTool.js";
+import { inicializarImportadorImagem } from "./tools/ImageImporter.js";
+import { inicializarMenuInicial } from "./core/UIManager.js";
+import { duplicarElemento } from "./utils/duplicateHelpers.js";
+import { PoligonoPolilinhaTool } from "./tools/PoligonoPolilinhaTool.js";
+import { PageRenderer } from "./core/PageRenderer.js";
+import { abrirPreviewImpressao, imprimir } from "./utils/printHelpers.js";
+import { HistoryManager } from "./core/HistoryManager.js";
+import { SideBar } from "./core/SideBar.js";
+import { PincelTool } from "./tools/PincelTool.js";
+import { CameraSVG } from "./core/CameraSVG.js";
+import { obterCoordenadaSVG } from "./utils/svgHelpers.js";
+import { agruparElementos, desagruparElementos } from "./core/GroupManager.js";
+import { inicializarMenuContexto } from "./contextMenu/index.js";
+import { ScrollbarSVG } from "./core/ScrollbarSVG.js";
+import { Regua } from "./core/Regua.js";
+import { LosangoTool } from "./tools/LosangoTool.js";
 import { espelharHorizontal, espelharVertical } from "./utils/flipHelpers.js";
 import {
   alinharEsquerda,
@@ -120,6 +123,7 @@ const nomeFerramenta = document.getElementById("nome-ferramenta");
 const btnExportar = document.getElementById("btn-exportar");
 const exportFormat = document.getElementById("export-format");
 const inputEspessuraLapis = document.getElementById("espessura-lapis");
+
 
 const indicadorNaoSalvo = document.getElementById("indicador-nao-salvo");
 function mostrarIndicadorNaoSalvo() {
@@ -382,6 +386,8 @@ function sincronizarInputsCores(elementos) {
   const fillAttr = el.getAttribute('fill');
   const stroke = normalizarCorHex(el.getAttribute('stroke'), estado.corBorda);
   const strokeWidth = el.getAttribute('stroke-width') || '2';
+  const fillOpacity = el.getAttribute('fill-opacity') || '1';
+  const strokeOpacity = el.getAttribute('stroke-opacity') || '1';
 
   if (ehGradiente(fillAttr)) {
     const info = obterInfoGradiente(svgCanvas, el);
@@ -421,9 +427,44 @@ function sincronizarInputsCores(elementos) {
   popupCorBorda.value = stroke;
   inputCorBorda.value = stroke;
   popupStrokeWidth.value = strokeWidth;
+  
+// Se o preenchimento do objeto selecionado for um gradiente, sincroniza
+    // o alternador Sólido/Gradiente e os color-pickers "De"/"Para".
+    if (typeof ehGradiente === 'function' && ehGradiente(corPreenchimentoAtual)) {
+      const infoGradiente = obterInfoGradiente(svgCanvas, primeiroSelecionado);
+      if (infoGradiente) {
+        const radioAlvo = document.getElementById(`tipo-preenchimento-${infoGradiente.tipo}`);
+        if (radioAlvo) radioAlvo.checked = true;
+        if (inputCorGradienteInicio) inputCorGradienteInicio.value = infoGradiente.corInicio;
+        if (inputCorGradienteFim) inputCorGradienteFim.value = infoGradiente.corFim;
+        atualizarVisibilidadeControlesPreenchimento(infoGradiente.tipo);
+      }
+    } else {
+      const radioSolido = document.getElementById("tipo-preenchimento-solido");
+      if (radioSolido) radioSolido.checked = true;
+      if (typeof atualizarVisibilidadeControlesPreenchimento === 'function') {
+        atualizarVisibilidadeControlesPreenchimento("solido");
+      }
+    }
+
+    // Atualiza visualmente os Sliders de Opacidade na UI com segurança (sua branch)
+    if (sliderOpacidadePreenchimento) {
+      sliderOpacidadePreenchimento.value = opacidadePreenchimentoAtual;
+    }
+    if (sliderOpacidadeBorda) {
+      sliderOpacidadeBorda.value = opacidadeBordaAtual;
+    }
+    if (txtOpacidadePreenchimento) {
+      txtOpacidadePreenchimento.textContent = `${Math.round(opacidadePreenchimentoAtual * 100)}%`;
+    }
+    if (txtOpacidadeBorda) {
+      txtOpacidadeBorda.textContent = `${Math.round(opacidadeBordaAtual * 100)}%`;
+    }
   atualizarBotaoEstiloAtivo(detectarEstiloBorda(el));
 
   definirCorBorda(stroke);
+  definirOpacidadePreenchimento(fillOpacity);
+  definirOpacidadeBorda(strokeOpacity);
 }
 
 document.addEventListener('selecao-mudou', (e) => {
@@ -633,16 +674,10 @@ svgCanvas.addEventListener("mouseup", (evento) => {
   if (primeiroSelecionado) {
     const corPreenchimentoAtual = primeiroSelecionado.getAttribute('fill') || '#ffffff';
     const corBordaAtual = primeiroSelecionado.getAttribute('stroke') || '#000000';
-
-    // Captura as opacidades existentes (padrão é 1 se não houver atributo)
     const opacidadePreenchimentoAtual = primeiroSelecionado.getAttribute('fill-opacity') || '1';
     const opacidadeBordaAtual = primeiroSelecionado.getAttribute('stroke-opacity') || '1';
 
-    // Só atualizamos os seletores visuais do HTML se o valor do SVG for uma cor hexadecimal válida.
-    if (
-      corPreenchimentoAtual !== "none" &&
-      corPreenchimentoAtual.startsWith("#")
-    ) {
+    if (corPreenchimentoAtual !== "none" && corPreenchimentoAtual.startsWith("#")) {
       inputCorPreenchimento.value = corPreenchimentoAtual;
     }
     if (corBordaAtual !== "none" && corBordaAtual.startsWith("#")) {
@@ -651,30 +686,43 @@ svgCanvas.addEventListener("mouseup", (evento) => {
 
     // Se o preenchimento do objeto selecionado for um gradiente, sincroniza
     // o alternador Sólido/Gradiente e os color-pickers "De"/"Para".
-    if (ehGradiente(corPreenchimentoAtual)) {
+    if (typeof ehGradiente === 'function' && ehGradiente(corPreenchimentoAtual)) {
       const infoGradiente = obterInfoGradiente(svgCanvas, primeiroSelecionado);
       if (infoGradiente) {
         const radioAlvo = document.getElementById(`tipo-preenchimento-${infoGradiente.tipo}`);
         if (radioAlvo) radioAlvo.checked = true;
-        inputCorGradienteInicio.value = infoGradiente.corInicio;
-        inputCorGradienteFim.value = infoGradiente.corFim;
+        if (inputCorGradienteInicio) inputCorGradienteInicio.value = infoGradiente.corInicio;
+        if (inputCorGradienteFim) inputCorGradienteFim.value = infoGradiente.corFim;
         atualizarVisibilidadeControlesPreenchimento(infoGradiente.tipo);
       }
     } else {
-      document.getElementById("tipo-preenchimento-solido").checked = true;
-      atualizarVisibilidadeControlesPreenchimento("solido");
+      const radioSolido = document.getElementById("tipo-preenchimento-solido");
+      if (radioSolido) radioSolido.checked = true;
+      if (typeof atualizarVisibilidadeControlesPreenchimento === 'function') {
+        atualizarVisibilidadeControlesPreenchimento("solido");
+      }
     }
 
-    // Atualiza visualmente os Sliders de Opacidade na UI
-    sliderOpacidadePreenchimento.value = opacidadePreenchimentoAtual;
-    sliderOpacidadeBorda.value = opacidadeBordaAtual;
-
-    // Atualiza também os valores armazenados no StateManager para consistência
+    // Atualiza visualmente os Sliders de Opacidade na UI com segurança
+    if (sliderOpacidadePreenchimento) {
+      sliderOpacidadePreenchimento.value = opacidadePreenchimentoAtual;
+    }
+    if (sliderOpacidadeBorda) {
+      sliderOpacidadeBorda.value = opacidadeBordaAtual;
+    }
+    if (txtOpacidadePreenchimento) {
+      txtOpacidadePreenchimento.textContent = `${Math.round(opacidadePreenchimentoAtual * 100)}%`;
+    }
+    if (txtOpacidadeBorda) {
+      txtOpacidadeBorda.textContent = `${Math.round(opacidadeBordaAtual * 100)}%`;
+    }
+    
     definirCorPreenchimento(corPreenchimentoAtual);
     definirCorBorda(corBordaAtual);
+    definirOpacidadePreenchimento(opacidadePreenchimentoAtual);
+    definirOpacidadeBorda(opacidadeBordaAtual);
   }
 
-  // Auto-save silencioso após cada ação de desenho concluída no canvas principal
   salvarRascunho(svgCanvas, estado, "editor");
   mostrarIndicadorNaoSalvo();
 });
@@ -703,6 +751,41 @@ btnBordaNenhum.addEventListener('click', () => {
   registrarAcaoHistorico();
   atualizarBotoesHistorico();
 });
+
+// listeners de opacidade
+if (sliderOpacidadePreenchimento) {
+  sliderOpacidadePreenchimento.addEventListener("input", () => {
+    const valor = sliderOpacidadePreenchimento.value;
+    definirOpacidadePreenchimento(valor);
+    if (txtOpacidadePreenchimento) txtOpacidadePreenchimento.textContent = `${Math.round(valor * 100)}%`;
+    
+    estado.elementosSelecionados.forEach(el => {
+      el.setAttribute('fill-opacity', valor);
+    });
+  });
+
+  sliderOpacidadePreenchimento.addEventListener('change', () => {
+    registrarAcaoHistorico();
+    atualizarBotoesHistorico();
+  });
+}
+
+if (sliderOpacidadeBorda) {
+  sliderOpacidadeBorda.addEventListener("input", () => {
+    const valor = sliderOpacidadeBorda.value;
+    definirOpacidadeBorda(valor);
+    if (txtOpacidadeBorda) txtOpacidadeBorda.textContent = `${Math.round(valor * 100)}%`;
+    
+    estado.elementosSelecionados.forEach(el => {
+      el.setAttribute('stroke-opacity', valor);
+    });
+  });
+
+  sliderOpacidadeBorda.addEventListener("change", () => {
+    registrarAcaoHistorico();
+    atualizarBotoesHistorico();
+  });
+}
 
 sliderOpacidadePreenchimento.addEventListener("input", () => {
   const valor = sliderOpacidadePreenchimento.value;
@@ -1107,6 +1190,9 @@ document.addEventListener('keydown', (evento) => {
   }
 });
 
+const txtOpacidadePreenchimento = document.getElementById('val-opacity-fill');
+const txtOpacidadeBorda = document.getElementById('val-opacity-stroke');
+
 // Importação de imagens
 btnImportarImagem.addEventListener("click", () => {
   inputImagem.click();
@@ -1128,6 +1214,75 @@ if (tabTracer) {
     observerTab.observe(tabTracer, { attributes: true, attributeFilter: ['class'] });
 }
 
+const containerCoresRecentes = document.getElementById("cores-recentes-container");
+
+// 1. Função de Renderização Corrigida (com "Ar" e verificações robustas)
+function renderizarCoresRecentes(cores) {
+  if (!containerCoresRecentes) return;
+  
+  containerCoresRecentes.innerHTML = ""; // Limpa a UI antiga
+  
+  cores.forEach(cor => {
+    const botaoCor = document.createElement("button");
+    botaoCor.className = "cor-recente-item";
+    botaoCor.style.backgroundColor = cor;
+    
+    // Tooltip com dica de usabilidade
+    botaoCor.title = `Cor ${cor}\n• Clique para Preenchimento\n• Shift + Clique para Borda`;
+    
+    botaoCor.addEventListener("click", (evento) => {
+      const eBorda = evento.shiftKey;
+      
+      if (eBorda) {
+        // Aplica na Borda
+        definirCorBorda(cor);
+        if (inputCorBorda) inputCorBorda.value = cor;
+        if (popupCorBorda) popupCorBorda.value = cor;
+        
+        estado.elementosSelecionados.forEach(el => {
+          el.setAttribute("stroke", cor);
+        });
+      } else {
+        // Aplica no Preenchimento
+        definirCorPreenchimento(cor);
+        if (inputCorPreenchimento) inputCorPreenchimento.value = cor;
+        if (popupCorPreenchimento) popupCorPreenchimento.value = cor;
+        
+        estado.elementosSelecionados.forEach(el => {
+          el.setAttribute("fill", cor);
+        });
+      }
+      
+      // Salva no histórico de ações do canvas
+      if (typeof registrarAcaoHistorico === 'function') registrarAcaoHistorico();
+      if (typeof atualizarBotoesHistorico === 'function') atualizarBotoesHistorico();
+    });
+    
+    containerCoresRecentes.appendChild(botaoCor);
+  });
+}
+// Escuta as atualizações do estado para redesenhar a UI
+document.addEventListener('cores-recentes-mudou', (e) => {
+  renderizarCoresRecentes(e.detail.cores);
+});
+
+// Captura quando o usuário altera a cor no input principal para salvar no histórico
+inputCorPreenchimento.addEventListener("change", () => {
+  adicionarCorRecente(inputCorPreenchimento.value);
+});
+
+inputCorBorda.addEventListener("change", () => {
+  adicionarCorRecente(inputCorBorda.value);
+});
+
+// Captura também as mudanças que vêm do popup flutuante
+popupCorPreenchimento.addEventListener("change", () => {
+  adicionarCorRecente(popupCorPreenchimento.value);
+});
+
+popupCorBorda.addEventListener("change", () => {
+  adicionarCorRecente(popupCorBorda.value);
+});
 // Inicializar o estado dos botões de histórico
 atualizarBotoesHistorico();
 

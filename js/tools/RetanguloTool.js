@@ -29,13 +29,15 @@ export class RetanguloTool extends ToolBase {
     this.startY = pt.y;
 
     // Cria o elemento SVG <rect> dinamicamente
-    this.rectElement = criarElementoSVG('rect', {
+      this.rectElement = criarElementoSVG('rect', {
       x: this.startX,
       y: this.startY,
       width: 0,
       height: 0,
       fill: estado.corPreenchimento,
+      'fill-opacity': estado.opacidadePreenchimento || '1', 
       stroke: estado.corBorda,
+      'stroke-opacity': estado.opacidadeBorda || '1',     
       'stroke-width': 2
     });
 
