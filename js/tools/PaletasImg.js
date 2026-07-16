@@ -7,10 +7,9 @@ export class PaletaImg {
 
     this.btnImportar = document.getElementById("btn-importar-paletas");
     this.btnRemover = document.getElementById("btn-remover-paletas");
-    this.inputPaleta = document.getElementById("input-imagem-referencia");
+    this.inputPaleta = document.getElementById("input-arquivo-referencia");
 
-    this.qtdCores = 5;
-    this.tamCard = "76px";
+    this.qtdCores = 10;
     this.paletaSelecionada = null;
 
     this.initUI();
@@ -18,19 +17,12 @@ export class PaletaImg {
   }
 
   initUI() {
-    this.container.style.display = "flex";
-    this.container.style.flexWrap = "wrap";
-    this.container.style.gap = "12px";
-    this.container.style.padding = "10px";
-    this.container.style.overflowY = "auto";
-    this.container.style.minHeight = "150px";
-    this.container.style.border = "1px dashed #555";
+    this.container.classList.add("paleta-container");
 
     // Texto de placeholder
     this.placeholder = document.createElement("span");
+    this.placeholder.className = "paleta-placeholder";
     this.placeholder.textContent = "Arraste imagens aqui";
-    this.placeholder.style.color = "#888";
-    this.placeholder.style.margin = "auto";
     this.container.appendChild(this.placeholder);
 
     if (this.btnRemover) {
@@ -89,38 +81,28 @@ export class PaletaImg {
         this.placeholder.remove();
       }
 
-      // Container individual para agrupar Imagem e Paleta
+      // Container individual (Card)
       const card = document.createElement("div");
       card.className = "paleta-card";
 
-      card.style.display = "flex";
-      card.style.flexDirection = "column";
-      card.style.gap = "4px";
-      card.style.width = this.tamCard;
-      card.style.padding = "4px";
-      card.style.borderRadius = "4px";
-      card.style.transition = "background-color 0.2s";
-
       const img = document.createElement("img");
-      img.src = e.target.result;
-      img.style.width = "68px";
-      img.style.height = "68px";
-      img.style.objectFit = "cover";
-      img.style.cursor = "pointer";
-      img.style.borderRadius = "4px";
-      img.style.border = "1px solid transparent";
+      img.className = "paleta-img";
 
+      img.onload = () => {
+        const paleta = this.extrairCores(img, this.qtdCores);
+        const paletaUI = this.criarPaletaUI(paleta);
+        card.appendChild(paletaUI);
+      };
+
+      img.src = e.target.result;
       card.appendChild(img);
 
       card.addEventListener("click", () => {
         this.paletas.forEach((item) => {
           item.element.classList.remove("selecionada");
-          item.element.style.backgroundColor = "transparent";
         });
 
         card.classList.add("selecionada");
-        card.style.backgroundColor = "rgba(102, 204, 255, 0.15)";
-
         this.paletaSelecionada = card;
 
         if (this.btnRemover) {
@@ -134,13 +116,6 @@ export class PaletaImg {
         );
       });
 
-      // processa as cores dominantes
-      img.onload = () => {
-        const paleta = this.extrairCores(img, this.qtdCores);
-        const paletaUI = this.criarPaletaUI(paleta);
-        card.appendChild(paletaUI);
-      };
-
       this.paletas.push({ file, element: card });
       this.container.appendChild(card);
     };
@@ -148,7 +123,6 @@ export class PaletaImg {
     reader.readAsDataURL(file);
   }
 
-  // Remover o card selecionado
   removerSelecionado() {
     if (!this.paletaSelecionada) return;
 
@@ -170,53 +144,100 @@ export class PaletaImg {
 
   extrairCores(imgElement, quantidadeCores = 5) {
     const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    const ctx = canvas.getContext("2d", {
+      willReadFrequently: true,
+    });
 
-    canvas.width = 50;
-    canvas.height = 50;
+    const maxSize = 300;
+
+    const scale = Math.min(
+      maxSize / imgElement.width,
+      maxSize / imgElement.height,
+      1,
+    );
+
+    canvas.width = Math.round(imgElement.width * scale);
+    canvas.height = Math.round(imgElement.height * scale);
 
     ctx.drawImage(imgElement, 0, 0, canvas.width, canvas.height);
 
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-    const colorCounts = {};
+    const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
 
-    for (let i = 0; i < imageData.length; i += 4) {
-      const r = imageData[i];
-      const g = imageData[i + 1];
-      const b = imageData[i + 2];
-      const a = imageData[i + 3];
+    const grupos = [];
 
-      if (a < 128) continue;
+    const sample = 2; // pula pixels
+    const step = 16; // quantização
 
-      const step = 32;
-      const rQuant = Math.round(r / step) * step;
-      const gQuant = Math.round(g / step) * step;
-      const bQuant = Math.round(b / step) * step;
+    for (let y = 0; y < canvas.height; y += sample) {
+      for (let x = 0; x < canvas.width; x += sample) {
+        const i = (y * canvas.width + x) * 4;
 
-      const hex = this.rgbParaHex(rQuant, gQuant, bQuant);
-      colorCounts[hex] = (colorCounts[hex] || 0) + 1;
+        const r = pixels[i];
+        const g = pixels[i + 1];
+        const b = pixels[i + 2];
+        const a = pixels[i + 3];
+
+        if (a < 128) continue;
+
+        const rq = Math.round(r / step) * step;
+        const gq = Math.round(g / step) * step;
+        const bq = Math.round(b / step) * step;
+
+        // ignora branco e preto
+        if (rq > 245 && gq > 245 && bq > 245) continue;
+
+        if (rq < 15 && gq < 15 && bq < 15) continue;
+
+        let encontrado = false;
+
+        for (const grupo of grupos) {
+          const dist =
+            Math.abs(grupo.r - rq) +
+            Math.abs(grupo.g - gq) +
+            Math.abs(grupo.b - bq);
+
+          if (dist < 35) {
+            grupo.r = (grupo.r * grupo.count + rq) / (grupo.count + 1);
+
+            grupo.g = (grupo.g * grupo.count + gq) / (grupo.count + 1);
+
+            grupo.b = (grupo.b * grupo.count + bq) / (grupo.count + 1);
+
+            grupo.count++;
+
+            encontrado = true;
+            break;
+          }
+        }
+
+        if (!encontrado) {
+          grupos.push({
+            r: rq,
+            g: gq,
+            b: bq,
+            count: 1,
+          });
+        }
+      }
     }
 
-    return Object.entries(colorCounts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, quantidadeCores)
-      .map((entry) => entry[0]);
-  }
+    grupos.sort((a, b) => b.count - a.count);
 
+    return grupos
+      .slice(0, quantidadeCores)
+      .map((c) =>
+        this.rgbParaHex(Math.round(c.r), Math.round(c.g), Math.round(c.b)),
+      );
+  }
   criarPaletaUI(coresHex) {
     const paletaContainer = document.createElement("div");
-    paletaContainer.style.display = "flex";
-    paletaContainer.style.width = "100%";
-    paletaContainer.style.height = "12px";
-    paletaContainer.style.borderRadius = "2px";
-    paletaContainer.style.overflow = "hidden";
+    paletaContainer.className = "paleta-ui";
 
     coresHex.forEach((cor) => {
       const swatch = document.createElement("div");
-      swatch.style.flex = "1";
+      swatch.className = "paleta-swatch";
       swatch.style.backgroundColor = cor;
       swatch.title = cor;
-      swatch.style.cursor = "pointer";
 
       swatch.addEventListener("click", (e) => {
         e.stopPropagation();

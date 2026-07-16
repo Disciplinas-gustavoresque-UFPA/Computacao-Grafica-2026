@@ -1406,55 +1406,6 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* ---------------------- */
-#paleta-cores {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 10px;
-  overflow-y: auto;
-  min-height: 150px;
-}
-
-#paleta-cores.dragover {
-  border-color: #6cf;
-}
-
-#paleta-cores img {
-  width: 64px;
-  height: 64px;
-  object-fit: cover;
-  border-radius: 4px;
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-#paleta-cores img:hover {
-  border-color: #6cf;
-}
-
-.paleta-card {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 4px;
-  border: 2px solid transparent;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.paleta-card:hover {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.paleta-card.selecionada {
-  border-color: var(--cor-destaque);
-  background: rgba(74, 144, 217, 0.15);
-  box-shadow: 0 0 6px rgba(74, 144, 217, 0.35);
-}
-
-/* ---------------------- */
 .sub-tabs-nav {
   display: flex;
   background-color: var(--cor-fundo-painel);
@@ -1505,4 +1456,94 @@ input[type="range"]::-moz-range-thumb {
   border-radius: 4px;
   padding: 6px 12px;
   cursor: pointer;
+}
+
+/* ---------------------- */
+/* Container Principal */
+.paleta-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 10px;
+  overflow-y: auto;
+  min-height: 150px;
+  border: 1px dashed #555;
+  transition:
+    border-color 0.2s,
+    background-color 0.2s;
+}
+
+/* Estado de Arrastar Arquivo */
+.paleta-container.dragover {
+  border-color: #6cf;
+  background-color: rgba(102, 204, 255, 0.05);
+}
+
+/* Placeholder */
+.paleta-placeholder {
+  color: #888;
+  margin: auto;
+  font-size: 14px;
+  user-select: none;
+}
+
+/* Card Individual */
+.paleta-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 76px;
+  padding: 4px;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.paleta-card:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Card Selecionado */
+.paleta-card.selecionada {
+  border-color: var(--cor-destaque, #4a90d9);
+  background-color: rgba(74, 144, 217, 0.15);
+  box-shadow: 0 0 6px rgba(74, 144, 217, 0.35);
+}
+
+/* Elemento de Imagem dentro do Card */
+.paleta-img {
+  width: 68px;
+  height: 68px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.paleta-card:hover .paleta-img {
+  border-color: rgba(102, 204, 255, 0.5);
+}
+
+/* Container de Amostras de Cores */
+.paleta-ui {
+  display: flex;
+  width: 100%;
+  height: 12px;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+/* Divs de cores individuais */
+.paleta-swatch {
+  flex: 1;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.paleta-swatch:hover {
+  transform: scaleY(1.2);
 }
