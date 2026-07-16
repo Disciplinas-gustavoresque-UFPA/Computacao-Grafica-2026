@@ -1,6 +1,7 @@
 import { ToolBase } from './ToolBase.js';
 import { criarElementoSVG, obterCoordenadaSVG } from '../utils/svgHelpers.js';
 import { estado, registrarAcaoHistorico } from '../core/StateManager.js';
+import { gerarPathDataSuave } from '../utils/curvaHelpers.js';
 
 const ESTILOS_LINHA_CURVADA = {
   continua: {},
@@ -70,12 +71,18 @@ export class LinhaCurvadaTool extends ToolBase {
     this.atualizarPath(this.ultimoPontoMouse);
   }
 
-  onKeyDown(evento) {
-    if (evento.key !== 'Enter') return;
+onKeyDown(evento) {
+    if (evento.key === 'Enter') {
+        evento.preventDefault();
+        this.finalizarCurva(this.ultimoPontoMouse);
+        return;
+    }
 
-    evento.preventDefault();
-    this.finalizarCurva(this.ultimoPontoMouse);
-  }
+    if (evento.key === 'Escape') {
+        evento.preventDefault();
+        this.resetarDesenho();
+    }
+}
 
   onDoubleClick(evento) {
     evento.preventDefault();
@@ -104,10 +111,16 @@ export class LinhaCurvadaTool extends ToolBase {
     }
 
     this.atualizarPath(pontoFinal);
+    this.salvarVerticesNoElemento(this.pathElement, pontosFinais);
     this.pathElement = null;
     this.pontos = [];
     this.ultimoPontoMouse = null;
     registrarAcaoHistorico();
+  }
+
+  salvarVerticesNoElemento(elemento, pontos) {
+    elemento.dataset.tipoLinha = 'linhaCurvada';
+    elemento.dataset.pontos = JSON.stringify(pontos);
   }
 
   resetarDesenho() {
@@ -122,39 +135,7 @@ export class LinhaCurvadaTool extends ToolBase {
 
   criarPathData(pontoPreview = null) {
     const pontosPath = this.montarPontosPath(pontoPreview);
-
-    if (pontosPath.length === 0) return '';
-
-    const [inicio] = pontosPath;
-
-    if (pontosPath.length === 1) {
-      return `M ${inicio.x} ${inicio.y}`;
-    }
-
-    if (pontosPath.length === 2) {
-      const fim = pontosPath[1];
-      return `M ${inicio.x} ${inicio.y} L ${fim.x} ${fim.y}`;
-    }
-
-    let d = `M ${inicio.x} ${inicio.y}`;
-
-    for (let i = 1; i < pontosPath.length - 1; i += 1) {
-      const controle = pontosPath[i];
-      const proximo = pontosPath[i + 1];
-      const ehUltimoControle = i === pontosPath.length - 2;
-      const fim = ehUltimoControle ? proximo : this.calcularPontoMedio(controle, proximo);
-
-      d += ` Q ${controle.x} ${controle.y} ${fim.x} ${fim.y}`;
-    }
-
-    return d;
-  }
-
-  calcularPontoMedio(pontoA, pontoB) {
-    return {
-      x: (pontoA.x + pontoB.x) / 2,
-      y: (pontoA.y + pontoB.y) / 2,
-    };
+    return gerarPathDataSuave(pontosPath);
   }
 
   montarPontosPath(pontoExtra = null) {
