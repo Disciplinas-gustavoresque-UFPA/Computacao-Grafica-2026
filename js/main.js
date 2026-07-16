@@ -32,7 +32,7 @@ import { Lapis } from "./tools/LapisTool.js";
 import { RetanguloTool } from "./tools/RetanguloTool.js";
 import { TextoTool } from "./tools/TextoTool.js";
 import { exportarDesenho } from "./utils/exportHelpers.js";
-import { SelecaoTool } from "./tools/SelecaoTool.js";
+import { SelectionNodeEditTool } from './tools/SelectionNodeEditTool.js';
 import { Selecao } from "./core/Selecao.js";
 import { BorrachaTool } from "./tools/BorrachaTool.js";
 import { NodeEditTool } from "./tools/NodeEditTool.js";
@@ -268,7 +268,7 @@ definirGerenciadorSelecao(selecaoVisual);
 const cameraGlobal = new CameraSVG([svgCanvas, overlayCanvas]);
 const scrollbar = new ScrollbarSVG(canvasContainer, svgCanvas, cameraGlobal);
 const instanciasFerramentas = {
-  selecao: new SelecaoTool(svgCanvas, selecaoVisual),
+  selecao: new SelectionNodeEditTool(svgCanvas),
   edicaoVertices: new NodeEditTool(svgCanvas),
   retangulo: new RetanguloTool(svgCanvas),
   linha: new LinhaTool(svgCanvas),
