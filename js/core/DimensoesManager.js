@@ -14,8 +14,22 @@ export class DimensoesManager {
   }
 
   registrarEventos() {
+    this.btnCadeado.addEventListener('click', () => this.mudaCadeado());
     this.inputLargura.addEventListener('change', () => this.mudarLargura());
     this.inputAltura.addEventListener('change',  () => this.mudarAltura());
+  }
+
+  mudaCadeado() {
+    this.proporcaoTravada = !this.proporcaoTravada;
+    // Atualiza o ícone
+    this.btnCadeado.innerHTML = this.proporcaoTravada ? '&#128274;' : '&#128275;';
+
+    // Captura a proporção atual no momento que trava
+    if (this.proporcaoTravada) {
+      const l = parseFloat(this.inputLargura.value);
+      const a = parseFloat(this.inputAltura.value);
+      if (a !== 0) this.proporcaoOriginal = l / a;
+    }
   }
 
   mudarLargura() {
