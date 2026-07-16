@@ -1,4 +1,4 @@
-import { estado, registrarAcaoHistorico } from './StateManager.js';
+import { estado, registrarAcaoHistorico, definirElementosSelecionados } from './StateManager.js';
 import { criarElementoSVG } from '../utils/svgHelpers.js';
 
 /**
@@ -6,7 +6,7 @@ import { criarElementoSVG } from '../utils/svgHelpers.js';
  */
 export function agruparElementos() {
     const elementos = estado.elementosSelecionados;
-    
+
     // Só faz sentido agrupar se houver 2 ou mais elementos selecionados
     if (!elementos || elementos.length < 2) return;
 
@@ -23,7 +23,7 @@ export function agruparElementos() {
 
     // Cria o elemento de grupo <g>
     const grupo = criarElementoSVG('g', {});
-    
+
     // 2. DESCOBRIR ONDE INSERIR O GRUPO
     // Pegamos o elemento que estava mais à frente (o último do array ordenado).
     // Inserimos o grupo logo após ele para preservar o Z-Index global.
@@ -38,20 +38,16 @@ export function agruparElementos() {
         grupo.appendChild(el);
     });
 
-    // Atualiza o estado da seleção: agora o grupo inteiro é o selecionado
-    estado.elementosSelecionados = [grupo];
-    
-    // Refaz o desenho da borda azul ao redor do novo grupo
-    if (estado.gerenciadorSelecao) {
-        estado.gerenciadorSelecao.desenhar(estado.elementosSelecionados);
-    }
+    // Atualiza o estado da seleção e redesenha a borda azul:
+    // agora o grupo inteiro é o selecionado
+    definirElementosSelecionados([grupo]);
 
     // Registra a criação do grupo para o Ctrl+Z funcionar
     registrarAcaoHistorico();
 }
 
 /**
- * Aplica o deslocamento do grupo (dx, dy) diretamente nas coordenadas 
+ * Aplica o deslocamento do grupo (dx, dy) diretamente nas coordenadas
  * do elemento filho para preservar sua posição visual.
  */
 function aplicarTranslacaoAoFilho(el, dx, dy) {
@@ -111,7 +107,7 @@ export function desagruparElementos() {
         if (el.tagName.toLowerCase() === 'g') {
             ocorreuDesagrupamento = true;
             const pai = el.parentNode;
-            
+
             // 1. Descobre qual foi o deslocamento sofrido pelo grupo
             let grupoDx = 0;
             let grupoDy = 0;
@@ -124,18 +120,18 @@ export function desagruparElementos() {
                     break;
                 }
             }
-            
+
             // Pega todos os filhos de dentro do grupo
             const filhos = Array.from(el.childNodes);
-            
+
             // 2. Move os filhos para fora aplicando o deslocamento
             filhos.forEach(filho => {
                 aplicarTranslacaoAoFilho(filho, grupoDx, grupoDy);
-                
+
                 pai.insertBefore(filho, el);
                 novaSelecao.push(filho); // Adiciona os filhos soltos na nova seleção
             });
-            
+
             // 3. Remove a tag <g>
             pai.removeChild(el);
         } else {
@@ -145,12 +141,8 @@ export function desagruparElementos() {
 
     // Se pelo menos um grupo foi desfeito, atualiza o estado e o histórico
     if (ocorreuDesagrupamento) {
-        estado.elementosSelecionados = novaSelecao;
-        
-        if (estado.gerenciadorSelecao) {
-            estado.gerenciadorSelecao.desenhar(estado.elementosSelecionados);
-        }
-        
+        definirElementosSelecionados(novaSelecao);
+
         registrarAcaoHistorico();
     }
 }
