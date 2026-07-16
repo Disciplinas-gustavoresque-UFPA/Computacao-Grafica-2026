@@ -83,7 +83,8 @@ function _bboxAtributos(el) {
 }
 
 /**
- * Calcula o bounding box de um elemento SVG considerando rotação.
+ * Calcula o bounding box de um elemento SVG considerando qualquer
+ * transformação (translate, rotate, matrix, etc.).
  * Obtém os 4 cantos do bbox local, aplica a matriz de transformação
  * e retorna o bbox axis-aligned resultante.
  *
@@ -94,7 +95,7 @@ export function obterBoundingBox(el) {
   const local = _bboxAtributos(el);
   const transform = el.getAttribute('transform');
 
-  if (!transform || !transform.includes('rotate')) {
+  if (!transform) {
     return local;
   }
 
