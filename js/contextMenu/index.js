@@ -13,6 +13,7 @@
 import { registrarAcaoHistorico, definirElementosSelecionados } from "../core/StateManager.js";
 import { criarMenuContexto } from "./builder.js";
 import { sincronizarControles, normalizarHex } from "./sync.js";
+import { aplicarGradientePreenchimento } from "../utils/gradientHelpers.js";
 import {
   aplicarOffsetDuplicado,
   ordenarElemento,
@@ -63,6 +64,11 @@ export function inicializarMenuContexto(svgCanvas) {
     valorOpacidade,
     inputFill,
     btnFillNone,
+    radiosFillTipo,
+    corWrapperSolido,
+    gradRow,
+    inputGradInicio,
+    inputGradFim,
     inputStroke,
     btnStrokeNone,
     sliderEspessura,
@@ -89,6 +95,11 @@ export function inicializarMenuContexto(svgCanvas) {
     valorOpacidade,
     inputFill,
     btnFillNone,
+    radiosFillTipo,
+    corWrapperSolido,
+    gradRow,
+    inputGradInicio,
+    inputGradFim,
     inputStroke,
     btnStrokeNone,
     sliderEspessura,
@@ -129,7 +140,7 @@ export function inicializarMenuContexto(svgCanvas) {
     definirElementosSelecionados(alvo);
     elementoAtual = alvo;
     resetarBotaoExcluir();
-    sincronizarControles(elementoAtual, controles);
+    sincronizarControles(elementoAtual, controles, svgCanvas);
 
     // Posicionamento: torna visível fora da tela para medir dimensões
     menuContexto.hidden = false;
@@ -174,6 +185,42 @@ export function inicializarMenuContexto(svgCanvas) {
     valorOpacidade.textContent = `${sliderOpacidade.value}%`;
   });
 
+  /**
+   * Retorna o tipo de preenchimento selecionado no alternador do menu
+   * ('solido' | 'linear' | 'radial').
+   */
+  function tipoPreenchimentoSelecionado() {
+    const radioMarcado = radiosFillTipo.find((r) => r.checked);
+    return radioMarcado ? radioMarcado.value : "solido";
+  }
+
+  /**
+   * Aplica o preenchimento (cor sólida ou gradiente, conforme o alternador)
+   * ao elemento atualmente aberto no menu de contexto.
+   */
+  function aplicarPreenchimentoElementoAtual() {
+    if (!elementoAtual) return;
+
+    const tipo = tipoPreenchimentoSelecionado();
+
+    if (tipo === "solido") {
+      elementoAtual.setAttribute("fill", inputFill.value);
+    } else {
+      aplicarGradientePreenchimento(
+        svgCanvas,
+        elementoAtual,
+        tipo,
+        inputGradInicio.value,
+        inputGradFim.value,
+      );
+    }
+
+    btnFillNone.classList.remove("menu-contexto__none-btn--ativo");
+    inputFill.disabled = false;
+    corWrapperSolido.hidden = tipo !== "solido";
+    gradRow.hidden = tipo === "solido";
+  }
+
   inputFill.addEventListener("input", () => {
     if (!elementoAtual) return;
 
@@ -181,17 +228,24 @@ export function inicializarMenuContexto(svgCanvas) {
     btnFillNone.classList.remove("menu-contexto__none-btn--ativo");
   });
 
+  radiosFillTipo.forEach((radio) => {
+    radio.addEventListener("change", aplicarPreenchimentoElementoAtual);
+  });
+
+  inputGradInicio.addEventListener("input", aplicarPreenchimentoElementoAtual);
+  inputGradFim.addEventListener("input", aplicarPreenchimentoElementoAtual);
+
   btnFillNone.addEventListener("click", () => {
     if (!elementoAtual) return;
 
     if (elementoAtual.getAttribute("fill") === "none") {
-      elementoAtual.setAttribute("fill", inputFill.value);
-      btnFillNone.classList.remove("menu-contexto__none-btn--ativo");
-      inputFill.disabled = false;
+      aplicarPreenchimentoElementoAtual();
     } else {
       elementoAtual.setAttribute("fill", "none");
       btnFillNone.classList.add("menu-contexto__none-btn--ativo");
       inputFill.disabled = true;
+      corWrapperSolido.hidden = true;
+      gradRow.hidden = true;
     }
   });
 
