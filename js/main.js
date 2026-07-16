@@ -104,6 +104,10 @@ const inputCorGradienteFim = document.getElementById("cor-gradiente-fim");
 
 const popupCores = document.getElementById("popup-cores");
 const popupCorPreenchimento = document.getElementById("popup-cor-preenchimento");
+const popupFillTipo = document.getElementById("popup-fill-tipo");
+const popupGradienteCores = document.getElementById("popup-gradiente-cores");
+const popupCorGradienteInicio = document.getElementById("popup-cor-gradiente-inicio");
+const popupCorGradienteFim = document.getElementById("popup-cor-gradiente-fim");
 const popupCorBorda = document.getElementById("popup-cor-borda");
 const popupStrokeWidth = document.getElementById("popup-stroke-width");
 const popupBotoesEstilo = document.querySelectorAll(".btn-estilo-borda");
@@ -353,18 +357,50 @@ function aplicarEstiloBorda(el, estilo) {
 
 function sincronizarInputsCores(elementos) {
   const el = elementos[0];
-  const fill = normalizarCorHex(el.getAttribute('fill'), estado.corPreenchimento);
+  const fillAttr = el.getAttribute('fill');
   const stroke = normalizarCorHex(el.getAttribute('stroke'), estado.corBorda);
   const strokeWidth = el.getAttribute('stroke-width') || '2';
 
-  popupCorPreenchimento.value = fill;
+  if (ehGradiente(fillAttr)) {
+    const info = obterInfoGradiente(svgCanvas, el);
+    const tipo = info ? info.tipo : 'linear';
+
+    popupFillTipo.value = tipo;
+    popupCorPreenchimento.classList.add('oculto');
+    popupGradienteCores.classList.remove('oculto');
+
+    if (info) {
+      popupCorGradienteInicio.value = info.corInicio;
+      popupCorGradienteFim.value = info.corFim;
+      inputCorGradienteInicio.value = info.corInicio;
+      inputCorGradienteFim.value = info.corFim;
+    }
+
+    const radioAlvo = document.getElementById(`tipo-preenchimento-${tipo}`);
+    if (radioAlvo) radioAlvo.checked = true;
+    atualizarVisibilidadeControlesPreenchimento(tipo);
+
+    definirCorPreenchimento(fillAttr);
+  } else {
+    const fill = normalizarCorHex(fillAttr, estado.corPreenchimento);
+
+    popupFillTipo.value = 'solido';
+    popupCorPreenchimento.classList.remove('oculto');
+    popupGradienteCores.classList.add('oculto');
+    popupCorPreenchimento.value = fill;
+    inputCorPreenchimento.value = fill;
+
+    document.getElementById('tipo-preenchimento-solido').checked = true;
+    atualizarVisibilidadeControlesPreenchimento('solido');
+
+    definirCorPreenchimento(fill);
+  }
+
   popupCorBorda.value = stroke;
-  inputCorPreenchimento.value = fill;
   inputCorBorda.value = stroke;
   popupStrokeWidth.value = strokeWidth;
   atualizarBotaoEstiloAtivo(detectarEstiloBorda(el));
 
-  definirCorPreenchimento(fill);
   definirCorBorda(stroke);
 }
 
@@ -375,7 +411,12 @@ document.addEventListener('selecao-mudou', (e) => {
     popupCores.classList.add('visivel');
   } else {
     popupCores.classList.remove('visivel');
-    popupCorPreenchimento.value = estado.corPreenchimento;
+    popupFillTipo.value = 'solido';
+    popupCorPreenchimento.classList.remove('oculto');
+    popupGradienteCores.classList.add('oculto');
+    if (!ehGradiente(estado.corPreenchimento) && estado.corPreenchimento !== 'none') {
+      popupCorPreenchimento.value = estado.corPreenchimento;
+    }
     popupCorBorda.value = estado.corBorda;
   }
 });
@@ -386,6 +427,42 @@ popupCorPreenchimento.addEventListener('input', () => {
   inputCorPreenchimento.value = novaCor;
   estado.elementosSelecionados.forEach(el => el.setAttribute('fill', novaCor));
 });
+
+/**
+ * Aplica o preenchimento escolhido no popup (sólido ou gradiente) aos
+ * elementos selecionados, e mantém a sidebar sincronizada com a mesma
+ * escolha.
+ */
+function aplicarPreenchimentoPopup() {
+  const tipo = popupFillTipo.value;
+
+  if (tipo === 'solido') {
+    const cor = popupCorPreenchimento.value;
+    definirCorPreenchimento(cor);
+    inputCorPreenchimento.value = cor;
+    estado.elementosSelecionados.forEach(el => el.setAttribute('fill', cor));
+  } else {
+    const corInicio = popupCorGradienteInicio.value;
+    const corFim = popupCorGradienteFim.value;
+    estado.elementosSelecionados.forEach(el => {
+      aplicarGradientePreenchimento(svgCanvas, el, tipo, corInicio, corFim);
+    });
+    inputCorGradienteInicio.value = corInicio;
+    inputCorGradienteFim.value = corFim;
+  }
+
+  popupCorPreenchimento.classList.toggle('oculto', tipo !== 'solido');
+  popupGradienteCores.classList.toggle('oculto', tipo === 'solido');
+
+  // Mantém o painel lateral sincronizado com a mesma escolha
+  const radioAlvo = document.getElementById(`tipo-preenchimento-${tipo}`);
+  if (radioAlvo) radioAlvo.checked = true;
+  atualizarVisibilidadeControlesPreenchimento(tipo);
+}
+
+popupFillTipo.addEventListener('change', aplicarPreenchimentoPopup);
+popupCorGradienteInicio.addEventListener('input', aplicarPreenchimentoPopup);
+popupCorGradienteFim.addEventListener('input', aplicarPreenchimentoPopup);
 
 popupCorBorda.addEventListener('input', () => {
   const novaCor = popupCorBorda.value;
@@ -683,6 +760,7 @@ svgCanvas.addEventListener("contextmenu", (e) => {
 // Inicializa os valores dos inputs com os valores padrão do estado
 inputCorPreenchimento.value = estado.corPreenchimento;
 inputCorBorda.value = estado.corBorda;
+popupFillTipo.value = 'solido';
 popupCorPreenchimento.value = estado.corPreenchimento;
 popupCorBorda.value = estado.corBorda;
 atualizarBotaoEstiloLinhaAtivo(estado.estiloLinha);

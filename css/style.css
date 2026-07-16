@@ -180,6 +180,30 @@ body {
   border-color: var(--cor-destaque);
 }
 
+.popup-fill-tipo-select {
+  height: 28px;
+  background: var(--cor-fundo-barra);
+  border: 1px solid var(--cor-borda-ui);
+  border-radius: var(--raio-borda);
+  color: var(--cor-texto);
+  font-size: 11px;
+  padding: 0 6px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.popup-fill-tipo-select:hover,
+.popup-fill-tipo-select:focus {
+  border-color: var(--cor-destaque);
+  outline: none;
+}
+
+.popup-gradiente-cores {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 #popup-stroke-width {
   width: 52px;
   height: 28px;
