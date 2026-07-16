@@ -24,6 +24,7 @@ import {
   definirCallbackPainelAlinhamento,
   atualizarPosicaoSelecaoVisual,
   definirEspessuraLapis,
+  adicionarCorRecente, 
 } from "./core/StateManager.js";
 import { rgbToHex } from "./utils/colorHelpers.js";
 import { ColorPickerTool } from "./tools/ColorPickerTool.js";
@@ -1162,6 +1163,66 @@ if (tabTracer) {
     });
     observerTab.observe(tabTracer, { attributes: true, attributeFilter: ['class'] });
 }
+
+const containerCoresRecentes = document.getElementById("cores-recentes-container");
+
+// Função para renderizar os quadradinhos de cores na tela
+function renderizarCoresRecentes(cores) {
+  if (!containerCoresRecentes) return;
+  
+  containerCoresRecentes.innerHTML = ""; // Limpa a UI antiga
+  
+  cores.forEach(cor => {
+    const botaoCor = document.createElement("button");
+    botaoCor.className = "cor-recente-item";
+    botaoCor.style.backgroundColor = cor;
+    botaoCor.title = `Aplicar cor ${cor}`;
+    
+    // Quando o usuário clicar na cor recente
+    botaoCor.addEventListener("click", () => {
+      // 1. Atualiza as variáveis de estado de cor ativa
+      definirCorPreenchimento(cor);
+      
+      // 2. Atualiza os inputs de cor da UI para o usuário ver a mudança
+      if (inputCorPreenchimento) inputCorPreenchimento.value = cor;
+      if (popupCorPreenchimento) popupCorPreenchimento.value = cor;
+      
+      // 3. Se houver elementos selecionados, aplica a cor neles
+      estado.elementosSelecionados.forEach(el => {
+        el.setAttribute("fill", cor);
+      });
+      
+      // Salva a alteração no histórico de edição do canvas
+      registrarAcaoHistorico();
+      atualizarBotoesHistorico();
+    });
+    
+    containerCoresRecentes.appendChild(botaoCor);
+  });
+}
+
+// Escuta as atualizações do estado para redesenhar a UI
+document.addEventListener('cores-recentes-mudou', (e) => {
+  renderizarCoresRecentes(e.detail.cores);
+});
+
+// Captura quando o usuário altera a cor no input principal para salvar no histórico
+inputCorPreenchimento.addEventListener("change", () => {
+  adicionarCorRecente(inputCorPreenchimento.value);
+});
+
+inputCorBorda.addEventListener("change", () => {
+  adicionarCorRecente(inputCorBorda.value);
+});
+
+// Captura também as mudanças que vêm do popup flutuante
+popupCorPreenchimento.addEventListener("change", () => {
+  adicionarCorRecente(popupCorPreenchimento.value);
+});
+
+popupCorBorda.addEventListener("change", () => {
+  adicionarCorRecente(popupCorBorda.value);
+});
 
 // Inicializar o estado dos botões de histórico
 atualizarBotoesHistorico();
