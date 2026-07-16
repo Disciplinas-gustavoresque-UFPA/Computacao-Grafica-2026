@@ -49,7 +49,7 @@ export class SelectionNodeEditTool extends ToolBase {
    *
    * @param {MouseEvent} evento - Evento nativo do mouse.
    */
-    dblclick(evento) {
+    onDblClick(evento) {
         const target = evento.target
         if (!target || target === this.svgCanvas) {
             return;
