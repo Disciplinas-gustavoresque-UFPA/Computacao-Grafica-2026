@@ -133,6 +133,42 @@
   background: rgba(74, 144, 217, 0.15);
 }
 
+/* --- Preenchimento: alternador Sólida / Gradiente --- */
+
+.menu-contexto__fill-type-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px 10px;
+  margin-bottom: 2px;
+}
+
+.menu-contexto__fill-type-row label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  color: var(--cor-texto-secundario);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.menu-contexto__fill-type-row input[type="radio"] {
+  cursor: pointer;
+  accent-color: var(--cor-destaque);
+}
+
+.menu-contexto__gradiente-row {
+  gap: 14px;
+}
+
+.menu-contexto__gradiente-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--cor-texto-secundario);
+}
+
 /* --- Estilo de borda (dash) --- */
 
 .menu-contexto__dash-opcoes {
