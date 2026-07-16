@@ -21,10 +21,8 @@ export class DimensoesManager {
 
   mudaCadeado() {
     this.proporcaoTravada = !this.proporcaoTravada;
-    // Atualiza o ícone
     this.btnCadeado.innerHTML = this.proporcaoTravada ? '&#128274;' : '&#128275;';
 
-    // Captura a proporção atual no momento que trava
     if (this.proporcaoTravada) {
       const l = parseFloat(this.inputLargura.value);
       const a = parseFloat(this.inputAltura.value);
@@ -36,18 +34,18 @@ export class DimensoesManager {
     const novaLargura = this.avaliarExpressao(this.inputLargura.value);
     if (!novaLargura) return;
     this.inputLargura.value = Number(novaLargura.toFixed(2));
-  
+
     if (this.proporcaoTravada) {
       this.inputAltura.value = Number((novaLargura / this.proporcaoOriginal).toFixed(2));
     }
     this.aplicarDimensoesNoElemento();
   }
-  
+
   mudarAltura() {
     const novaAltura = this.avaliarExpressao(this.inputAltura.value);
     if (!novaAltura) return;
     this.inputAltura.value = Number(novaAltura.toFixed(2));
-  
+
     if (this.proporcaoTravada) {
       this.inputLargura.value = Number((novaAltura * this.proporcaoOriginal).toFixed(2));
     }
@@ -55,7 +53,6 @@ export class DimensoesManager {
   }
 
   avaliarExpressao(expressao) {
-    // Apenas números e operadores matemáticos básicos
     const segura = String(expressao).replace(/[^0-9+\-*/.()]/g, '');
     try {
       const resultado = Function('"use strict"; return (' + segura + ')')();
@@ -74,7 +71,6 @@ export class DimensoesManager {
     if (isNaN(largura) || isNaN(altura) || largura <= 0 || altura <= 0) return;
 
     this.aplicarDimensoes(el, largura, altura);
-    
     this.selecaoVisual.desenhar(estado.elementosSelecionados);
   }
 
@@ -84,17 +80,27 @@ export class DimensoesManager {
       el.setAttribute('width',  String(largura));
       el.setAttribute('height', String(altura));
     } else if (tag === 'circle') {
-      // Usa a largura como diâmetro (cadeado garante que L === A quando travado)
       el.setAttribute('r', String(largura / 2));
     } else if (tag === 'ellipse') {
       el.setAttribute('rx', String(largura / 2));
       el.setAttribute('ry', String(altura  / 2));
+    } else if (tag === 'path' || tag === 'polygon' || tag === 'polyline') {
+      const bbox = el.getBBox();
+      if (bbox.width === 0 || bbox.height === 0) return;
+
+      const scaleX = largura / bbox.width;
+      const scaleY = altura  / bbox.height;
+
+      // Escala a partir do canto superior esquerdo do elemento para não deslocá-lo
+      el.setAttribute('transform',
+        `translate(${bbox.x}, ${bbox.y}) scale(${scaleX}, ${scaleY}) translate(${-bbox.x}, ${-bbox.y})`
+      );
     }
-    // line/path/g tem um redimensionamento mais complicado, então é melhor abrir outra issue pra isso
+    // line: redimensionamento mais complicado, melhor abrir outra issue pra isso
   }
 
-  //Pega a altura e a largura do elemento selecion (só pra um elemento, por hora)
-  atualizarInputs(){
+  // Pega a altura e a largura do elemento selecionado (só pra um elemento, por hora)
+  atualizarInputs() {
     const selecionados = estado.elementosSelecionados;
     if (selecionados.length === 1) {
       const dimensoes = this.lerDimensoes(selecionados[0]);
@@ -109,7 +115,6 @@ export class DimensoesManager {
     this.inputAltura.value  = '';
   }
 
-  
   lerDimensoes(elemento) {
     const tag = elemento.tagName.toLowerCase();
     if (tag === 'rect' || tag === 'image') {
@@ -130,9 +135,10 @@ export class DimensoesManager {
       const dy = parseFloat(elemento.getAttribute('y2') || 0) - parseFloat(elemento.getAttribute('y1') || 0);
       return { largura: Math.abs(dx), altura: Math.abs(dy) };
     }
+    // path, polygon, polyline — usa bounding box
     try {
       const bbox = elemento.getBBox();
-      return { largura: Math.round(bbox.width), altura: Math.round(bbox.height) };
+      return { largura: bbox.width, altura: bbox.height };
     } catch {
       return null;
     }
