@@ -24,6 +24,7 @@ import {
   definirCallbackPainelAlinhamento,
   atualizarPosicaoSelecaoVisual,
   definirEspessuraLapis,
+  adicionarCorRecente, 
 } from "./core/StateManager.js";
 import { rgbToHex } from "./utils/colorHelpers.js";
 import { ColorPickerTool } from "./tools/ColorPickerTool.js";
@@ -69,7 +70,8 @@ import {
 import { salvarRascunho, marcarSalvo } from "./utils/autoSave.js";
 import { ImageTracerManager } from "./tools/ImageTracerManager.js";
 import { MedidorTool } from "./tools/MedidorTool.js";
-import { ToolbarGroup } from './core/ToolbarGroup.js';
+import { ToolbarGroup } from "./core/ToolbarGroup.js";
+import { PaletaImg } from "./tools/PaletasImg.js";
 import {
   aplicarGradientePreenchimento,
   obterInfoGradiente,
@@ -122,6 +124,10 @@ const inputEspessuraLapis = document.getElementById("espessura-lapis");
 
 
 const indicadorNaoSalvo = document.getElementById("indicador-nao-salvo");
+
+const painelPaleta = document.getElementById("paleta-cores");
+const paletaImg = new PaletaImg(painelPaleta);
+
 function mostrarIndicadorNaoSalvo() {
   if (indicadorNaoSalvo) indicadorNaoSalvo.classList.remove("oculto");
 }
@@ -217,14 +223,17 @@ svgCanvas.parentNode.insertBefore(canvasContainer, svgCanvas);
 canvasContainer.appendChild(svgCanvas);
 
 // Camada de Interação: instanciar o novo SVG de overlay para seleções
-const overlayCanvas = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-overlayCanvas.setAttribute('id', 'overlay-canvas');
-overlayCanvas.setAttribute('width', '100%');
-overlayCanvas.setAttribute('height', '100%');
-overlayCanvas.style.position = 'absolute';
-overlayCanvas.style.top = '0';
-overlayCanvas.style.left = '0';
-overlayCanvas.style.pointerEvents = 'none'; // Coordenado com o principal
+const overlayCanvas = document.createElementNS(
+  "http://www.w3.org/2000/svg",
+  "svg",
+);
+overlayCanvas.setAttribute("id", "overlay-canvas");
+overlayCanvas.setAttribute("width", "100%");
+overlayCanvas.setAttribute("height", "100%");
+overlayCanvas.style.position = "absolute";
+overlayCanvas.style.top = "0";
+overlayCanvas.style.left = "0";
+overlayCanvas.style.pointerEvents = "none"; // Coordenado com o principal
 canvasContainer.appendChild(overlayCanvas);
 
 // Réguas de medida (em pixels) nas bordas do canvas
@@ -326,39 +335,45 @@ botoesFerramenta.forEach((btn) => {
 // --- Popup de Cores ---
 
 function normalizarCorHex(cor, fallback) {
-  if (!cor || cor === 'none' || cor === 'transparent') return fallback;
-  if (cor.startsWith('#')) return cor.length === 4
-    ? '#' + cor.slice(1).split('').map(c => c + c).join('')
-    : cor;
-  if (cor.startsWith('rgb')) return rgbToHex(cor);
+  if (!cor || cor === "none" || cor === "transparent") return fallback;
+  if (cor.startsWith("#"))
+    return cor.length === 4
+      ? "#" +
+          cor
+            .slice(1)
+            .split("")
+            .map((c) => c + c)
+            .join("")
+      : cor;
+  if (cor.startsWith("rgb")) return rgbToHex(cor);
   return fallback;
 }
 
 function atualizarBotaoEstiloAtivo(estilo) {
-  popupBotoesEstilo.forEach(btn => {
-    btn.classList.toggle('ativo', btn.getAttribute('data-dash') === estilo);
+  popupBotoesEstilo.forEach((btn) => {
+    btn.classList.toggle("ativo", btn.getAttribute("data-dash") === estilo);
   });
 }
 
 function detectarEstiloBorda(el) {
-  const linecap = el.getAttribute('stroke-linecap');
-  const dash = el.getAttribute('stroke-dasharray');
-  if (linecap === 'round' && dash && dash.startsWith('0 ')) return 'dot';
-  if (!dash || dash === 'none') return 'none';
+  const linecap = el.getAttribute("stroke-linecap");
+  const dash = el.getAttribute("stroke-dasharray");
+  if (linecap === "round" && dash && dash.startsWith("0 ")) return "dot";
+  if (!dash || dash === "none") return "none";
   return dash;
 }
 
 function aplicarEstiloBorda(el, estilo) {
-  if (estilo === 'none') {
-    el.removeAttribute('stroke-dasharray');
-    el.removeAttribute('stroke-linecap');
-  } else if (estilo === 'dot') {
-    const sw = Math.max(1, Number(el.getAttribute('stroke-width') || 2));
-    el.setAttribute('stroke-linecap', 'round');
-    el.setAttribute('stroke-dasharray', `0 ${sw * 2.5}`);
+  if (estilo === "none") {
+    el.removeAttribute("stroke-dasharray");
+    el.removeAttribute("stroke-linecap");
+  } else if (estilo === "dot") {
+    const sw = Math.max(1, Number(el.getAttribute("stroke-width") || 2));
+    el.setAttribute("stroke-linecap", "round");
+    el.setAttribute("stroke-dasharray", `0 ${sw * 2.5}`);
   } else {
-    el.setAttribute('stroke-dasharray', estilo);
-    el.removeAttribute('stroke-linecap');
+    el.setAttribute("stroke-dasharray", estilo);
+    el.removeAttribute("stroke-linecap");
   }
 }
 
@@ -448,11 +463,11 @@ function sincronizarInputsCores(elementos) {
   definirOpacidadeBorda(strokeOpacity);
 }
 
-document.addEventListener('selecao-mudou', (e) => {
+document.addEventListener("selecao-mudou", (e) => {
   const elementos = e.detail.elementos;
   if (elementos.length > 0) {
     sincronizarInputsCores(elementos);
-    popupCores.classList.add('visivel');
+    popupCores.classList.add("visivel");
   } else {
     popupCores.classList.remove('visivel');
     popupFillTipo.value = 'solido';
@@ -465,7 +480,7 @@ document.addEventListener('selecao-mudou', (e) => {
   }
 });
 
-popupCorPreenchimento.addEventListener('input', () => {
+popupCorPreenchimento.addEventListener("input", () => {
   const novaCor = popupCorPreenchimento.value;
   definirCorPreenchimento(novaCor);
   inputCorPreenchimento.value = novaCor;
@@ -512,24 +527,28 @@ popupCorBorda.addEventListener('input', () => {
   const novaCor = popupCorBorda.value;
   definirCorBorda(novaCor);
   inputCorBorda.value = novaCor;
-  estado.elementosSelecionados.forEach(el => el.setAttribute('stroke', novaCor));
+  estado.elementosSelecionados.forEach((el) =>
+    el.setAttribute("stroke", novaCor),
+  );
 });
 
-popupStrokeWidth.addEventListener('input', () => {
+popupStrokeWidth.addEventListener("input", () => {
   const largura = Math.max(0, Number(popupStrokeWidth.value));
-  estado.elementosSelecionados.forEach(el => {
-    el.setAttribute('stroke-width', largura);
+  estado.elementosSelecionados.forEach((el) => {
+    el.setAttribute("stroke-width", largura);
     // Pontilhado: recalcula o espaço entre pontos para manter a aparência
-    if (detectarEstiloBorda(el) === 'dot') {
-      el.setAttribute('stroke-dasharray', `0 ${Math.max(1, largura) * 2.5}`);
+    if (detectarEstiloBorda(el) === "dot") {
+      el.setAttribute("stroke-dasharray", `0 ${Math.max(1, largura) * 2.5}`);
     }
   });
 });
 
-popupBotoesEstilo.forEach(btn => {
-  btn.addEventListener('click', () => {
-    const estilo = btn.getAttribute('data-dash');
-    estado.elementosSelecionados.forEach(el => aplicarEstiloBorda(el, estilo));
+popupBotoesEstilo.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const estilo = btn.getAttribute("data-dash");
+    estado.elementosSelecionados.forEach((el) =>
+      aplicarEstiloBorda(el, estilo),
+    );
     atualizarBotaoEstiloAtivo(estilo);
   });
 });
@@ -708,11 +727,11 @@ svgCanvas.addEventListener("mouseup", (evento) => {
   mostrarIndicadorNaoSalvo();
 });
 
-btnPreenchimentoNenhum.addEventListener('click', () => {
-  definirCorPreenchimento('none');
-  
-  estado.elementosSelecionados.forEach(el => {
-    el.setAttribute('fill', 'none');
+btnPreenchimentoNenhum.addEventListener("click", () => {
+  definirCorPreenchimento("none");
+
+  estado.elementosSelecionados.forEach((el) => {
+    el.setAttribute("fill", "none");
   });
 
   document.getElementById("tipo-preenchimento-solido").checked = true;
@@ -722,13 +741,13 @@ btnPreenchimentoNenhum.addEventListener('click', () => {
   atualizarBotoesHistorico();
 });
 
-btnBordaNenhum.addEventListener('click', () => {
-  definirCorBorda('none');
-  
-  estado.elementosSelecionados.forEach(el => {
-    el.setAttribute('stroke', 'none');
+btnBordaNenhum.addEventListener("click", () => {
+  definirCorBorda("none");
+
+  estado.elementosSelecionados.forEach((el) => {
+    el.setAttribute("stroke", "none");
   });
-  
+
   registrarAcaoHistorico();
   atualizarBotoesHistorico();
 });
@@ -813,7 +832,10 @@ svgCanvas.addEventListener("mousemove", (evento) => {
 });
 
 svgCanvas.addEventListener("dblclick", (evento) => {
-  if (estado.ferramentaAtual && typeof estado.ferramentaAtual.onDblClick === 'function') {
+  if (
+    estado.ferramentaAtual &&
+    typeof estado.ferramentaAtual.onDblClick === "function"
+  ) {
     estado.ferramentaAtual.onDblClick(evento);
   }
 });
@@ -861,12 +883,11 @@ btnExportar.addEventListener("click", () => {
   exportarDesenho(svgCanvas, formato);
 });
 
-const valorEspessura =
-    document.getElementById("valor-espessura-lapis");
+const valorEspessura = document.getElementById("valor-espessura-lapis");
 
 inputEspessuraLapis.addEventListener("input", (e) => {
-    definirEspessuraLapis(e.target.value);
-    valorEspessura.textContent = e.target.value;
+  definirEspessuraLapis(e.target.value);
+  valorEspessura.textContent = e.target.value;
 });
 
 // --- Controle de Camadas (Z-Index) ---
@@ -988,7 +1009,7 @@ window.addEventListener("keydown", (e) => {
     }
     // Ctrl+C / Ctrl+V / Ctrl+D são tratados em outro listener — apenas impede
     // que caiam no mapa de atalhos de ferramenta abaixo.
-    if (['c', 'v', 'd'].includes(e.key.toLowerCase())) {
+    if (["c", "v", "d"].includes(e.key.toLowerCase())) {
       return;
     }
   }
@@ -1087,9 +1108,9 @@ window.addEventListener("keydown", (e) => {
 });
 
 // --- Área de Transferência (Copiar / Colar) ---
-let clipboard = [];       
-let pasteCount = 0;       
-const PASTE_OFFSET = 20;  
+let clipboard = [];
+let pasteCount = 0;
+const PASTE_OFFSET = 20;
 
 // --- Duplicar elemento ---
 function handlerDuplicar() {
@@ -1102,36 +1123,36 @@ function handlerDuplicar() {
   }
 }
 
-document.addEventListener('keydown', (evento) => {
+document.addEventListener("keydown", (evento) => {
   if (!(evento.ctrlKey || evento.metaKey)) return;
 
   const tecla = evento.key.toLowerCase();
 
   // Ctrl+D — Duplicar
-  if (tecla === 'd') {
+  if (tecla === "d") {
     evento.preventDefault();
     handlerDuplicar();
     return;
   }
 
   // Ctrl+C — Copiar elementos selecionados para a área de transferência interna
-  if (tecla === 'c') {
+  if (tecla === "c") {
     if (estado.elementosSelecionados.length === 0) return;
     evento.preventDefault();
-    clipboard = estado.elementosSelecionados.map(el => el.cloneNode(true));
+    clipboard = estado.elementosSelecionados.map((el) => el.cloneNode(true));
     pasteCount = 0;
     return;
   }
 
   // Ctrl+V — Colar elementos da área de transferência interna
-  if (tecla === 'v') {
+  if (tecla === "v") {
     if (clipboard.length === 0) return;
     evento.preventDefault();
     pasteCount++;
     const offset = PASTE_OFFSET * pasteCount;
     const novosElementos = [];
 
-    clipboard.forEach(original => {
+    clipboard.forEach((original) => {
       const clone = duplicarElemento(original, svgCanvas, offset, offset);
       if (clone) {
         novosElementos.push(clone);
@@ -1162,15 +1183,87 @@ const tracerManager = new ImageTracerManager(svgCanvas, inputImagem);
 // Assiste a aba do Tracer para atualizar a lista de imagens quando ela for ativada
 const tabTracer = document.getElementById("tab-tracer");
 if (tabTracer) {
-    const observerTab = new MutationObserver(() => {
-      // Verifica se a classe 'ativo' foi adicionada pela SideBar.js
-        if (tabTracer.classList.contains('ativo')) {
-            tracerManager.atualizarLista();
-        }
-    });
-    observerTab.observe(tabTracer, { attributes: true, attributeFilter: ['class'] });
+  const observerTab = new MutationObserver(() => {
+    // Verifica se a classe 'ativo' foi adicionada pela SideBar.js
+    if (tabTracer.classList.contains("ativo")) {
+      tracerManager.atualizarLista();
+    }
+  });
+  observerTab.observe(tabTracer, {
+    attributes: true,
+    attributeFilter: ["class"],
+  });
 }
 
+const containerCoresRecentes = document.getElementById("cores-recentes-container");
+
+// 1. Função de Renderização Corrigida (com "Ar" e verificações robustas)
+function renderizarCoresRecentes(cores) {
+  if (!containerCoresRecentes) return;
+  
+  containerCoresRecentes.innerHTML = ""; // Limpa a UI antiga
+  
+  cores.forEach(cor => {
+    const botaoCor = document.createElement("button");
+    botaoCor.className = "cor-recente-item";
+    botaoCor.style.backgroundColor = cor;
+    
+    // Tooltip com dica de usabilidade
+    botaoCor.title = `Cor ${cor}\n• Clique para Preenchimento\n• Shift + Clique para Borda`;
+    
+    botaoCor.addEventListener("click", (evento) => {
+      const eBorda = evento.shiftKey;
+      
+      if (eBorda) {
+        // Aplica na Borda
+        definirCorBorda(cor);
+        if (inputCorBorda) inputCorBorda.value = cor;
+        if (popupCorBorda) popupCorBorda.value = cor;
+        
+        estado.elementosSelecionados.forEach(el => {
+          el.setAttribute("stroke", cor);
+        });
+      } else {
+        // Aplica no Preenchimento
+        definirCorPreenchimento(cor);
+        if (inputCorPreenchimento) inputCorPreenchimento.value = cor;
+        if (popupCorPreenchimento) popupCorPreenchimento.value = cor;
+        
+        estado.elementosSelecionados.forEach(el => {
+          el.setAttribute("fill", cor);
+        });
+      }
+      
+      // Salva no histórico de ações do canvas
+      if (typeof registrarAcaoHistorico === 'function') registrarAcaoHistorico();
+      if (typeof atualizarBotoesHistorico === 'function') atualizarBotoesHistorico();
+    });
+    
+    containerCoresRecentes.appendChild(botaoCor);
+  });
+}
+// Escuta as atualizações do estado para redesenhar a UI
+document.addEventListener('cores-recentes-mudou', (e) => {
+  renderizarCoresRecentes(e.detail.cores);
+});
+
+// Captura quando o usuário altera a cor no input principal para salvar no histórico
+inputCorPreenchimento.addEventListener("change", () => {
+  adicionarCorRecente(inputCorPreenchimento.value);
+});
+
+inputCorBorda.addEventListener("change", () => {
+  adicionarCorRecente(inputCorBorda.value);
+});
+
+// Captura também as mudanças que vêm do popup flutuante
+popupCorPreenchimento.addEventListener("change", () => {
+  adicionarCorRecente(popupCorPreenchimento.value);
+});
+
+popupCorBorda.addEventListener("change", () => {
+  adicionarCorRecente(popupCorBorda.value);
+});
 // Inicializar o estado dos botões de histórico
 atualizarBotoesHistorico();
 
@@ -1188,6 +1281,8 @@ svgCanvas.addEventListener(
         ? 1 + fator // scroll para baixo = zoom out
         : 1 - fator; // scroll para cima  = zoom in
 
-  cameraGlobal.zoom(escala, coords.x, coords.y);
-  scrollbar.atualizar();
-}, { passive: false });
+    cameraGlobal.zoom(escala, coords.x, coords.y);
+    scrollbar.atualizar();
+  },
+  { passive: false },
+);
