@@ -123,7 +123,8 @@ const nomeFerramenta = document.getElementById("nome-ferramenta");
 const btnExportar = document.getElementById("btn-exportar");
 const exportFormat = document.getElementById("export-format");
 const inputEspessuraLapis = document.getElementById("espessura-lapis");
-
+const txtOpacidadePreenchimento = document.getElementById('val-opacity-fill');
+const txtOpacidadeBorda = document.getElementById('val-opacity-stroke');
 
 const indicadorNaoSalvo = document.getElementById("indicador-nao-salvo");
 function mostrarIndicadorNaoSalvo() {
@@ -430,8 +431,8 @@ function sincronizarInputsCores(elementos) {
   
 // Se o preenchimento do objeto selecionado for um gradiente, sincroniza
     // o alternador Sólido/Gradiente e os color-pickers "De"/"Para".
-    if (typeof ehGradiente === 'function' && ehGradiente(corPreenchimentoAtual)) {
-      const infoGradiente = obterInfoGradiente(svgCanvas, primeiroSelecionado);
+    if (typeof ehGradiente === 'function' && ehGradiente(fillAttr)) {
+      const infoGradiente = obterInfoGradiente(svgCanvas, el);
       if (infoGradiente) {
         const radioAlvo = document.getElementById(`tipo-preenchimento-${infoGradiente.tipo}`);
         if (radioAlvo) radioAlvo.checked = true;
@@ -880,18 +881,22 @@ atualizarBotaoEstiloLinhaAtivo(estado.estiloLinha);
 
 	// Imprimir
 	const btnImprimir = document.getElementById('btn-imprimir');
-	btnImprimir.addEventListener('click', () => {
-	  abrirPreviewImpressao(svgCanvas, obterAreaPagina());
-	});
+	if (btnImprimir) {
+	  btnImprimir.addEventListener('click', () => {
+	    abrirPreviewImpressao(svgCanvas, obterAreaPagina());
+	  });
+	}
 
 	// Ajustar zoom à página
 	const btnFitPage = document.getElementById('btn-fit-page');
-	btnFitPage.addEventListener('click', () => {
-	  if (cameraGlobal) {
-	    cameraGlobal.fitToPage(obterAreaPagina());
-	    atualizarIndicadorZoom();
-	  }
-	});
+	if (btnFitPage) {
+	  btnFitPage.addEventListener('click', () => {
+	    if (cameraGlobal) {
+	      cameraGlobal.fitToPage(obterAreaPagina());
+	      atualizarIndicadorZoom();
+	    }
+	  });
+	}
 
 	function atualizarIndicadorZoom() {
 	  const el = document.getElementById('zoom-indicator');
@@ -1189,10 +1194,6 @@ document.addEventListener('keydown', (evento) => {
     return;
   }
 });
-
-const txtOpacidadePreenchimento = document.getElementById('val-opacity-fill');
-const txtOpacidadeBorda = document.getElementById('val-opacity-stroke');
-
 // Importação de imagens
 btnImportarImagem.addEventListener("click", () => {
   inputImagem.click();
