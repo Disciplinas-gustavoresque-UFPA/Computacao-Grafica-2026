@@ -125,6 +125,113 @@ body {
 }
 
 /* =========================================================
+   Popup de Cores (aparece ao selecionar elemento)
+   ========================================================= */
+#popup-cores {
+  position: fixed;
+  top: calc(var(--altura-painel-superior) + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-6px);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background-color: var(--cor-fundo-painel);
+  border: 1px solid var(--cor-borda-ui);
+  border-radius: var(--raio-borda);
+  box-shadow: var(--sombra-padrao);
+  z-index: 20;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+#popup-cores.visivel {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.popup-cores-label {
+  font-size: 11px;
+  color: var(--cor-texto-secundario);
+  white-space: nowrap;
+}
+
+.popup-cores-separador {
+  width: 1px;
+  height: 20px;
+  background-color: var(--cor-borda-ui);
+  margin: 0 4px;
+}
+
+#popup-cores input[type="color"] {
+  width: 32px;
+  height: 28px;
+  border: 1px solid var(--cor-borda-ui);
+  border-radius: var(--raio-borda);
+  background: none;
+  cursor: pointer;
+  padding: 2px;
+  transition: border-color 0.15s;
+}
+
+#popup-cores input[type="color"]:hover {
+  border-color: var(--cor-destaque);
+}
+
+#popup-stroke-width {
+  width: 52px;
+  height: 28px;
+  background: var(--cor-fundo-barra);
+  border: 1px solid var(--cor-borda-ui);
+  border-radius: var(--raio-borda);
+  color: var(--cor-texto);
+  font-size: 12px;
+  text-align: center;
+  padding: 0 4px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+#popup-stroke-width:hover,
+#popup-stroke-width:focus {
+  border-color: var(--cor-destaque);
+  outline: none;
+}
+
+.popup-stroke-estilo {
+  display: flex;
+  gap: 4px;
+}
+
+.btn-estilo-borda {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 28px;
+  background: var(--cor-fundo-barra);
+  border: 1px solid var(--cor-borda-ui);
+  border-radius: var(--raio-borda);
+  color: var(--cor-texto-secundario);
+  cursor: pointer;
+  transition: all 0.15s;
+  padding: 0;
+}
+
+.btn-estilo-borda:hover {
+  border-color: var(--cor-destaque);
+  color: var(--cor-destaque);
+}
+
+.btn-estilo-borda.ativo {
+  border-color: var(--cor-destaque);
+  color: var(--cor-destaque);
+  background: rgba(74, 144, 217, 0.15);
+}
+
+/* =========================================================
    Controles de Camada (Z-Index)
    ========================================================= */
 .layer-controls {
@@ -172,6 +279,73 @@ body {
   margin-left: 16px;
   border-left: 1px solid var(--cor-borda-ui);
   padding-left: 16px;
+}
+
+/* =========================================================
+   Painel de Alinhamento (multi-seleção)
+   ========================================================= */
+.painel-alinhamento {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  border-left: 1px solid var(--cor-borda-ui);
+  border-right: 1px solid var(--cor-borda-ui);
+  animation: fadeInAlign 0.18s ease;
+}
+
+@keyframes fadeInAlign {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.align-label {
+  white-space: nowrap;
+}
+
+.align-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.btn-align {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 4px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--raio-borda);
+  color: var(--cor-texto-secundario);
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.btn-align svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.btn-align:hover {
+  background-color: rgba(74, 144, 217, 0.2);
+  border-color: var(--cor-destaque);
+  color: var(--cor-destaque);
+}
+
+.btn-align:active {
+  transform: scale(0.92);
+  background-color: rgba(74, 144, 217, 0.35);
+}
+
+.align-separator {
+  width: 1px;
+  height: 20px;
+  background: var(--cor-borda-ui);
+  margin: 0 4px;
 }
 
 /* =========================================================
@@ -507,13 +681,13 @@ body {
 #zoom-options,
 #line-options {
   position: absolute;
-  background: var(--cor-fundo-barra);
+  background: var(--cor-fundo-painel);
   border: 1px solid var(--cor-borda-ui);
   box-shadow: var(--sombra-padrao);
   padding: 6px;
   border-radius: var(--raio-borda);
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
   z-index: 20;
 }
 
@@ -527,23 +701,57 @@ body {
   display: flex;
 }
 
-#zoom-options button,
 #line-options .btn-line-style {
-  background-color: #4a90d9;
-  width: 36px;
-  height: 36px;
-  border: 1px solid transparent;
+  width: 44px;
+  height: 34px;
+  background: var(--cor-fundo-app);
+  border: 1px solid var(--cor-borda-ui);
   border-radius: var(--raio-borda);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
-#zoom-options button:hover,
+#line-options .btn-line-style svg {
+  width: 30px;
+  height: 12px;
+}
+
+#line-options .btn-line-style line {
+  stroke: var(--cor-texto);
+  stroke-width: 2;
+}
+
 #line-options .btn-line-style:hover {
   border-color: var(--cor-destaque);
 }
 
-#zoom-options button.ativo,
 #line-options .btn-line-style.ativo {
-  background: rgba(0, 38, 255, 0.35);
+  background: rgba(74, 144, 217, 0.2);
+  border-color: var(--cor-destaque);
+}
+
+#line-options .btn-line-style.ativo line {
+  stroke: var(--cor-destaque);
+}
+
+#zoom-options button {
+  background-color: transparent;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--cor-borda-ui);
+  border-radius: var(--raio-borda);
+  color: var(--cor-texto);
+}
+
+#zoom-options button:hover {
+  border-color: var(--cor-destaque);
+}
+
+#zoom-options button.ativo {
+  background: rgba(74, 144, 217, 0.2);
   border-color: var(--cor-destaque);
 }
 
@@ -974,9 +1182,14 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .btn-line-style svg {
-    display: block;
-    width: 100%;
-    height: 100%;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.btn-ferramenta i.ti {
+  font-size: 20px;
+  line-height: 1;
 }
 
 /* --- Indicador de Não Salvo --- */
@@ -1000,4 +1213,76 @@ input[type="range"]::-moz-range-thumb {
     display: flex !important;
     opacity: 0;
     visibility: hidden;
+}
+
+
+/* =========================================================
+   Grupos de Ferramentas da Sidebar
+   ========================================================= */
+.btn-grupo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background-color: transparent;
+  color: var(--cor-texto);
+  border: 1px solid var(--cor-borda-ui);
+  border-radius: var(--raio-borda);
+  font-size: 18px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  position: relative;
+}
+
+.btn-grupo:hover {
+  background-color: rgba(74, 144, 217, 0.2);
+  border-color: var(--cor-destaque);
+  color: var(--cor-destaque);
+}
+
+.btn-grupo.ativo {
+  background-color: rgba(74, 144, 217, 0.35);
+  border-color: var(--cor-destaque);
+  color: var(--cor-destaque);
+  box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.25);
+}
+
+.grupo-ferramentas {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 4px 0;
+  border-left: 2px solid var(--cor-destaque);
+  margin-left: 4px;
+}
+
+.grupo-ferramentas.escondido {
+  display: none;
+}
+
+.btn-grupo[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%) translateX(-4px);
+  background-color: var(--cor-fundo-painel);
+  color: var(--cor-texto);
+  border: 1px solid var(--cor-destaque);
+  border-radius: var(--raio-borda);
+  padding: 4px 8px;
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 100;
+}
+
+.btn-grupo[data-tooltip]:hover::after {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
 }
