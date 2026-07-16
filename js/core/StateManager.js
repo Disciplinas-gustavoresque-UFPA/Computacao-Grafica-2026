@@ -8,23 +8,44 @@
  * - ferramentaAtual {ToolBase|null} - Instância da ferramenta de desenho ativa.
  * - corPreenchimento {string}       - Cor de preenchimento dos elementos (formato hex).
  * - corBorda {string}               - Cor da borda/stroke dos elementos (formato hex).
+ * - estiloLinha {string}            - Estilo visual usado pela ferramenta de linha.
  * - elementosSelecionados {SVGElement[]} - Elementos SVG atualmente selecionados.
  * - interfaceAtual {string}         - Flag para sabermos a tela onde o usuário está.
  */
 
-/** @type {{ ferramentaAtual: import('../tools/ToolBase.js').ToolBase|null, corPreenchimento: string, corBorda: string, elementosSelecionados: SVGElement[], interfaceAtual: string }} */
+/** @type {{ ferramentaAtual: import('../tools/ToolBase.js').ToolBase|null, corPreenchimento: string, corBorda: string, opacidadePreenchimento: string, opacidadeBorda: string, estiloLinha: string, elementosSelecionados: SVGElement[], interfaceAtual: string }} */
 export const estado = {
   ferramentaAtual: null,
   corPreenchimento: '#4a90d9',
   corBorda: '#1a1a2e',
-  interfaceAtual: 'inicio', // Nova flag para sabermos onde o usuário está
+  opacidadePreenchimento: '1', // Adicionado: 100% opaco por padrão
+  opacidadeBorda: '1',        // Adicionado: 100% opaco por padrão
+  estiloLinha: 'continua',
+  interfaceAtual: 'inicio', 
   elementosSelecionados: [],
+  espessuraLapis: 2,
 };
 
 let gerenciadorSelecaoVisual = null;
+let callbackPainelAlinhamento = null;
+
+
+export function definirEspessuraLapis(espessura) {
+  estado.espessuraLapis = Number(espessura);
+}
 
 export function definirGerenciadorSelecao(selecao) {
   gerenciadorSelecaoVisual = selecao;
+}
+
+export function definirCallbackPainelAlinhamento(fn) {
+  callbackPainelAlinhamento = fn;
+}
+
+function _notificarPainelAlinhamento() {
+  if (typeof callbackPainelAlinhamento === 'function') {
+    callbackPainelAlinhamento(estado.elementosSelecionados.length);
+  }
 }
 
 export function atualizarPosicaoSelecaoVisual() {
@@ -75,6 +96,10 @@ export function definirCorBorda(cor) {
   estado.corBorda = cor;
 }
 
+export function definirEstiloLinha(estilo) {
+  estado.estiloLinha = estilo;
+}
+
 /**
  * Define os elementos SVG atualmente selecionados.
  *
@@ -92,6 +117,11 @@ export function definirElementosSelecionados(elementos) {
   if (gerenciadorSelecaoVisual) {
     gerenciadorSelecaoVisual.desenhar(estado.elementosSelecionados);
   }
+
+  document.dispatchEvent(new CustomEvent('selecao-mudou', {
+    detail: { elementos: estado.elementosSelecionados }
+  }));
+  _notificarPainelAlinhamento();
 }
 
 /**
@@ -113,6 +143,10 @@ export function adicionarElementoSelecao(elemento) {
     if (gerenciadorSelecaoVisual) {
       gerenciadorSelecaoVisual.desenhar(estado.elementosSelecionados);
     }
+    document.dispatchEvent(new CustomEvent('selecao-mudou', {
+      detail: { elementos: estado.elementosSelecionados }
+    }));
+    _notificarPainelAlinhamento();
   }
 }
 
@@ -126,8 +160,58 @@ export function removerElementoSelecao(elemento) {
   if (gerenciadorSelecaoVisual) {
     gerenciadorSelecaoVisual.desenhar(estado.elementosSelecionados);
   }
+  document.dispatchEvent(new CustomEvent('selecao-mudou', {
+    detail: { elementos: estado.elementosSelecionados }
+  }));
+  _notificarPainelAlinhamento();
 }
 
 export function definirInterface(novaInterface) {
   estado.interfaceAtual = novaInterface;
+}
+
+let gerenciadorHistorico = null;
+
+/**
+ * Injeta a instância do HistoryManager no estado global.
+ * Chamado apenas uma vez pelo main.js.
+ */
+export function definirGerenciadorHistorico(manager) {
+  gerenciadorHistorico = manager;
+}
+
+/**
+ * Função global para as ferramentas avisarem que o canvas foi alterado.
+ */
+export function registrarAcaoHistorico() {
+  if (gerenciadorHistorico) {
+    gerenciadorHistorico.salvarEstado();
+  }
+}
+
+/**
+ * Funções para os atalhos de teclado (Ctrl+Z / Ctrl+Y) chamarem.
+ */
+export function desfazerAcao() {
+  if (gerenciadorHistorico) gerenciadorHistorico.desfazer();
+}
+
+export function refazerAcao() {
+  if (gerenciadorHistorico) gerenciadorHistorico.refazer();
+}
+
+/**
+ * Define a opacidade do preenchimento ativa.
+ * @param {string|number} opacidade - Valor entre '0' e '1'
+ */
+export function definirOpacidadePreenchimento(opacidade) {
+  estado.opacidadePreenchimento = String(opacidade);
+}
+
+/**
+ * Define a opacidade da borda ativa.
+ * @param {string|number} opacidade - Valor entre '0' e '1'
+ */
+export function definirOpacidadeBorda(opacidade) {
+  estado.opacidadeBorda = String(opacidade);
 }
