@@ -154,7 +154,16 @@
     <!-- Popup de cores: aparece ao selecionar um elemento -->
     <div id="popup-cores" aria-label="Propriedades de cor do objeto selecionado">
       <span class="popup-cores-label">Preenchimento</span>
+      <select id="popup-fill-tipo" class="popup-fill-tipo-select" title="Tipo de preenchimento">
+        <option value="solido">Sólida</option>
+        <option value="linear">Gradiente Linear</option>
+        <option value="radial">Gradiente Radial</option>
+      </select>
       <input type="color" id="popup-cor-preenchimento" title="Cor de preenchimento" />
+      <div class="popup-gradiente-cores oculto" id="popup-gradiente-cores">
+        <input type="color" id="popup-cor-gradiente-inicio" title="Cor inicial do gradiente" />
+        <input type="color" id="popup-cor-gradiente-fim" title="Cor final do gradiente" />
+      </div>
 
       <span class="popup-cores-separador"></span>
 
@@ -303,10 +312,39 @@
 
             <div class="color-control-group">
               <span class="grupo-titulo">Preenchimento:</span>
-              <div class="color-row">
+
+              <div class="fill-type-row" role="radiogroup" aria-label="Tipo de preenchimento">
+                <label>
+                  <input type="radio" name="tipo-preenchimento" id="tipo-preenchimento-solido" value="solido" checked />
+                  Sólida
+                </label>
+                <label>
+                  <input type="radio" name="tipo-preenchimento" id="tipo-preenchimento-linear" value="linear" />
+                  Gradiente Linear
+                </label>
+                <label>
+                  <input type="radio" name="tipo-preenchimento" id="tipo-preenchimento-radial" value="radial" />
+                  Gradiente Radial
+                </label>
+              </div>
+
+              <div class="color-row" id="preenchimento-solido-row">
                 <input type="color" id="cor-preenchimento" value="#4a90d9" />
                 <button id="btn-preenchimento-nenhum" class="btn-color-none" title="Sem preenchimento" aria-label="Remover preenchimento">
               </button>
+              </div>
+
+              <div class="color-row gradiente-row oculto" id="preenchimento-gradiente-row">
+                <label class="gradiente-stop-label">
+                  De
+                  <input type="color" id="cor-gradiente-inicio" value="#4a90d9" />
+                </label>
+                <label class="gradiente-stop-label">
+                  Para
+                  <input type="color" id="cor-gradiente-fim" value="#ffffff" />
+                </label>
+              </div>
+
               <div class="opacity-slider-wrapper">
                 <label>
                   Opacidade:
