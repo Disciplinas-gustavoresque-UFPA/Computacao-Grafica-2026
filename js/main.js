@@ -23,6 +23,7 @@ import {
   atualizarPosicaoSelecaoVisual,
   definirEspessuraLapis,
 } from "./core/StateManager.js";
+import { rgbToHex } from "./utils/colorHelpers.js";
 import { ColorPickerTool } from "./tools/ColorPickerTool.js";
 import { Lapis } from "./tools/LapisTool.js";
 import { RetanguloTool } from "./tools/RetanguloTool.js";
@@ -87,6 +88,11 @@ const btnImportarImagem = document.getElementById("btn-importar-imagem");
 const inputImagem = document.getElementById("input-imagem");
 const inputCorPreenchimento = document.getElementById("cor-preenchimento");
 const inputCorBorda = document.getElementById("cor-borda");
+const popupCores = document.getElementById("popup-cores");
+const popupCorPreenchimento = document.getElementById("popup-cor-preenchimento");
+const popupCorBorda = document.getElementById("popup-cor-borda");
+const popupStrokeWidth = document.getElementById("popup-stroke-width");
+const popupBotoesEstilo = document.querySelectorAll(".btn-estilo-borda");
 const botoesEstiloLinha = document.querySelectorAll(".btn-line-style");
 const nomeFerramenta = document.getElementById("nome-ferramenta");
 const btnExportar = document.getElementById("btn-exportar");
@@ -292,6 +298,107 @@ botoesFerramenta.forEach((btn) => {
   });
 });
 
+// --- Popup de Cores ---
+
+function normalizarCorHex(cor, fallback) {
+  if (!cor || cor === 'none' || cor === 'transparent') return fallback;
+  if (cor.startsWith('#')) return cor.length === 4
+    ? '#' + cor.slice(1).split('').map(c => c + c).join('')
+    : cor;
+  if (cor.startsWith('rgb')) return rgbToHex(cor);
+  return fallback;
+}
+
+function atualizarBotaoEstiloAtivo(estilo) {
+  popupBotoesEstilo.forEach(btn => {
+    btn.classList.toggle('ativo', btn.getAttribute('data-dash') === estilo);
+  });
+}
+
+function detectarEstiloBorda(el) {
+  const linecap = el.getAttribute('stroke-linecap');
+  const dash = el.getAttribute('stroke-dasharray');
+  if (linecap === 'round' && dash && dash.startsWith('0 ')) return 'dot';
+  if (!dash || dash === 'none') return 'none';
+  return dash;
+}
+
+function aplicarEstiloBorda(el, estilo) {
+  if (estilo === 'none') {
+    el.removeAttribute('stroke-dasharray');
+    el.removeAttribute('stroke-linecap');
+  } else if (estilo === 'dot') {
+    const sw = Math.max(1, Number(el.getAttribute('stroke-width') || 2));
+    el.setAttribute('stroke-linecap', 'round');
+    el.setAttribute('stroke-dasharray', `0 ${sw * 2.5}`);
+  } else {
+    el.setAttribute('stroke-dasharray', estilo);
+    el.removeAttribute('stroke-linecap');
+  }
+}
+
+function sincronizarInputsCores(elementos) {
+  const el = elementos[0];
+  const fill = normalizarCorHex(el.getAttribute('fill'), estado.corPreenchimento);
+  const stroke = normalizarCorHex(el.getAttribute('stroke'), estado.corBorda);
+  const strokeWidth = el.getAttribute('stroke-width') || '2';
+
+  popupCorPreenchimento.value = fill;
+  popupCorBorda.value = stroke;
+  inputCorPreenchimento.value = fill;
+  inputCorBorda.value = stroke;
+  popupStrokeWidth.value = strokeWidth;
+  atualizarBotaoEstiloAtivo(detectarEstiloBorda(el));
+
+  definirCorPreenchimento(fill);
+  definirCorBorda(stroke);
+}
+
+document.addEventListener('selecao-mudou', (e) => {
+  const elementos = e.detail.elementos;
+  if (elementos.length > 0) {
+    sincronizarInputsCores(elementos);
+    popupCores.classList.add('visivel');
+  } else {
+    popupCores.classList.remove('visivel');
+    popupCorPreenchimento.value = estado.corPreenchimento;
+    popupCorBorda.value = estado.corBorda;
+  }
+});
+
+popupCorPreenchimento.addEventListener('input', () => {
+  const novaCor = popupCorPreenchimento.value;
+  definirCorPreenchimento(novaCor);
+  inputCorPreenchimento.value = novaCor;
+  estado.elementosSelecionados.forEach(el => el.setAttribute('fill', novaCor));
+});
+
+popupCorBorda.addEventListener('input', () => {
+  const novaCor = popupCorBorda.value;
+  definirCorBorda(novaCor);
+  inputCorBorda.value = novaCor;
+  estado.elementosSelecionados.forEach(el => el.setAttribute('stroke', novaCor));
+});
+
+popupStrokeWidth.addEventListener('input', () => {
+  const largura = Math.max(0, Number(popupStrokeWidth.value));
+  estado.elementosSelecionados.forEach(el => {
+    el.setAttribute('stroke-width', largura);
+    // Pontilhado: recalcula o espaço entre pontos para manter a aparência
+    if (detectarEstiloBorda(el) === 'dot') {
+      el.setAttribute('stroke-dasharray', `0 ${Math.max(1, largura) * 2.5}`);
+    }
+  });
+});
+
+popupBotoesEstilo.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const estilo = btn.getAttribute('data-dash');
+    estado.elementosSelecionados.forEach(el => aplicarEstiloBorda(el, estilo));
+    atualizarBotaoEstiloAtivo(estilo);
+  });
+});
+
 // Ouvir mudanças no input de cor de preenchimento da sidebar
 inputCorPreenchimento.addEventListener("input", () => {
   const novaCor = inputCorPreenchimento.value;
@@ -467,6 +574,8 @@ svgCanvas.addEventListener("contextmenu", (e) => {
 // Inicializa os valores dos inputs com os valores padrão do estado
 inputCorPreenchimento.value = estado.corPreenchimento;
 inputCorBorda.value = estado.corBorda;
+popupCorPreenchimento.value = estado.corPreenchimento;
+popupCorBorda.value = estado.corBorda;
 atualizarBotaoEstiloLinhaAtivo(estado.estiloLinha);
 
 // Exportar / Salvar desenho
