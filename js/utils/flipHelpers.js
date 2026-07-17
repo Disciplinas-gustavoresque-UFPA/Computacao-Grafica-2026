@@ -108,7 +108,9 @@ export function espelharHorizontal(elemento) {
         tag === "rect" ||
         tag === "path" ||
         tag === "circle" ||
-        tag === "ellipse"
+        tag === "ellipse" ||
+        tag === "polygon" ||
+        (tag === "g" && elemento.dataset.shape === "pincel")
     ) {
         alternarEspelhamentoHorizontal(elemento);
         return;
@@ -140,7 +142,9 @@ export function espelharVertical(elemento) {
         tag === "rect" ||
         tag === "path" ||
         tag === "circle" ||
-        tag === "ellipse"
+        tag === "ellipse" ||
+        tag === "polygon" ||
+        (tag === "g" && elemento.dataset.shape === "pincel")
     ) {
         alternarEspelhamentoVertical(elemento);
         return;

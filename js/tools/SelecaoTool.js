@@ -25,6 +25,12 @@ export class SelecaoTool extends ToolBase {
 
     this.isSkewing = false;
     this.skewInicial = null;
+
+    // Adição de propriedades para seleção por marquee (arrasto de retângulo)
+    this.isSelecting = false;
+    this.selectionStart = null;
+    this.selectionEnd = null;
+    this.selectionRect = null; // elemento SVG que representa o marquee
   }
 
   /**
@@ -170,6 +176,31 @@ export class SelecaoTool extends ToolBase {
     };
     this.isSkewing = true;
   }
+  _limparMarquee() {
+    this.isSelecting = false;
+    this.selectionStart = null;
+    this.selectionEnd = null;
+    if (this.selectionRect) {
+      this.selectionRect.remove();
+      this.selectionRect = null;
+    }
+  }
+
+  onDblClick(evento) {
+    const target = evento.target;
+    if (target && target.tagName && target.tagName.toLowerCase() === 'text') {
+      // Alterna para a ferramenta de texto
+      const btnTexto = document.querySelector('.btn-ferramenta[data-ferramenta="texto"]');
+      if (btnTexto) {
+        btnTexto.click();
+        
+        // Passa o evento para a ferramenta de texto lidar com o clique
+        if (estado.ferramentaAtual && estado.ferramentaAtual.onMouseDown) {
+          estado.ferramentaAtual.onMouseDown(evento);
+        }
+      }
+    }
+  }
 
   onMouseDown(evento) {
     const target = evento.target;
@@ -204,6 +235,7 @@ export class SelecaoTool extends ToolBase {
     }
 
     if (elementoAlvo) {
+      this._limparMarquee();
       this._aplicarSelecaoComModificador(elementoAlvo, isShift, isCtrl);
 
       if (estado.elementosSelecionados.length > 0) {
@@ -213,6 +245,10 @@ export class SelecaoTool extends ToolBase {
       }
     } else if (!isShift && !isCtrl) {
       this.limparSelecao();
+      // Verifica se o clique foi em uma área vazia do canvas para iniciar a seleção por marquee
+      this.isSelecting = true;
+      this.selectionStart = pt;
+      this.selectionEnd = pt;
     }
   }
 
@@ -234,6 +270,39 @@ export class SelecaoTool extends ToolBase {
   }
 
   onMouseMove(evento) {
+    if (evento.buttons === 0 && (this.isSelecting || this.isDragging || this.isSkewing)) {
+      this.onMouseUp(evento);
+      return;
+    }
+    const pt = obterCoordenadaSVG(evento, this.svgCanvas);
+    
+    // Verifica se estamos no modo de seleção por marquee
+    if (this.isSelecting) {
+      this.selectionEnd = pt;
+
+      // atualizar retângulo visual
+      if (!this.selectionRect) {
+          this.selectionRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+
+          this.selectionRect.setAttribute("fill", "rgba(0,150,255,0.2)");
+          this.selectionRect.setAttribute("stroke", "rgba(0,150,255,0.8)");
+          this.selectionRect.setAttribute("stroke-dasharray", "5,5");
+
+          this.svgCanvas.appendChild(this.selectionRect);
+      }
+
+      const x = Math.min(this.selectionStart.x, this.selectionEnd.x);
+      const y = Math.min(this.selectionStart.y, this.selectionEnd.y);
+      const w = Math.abs(this.selectionEnd.x - this.selectionStart.x);
+      const h = Math.abs(this.selectionEnd.y - this.selectionStart.y);
+
+      this.selectionRect.setAttribute("x", x);
+      this.selectionRect.setAttribute("y", y);
+      this.selectionRect.setAttribute("width", w);
+      this.selectionRect.setAttribute("height", h);
+      // atualizar retângulo visual
+      return;
+    }
     if (this.isSkewing) {
       this._aplicarSkew(evento);
       return;
@@ -241,7 +310,6 @@ export class SelecaoTool extends ToolBase {
 
     if (!this.isDragging || estado.elementosSelecionados.length === 0) return;
 
-    const pt = obterCoordenadaSVG(evento, this.svgCanvas);
 
     estado.elementosSelecionados.forEach((el, index) => {
       const offset = this.offsets[index];
@@ -327,8 +395,59 @@ export class SelecaoTool extends ToolBase {
 
     atualizarPosicaoSelecaoVisual();
   }
+  /**
+   * Verifica se o elemento (bbox) está completamente contido na seleção (rectSelecao)
+   * @private
+   */
+  _contem(rectSelecao, bbox) {
+      return (
+          bbox.x >= rectSelecao.x &&
+          bbox.y >= rectSelecao.y &&
+          (bbox.x + bbox.width) <= (rectSelecao.x + rectSelecao.w) &&
+          (bbox.y + bbox.height) <= (rectSelecao.y + rectSelecao.h)
+      );
+  }
 
   onMouseUp(evento) {
+    // Vefica se estamos no modo de seleção por marquee
+    if (this.isSelecting) {
+
+      // normaliza o retângulo
+      const rectSelecao = {
+        x: Math.min(this.selectionStart.x, this.selectionEnd.x),
+        y: Math.min(this.selectionStart.y, this.selectionEnd.y),
+        w: Math.abs(this.selectionEnd.x - this.selectionStart.x),
+        h: Math.abs(this.selectionEnd.y - this.selectionStart.y)
+      };
+
+      const selecionados = [];
+      const allowedTags = ['rect', 'text', 'image', 'circle', 'ellipse', 'g', 'path', 'line', 'polygon'];
+      
+      const elementos = this.svgCanvas.querySelectorAll(allowedTags.join(','));
+
+      elementos.forEach(elemento => {
+          // Ignora o próprio retângulo do marquee
+          if (elemento === this.selectionRect) return;
+
+          // Verifica se há colisão
+          if (this._contem(rectSelecao, elemento.getBBox())) {
+              
+              // Passa pelo filtro para pegar o elemento correto 
+              // (Ex: pega o 'grupo mestre', ignora o elemento id='canvas')
+              const elementoValido = this._buscarElementoValido(elemento, allowedTags);
+              
+              // Evita duplicatas se vários filhos de um mesmo <g> colidirem
+              if (elementoValido && !selecionados.includes(elementoValido)) {
+                  selecionados.push(elementoValido);
+              }
+          }
+      });
+
+      definirElementosSelecionados(selecionados);
+      this._limparMarquee();
+
+      return;
+    }
     if (this.isSkewing) {
       const houveSkew = this.skewInicial && this.skewInicial.elementos.some(({ el, kXInicial, kYInicial }) => {
         const skewItem = this._obterMatrizSkew(el);
@@ -389,6 +508,7 @@ export class SelecaoTool extends ToolBase {
     this.estadoInicialMovimento = null;
     this.isSkewing = false;
     this.skewInicial = null;
+    this._limparMarquee();
     definirElementosSelecionados([]);
   }
 
