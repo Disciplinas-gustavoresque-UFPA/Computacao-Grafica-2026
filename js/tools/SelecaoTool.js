@@ -524,7 +524,7 @@ export class SelecaoTool extends ToolBase {
         x = parseFloat(el.getAttribute('x') || 0);
         y = parseFloat(el.getAttribute('y') || 0);
       } else if (tag === 'polygon') {
-        if (el.dataset.shape === 'losango') {
+        if (el.dataset.shape === 'losango' || el.dataset.shape === 'regular-polygon') {
         x = parseFloat(el.getAttribute('x') || 0);
         y = parseFloat(el.getAttribute('y') || 0);
       } else {
@@ -564,7 +564,7 @@ export class SelecaoTool extends ToolBase {
         yAtual = parseFloat(el.getAttribute('y') || 0);
       } 
       else if (tag === 'polygon') {
-          if (el.dataset.shape === 'losango') {
+          if (el.dataset.shape === 'losango' || el.dataset.shape === 'regular-polygon') {
           xAtual = parseFloat(el.getAttribute('x') || 0);
           yAtual = parseFloat(el.getAttribute('y') || 0);
         } else {
@@ -729,7 +729,7 @@ export class SelecaoTool extends ToolBase {
         elX = parseFloat(el.getAttribute('x') || 0);
         elY = parseFloat(el.getAttribute('y') || 0);
       }else if (tag === 'polygon') {
-        if (el.dataset.shape === 'losango') {
+        if (el.dataset.shape === 'losango' || el.dataset.shape === 'regular-polygon') {
         elX = parseFloat(el.getAttribute('x') || 0);
         elY = parseFloat(el.getAttribute('y') || 0);
       } else {

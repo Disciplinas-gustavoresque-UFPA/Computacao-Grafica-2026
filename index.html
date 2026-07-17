@@ -50,6 +50,20 @@
           >Ferramenta:
           <strong id="nome-ferramenta">Nenhuma selecionada</strong>
         </span>
+        <!--'Box para escolher o numero de lados do poligono regular'-->
+        <div id="config-poligono-regular" class="config-ferramenta oculto">
+          <label for="input-numero-lados">
+            Lados:
+          </label>
+          <input 
+            id="input-numero-lados"
+            type="number"
+            min="3"
+            max="20"
+            value="6"
+            title="Número de lados do polígono regular"
+          >
+        </div>
         <!-- Botões de Desfazer/Refazer -->
         <div class="history-controls">
           <button
@@ -407,6 +421,9 @@
           <i class="ti ti-spiral"></i>
         </button>
         <button id="btn-criar-polilinha" class="btn-ferramenta" data-ferramenta="poligono" data-nome="Polígono / Polilinha" data-tooltip="Polígono / Polilinha (G)" title="Polígono / Polilinha (G)">
+          <i class="ti ti-polygon"></i>
+        </button>
+        <button id="btn-criar-PoligonoRegular" class="btn-ferramenta" data-ferramenta="poligonoRegular" data-nome="Polígono Regular" data-tooltip="Polígono Regular (K)" title="Polígono Regular (K)">
           <i class="ti ti-polygon"></i>
         </button>
         <button id="btn-criar-texto" class="btn-ferramenta" data-ferramenta="texto" data-nome="Texto" data-tooltip="Texto (T)" title="Texto (T)">

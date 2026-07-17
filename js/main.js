@@ -45,6 +45,7 @@ import { LupaTool } from "./tools/LupaTool.js";
 import { inicializarImportadorImagem } from "./tools/ImageImporter.js";
 import { inicializarMenuInicial } from "./core/UIManager.js";
 import { duplicarElemento } from "./utils/duplicateHelpers.js";
+import { PoligonoRegularTool } from './tools/PoligonoRegularTool.js';
 import { PoligonoPolilinhaTool } from "./tools/PoligonoPolilinhaTool.js";
 import { inicializarMenuContexto } from "./contextMenu/index.js";
 import { SideBar } from "./core/SideBar.js";
@@ -98,6 +99,7 @@ const btnImportarImagem = document.getElementById("btn-importar-imagem");
 const inputImagem = document.getElementById("input-imagem");
 const inputCorPreenchimento = document.getElementById("cor-preenchimento");
 const inputCorBorda = document.getElementById("cor-borda");
+const inputNumeroLados = document.getElementById('numero-lados'); // numero de lados para o poligono regular
 
 // Controles de tipo de preenchimento (sólido / gradiente linear / gradiente radial)
 const radiosTipoPreenchimento = document.querySelectorAll('input[name="tipo-preenchimento"]');
@@ -275,6 +277,7 @@ const instanciasFerramentas = {
   linhaCurvada: new LinhaCurvadaTool(svgCanvas),
   bezier: new BezierTool(svgCanvas),
   poligono: new PoligonoPolilinhaTool(svgCanvas),
+  poligonoRegular: new PoligonoRegularTool(svgCanvas),
   elipse: new ElipseTool(svgCanvas),
   espiral: new EspiralTool(svgCanvas),
   "Conta-gotas": new ColorPickerTool(svgCanvas),
@@ -869,6 +872,22 @@ popupCorPreenchimento.value = estado.corPreenchimento;
 popupCorBorda.value = estado.corBorda;
 atualizarBotaoEstiloLinhaAtivo(estado.estiloLinha);
 
+// Ouvir mudanças no input de número de lados do polígono regular
+inputNumeroLados.addEventListener('input', () => {
+
+    let lados = parseInt(inputNumeroLados.value);
+
+    if (isNaN(lados))
+        lados = 3;
+
+    lados = Math.max(3, Math.min(30, lados));
+
+    inputNumeroLados.value = lados;
+
+    estado.numeroLados = lados;
+
+});
+
 // Exportar / Salvar desenho
 btnExportar.addEventListener("click", () => {
   const formato = exportFormat.value || "png";
@@ -1060,6 +1079,7 @@ window.addEventListener("keydown", (e) => {
     l: "linha",
     c: "linhaCurvada",
     g: "poligono",
+    k: "poligonoRegular",
     p: "lapis",
     t: "texto",
     i: "Conta-gotas",

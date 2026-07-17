@@ -25,6 +25,7 @@ export const estado = {
   elementosSelecionados: [],
   espessuraLapis: 2,
   coresRecentes: [],
+  numeroLados: 6 // novo estado para o número de lados do polígono regular
 };
 
 let gerenciadorSelecaoVisual = null;

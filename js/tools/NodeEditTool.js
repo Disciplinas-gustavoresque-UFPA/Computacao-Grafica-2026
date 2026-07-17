@@ -3,6 +3,7 @@ import { obterCoordenadaSVG } from '../utils/svgHelpers.js';
 import { RetanguloShape } from '../shape/RetanguloShape.js';
 import { ElipseShape } from '../shape/ElipseShape.js';
 import { LinhaCurvadaShape } from '../shape/LinhaCurvadaShape.js';
+import { PoligonoRegularShape } from '../shape/PoligonoRegularShape.js';
 import { LosangoShape } from '../shape/LosangoShape.js';
 import { registrarAcaoHistorico } from '../core/StateManager.js';
 
@@ -25,6 +26,7 @@ export class NodeEditTool extends ToolBase {
             'image': new RetanguloShape(svgCanvas), // Image possui as mesmas propriedades de retangulos
             'linhaCurvada': new LinhaCurvadaShape(svgCanvas),
             'losango': new LosangoShape(svgCanvas),
+            'poligonoRegular': new PoligonoRegularShape(svgCanvas)
         }
     }
 
@@ -40,9 +42,16 @@ export class NodeEditTool extends ToolBase {
         }
 
         if (tag === 'polygon') {
-            return elemento.dataset && elemento.dataset.shape === 'losango'
-                ? 'losango'
-                : null;
+
+            if (elemento.dataset.shape === 'losango') {
+                return 'losango';
+            }
+
+            if (elemento.dataset.shape === 'regular-polygon') {
+                return 'poligonoRegular';
+            }
+
+            return null;
         }
 
         return Object.prototype.hasOwnProperty.call(this.allowedShapes, tag) ? tag : null;
