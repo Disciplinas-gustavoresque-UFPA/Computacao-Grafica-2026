@@ -256,7 +256,9 @@
           >
             📏
           </button>
-        </div>
+          
+        <button id="btn-toggle-grid" data-tooltip="Mostar/ocultar Grid" class="btn-layer" title="Mostar/ocultar Réguas">#</button>
+      </div>
         <!-- Botão de Primeiros Passos -->
         <button id="btn-primeiros-passos" class="btn-ajuda">
           <i class="btn-primeiros-passos-i" data-lucide="info"></i>
@@ -469,6 +471,34 @@
         </nav>
 
         <div class="tabs-container">
+
+        </div>
+
+        <div id="tab-grid" class="tab-content ativo">
+            <h3>Guia de Layout (Grid)</h3>
+            
+            <div class="color-control-group">
+              <label>Tipo:
+                <select id="grid-type" class="select-format" style="width: 100%; margin-top: 5px;">
+                  <option value="uniform" selected>Grid Uniforme</option>
+                  <option value="column">Colunas</option>
+                  <option value="row">Linhas</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="color-control-group">
+              <label>Tamanho: <input type="number" id="grid-size" value="50" style="width: 60px;" /></label>
+            </div>
+
+            <div class="color-control-group">
+              <label>Cor: <input type="color" id="grid-color" value="#ff4a4a" /></label>
+              <div class="opacity-slider-wrapper">
+                <label>Opacidade: <input type="range" id="grid-opacity" min="0" max="1" step="0.1" value="0.2" /></label>
+              </div>
+            </div>
+          </div>
+
           <div id="tab-estilo" class="tab-content ativo">
             <h3>Estilo do Objeto</h3>
 

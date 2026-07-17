@@ -1243,6 +1243,44 @@ input[type="range"]::-moz-range-thumb {
   height: 100%;
 }
 
+#grid-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  display: none;
+}
+
+#grid-overlay.ativo {
+  display: block;
+}
+
+.grid-uniform {
+  background-image: 
+    linear-gradient(to right, var(--cor-grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--cor-grid) 1px, transparent 1px);
+}
+.grid-column {
+  background-image: linear-gradient(to right, var(--cor-grid) 0, var(--cor-grid) calc(100% - 10px), transparent calc(100% - 10px), transparent 100%);
+}
+.grid-row {
+  background-image: linear-gradient(to bottom, var(--cor-grid) 0, var(--cor-grid) calc(100% - 10px), transparent calc(100% - 10px), transparent 100%);
+}
+
+#barra-configuracoes .select-format{
+  color:#fff;
+  border: #ccc;
+  background-color: #0f3460;
+}
+
+#barra-configurações .select-format option {
+  background-color: #fff;
+  color: #0f3460;
+}
+
 .btn-ferramenta i.ti {
   font-size: 20px;
   line-height: 1;

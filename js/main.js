@@ -57,6 +57,7 @@ import { Regua } from "./core/Regua.js";
 import { LosangoTool } from "./tools/LosangoTool.js";
 import { agruparElementos, desagruparElementos } from "./core/GroupManager.js";
 import { espelharHorizontal, espelharVertical } from "./utils/flipHelpers.js";
+import { GridManager } from './core/GridManager.js'
 import {
   alinharEsquerda,
   alinharCentroHorizontal,
@@ -243,6 +244,33 @@ if (btnToggleRegua) {
     const ativa = regua.alternar();
     btnToggleRegua.classList.toggle("ativo", ativa);
   });
+}
+
+// Grid
+const gridManager = new GridManager(canvasContainer);
+const btnToggleGrid = document.getElementById('btn-toggle-grid');
+const selectGridType = document.getElementById('grid-type');
+const inputGridSize = document.getElementById('grid-size');
+const inputGridColor = document.getElementById('grid-color');
+const inputGridOpacity = document.getElementById('grid-opacity');
+
+if (btnToggleGrid) {
+  btnToggleGrid.addEventListener('click', () => {
+    const isAtivo = gridManager.alternar();
+    btnToggleGrid.classList.toggle('ativo', isAtivo);
+  });
+}
+
+if (selectGridType) {
+  selectGridType.addEventListener('change', (e) => gridManager.atualizarConfig('tipo', e.target.value));
+
+  inputGridSize.addEventListener('change', (e) => {
+    gridManager.atualizarConfig('tamanho', parseInt(e.target.value) || 1);
+    e.target.value = gridManager.config.tamanho;  inputGridColor.addEventListener('input', (e) => gridManager.atualizarConfig('corHex', e.target.value));
+  });
+
+    inputGridColor.addEventListener('input', (e) => gridManager.atualizarConfig('corHex', e.target.value));
+  inputGridOpacity.addEventListener('input', (e) => gridManager.atualizarConfig('opacidade', parseFloat(e.target.value)));
 }
 
 // Sincronizar viewBox entre canvas principal e overlay quando necessário
