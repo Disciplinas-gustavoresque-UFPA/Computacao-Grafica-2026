@@ -1015,6 +1015,7 @@ window.addEventListener("keydown", (e) => {
     const mapaTeclasShift = {
       c: "bezier",
       e: "espiral",
+      s: "estrela",
     };
 
     if (teclaPressionada === "z") {
