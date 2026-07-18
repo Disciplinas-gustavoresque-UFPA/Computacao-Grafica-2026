@@ -4,6 +4,7 @@ import { RetanguloShape } from '../shape/RetanguloShape.js';
 import { ElipseShape } from '../shape/ElipseShape.js';
 import { LinhaCurvadaShape } from '../shape/LinhaCurvadaShape.js';
 import { LosangoShape } from '../shape/LosangoShape.js';
+import { PolygonShape } from '../shape/PolygonShape.js';
 import { registrarAcaoHistorico } from '../core/StateManager.js';
 
 /**
@@ -25,6 +26,7 @@ export class NodeEditTool extends ToolBase {
             'image': new RetanguloShape(svgCanvas), // Image possui as mesmas propriedades de retangulos
             'linhaCurvada': new LinhaCurvadaShape(svgCanvas),
             'losango': new LosangoShape(svgCanvas),
+            'polygon': new PolygonShape(svgCanvas),
         }
     }
 
@@ -40,9 +42,11 @@ export class NodeEditTool extends ToolBase {
         }
 
         if (tag === 'polygon') {
-            return elemento.dataset && elemento.dataset.shape === 'losango'
-                ? 'losango'
-                : null;
+            if (elemento.dataset?.shape === 'losango') {
+                return 'losango';
+            }
+
+            return 'polygon';
         }
 
         return Object.prototype.hasOwnProperty.call(this.allowedShapes, tag) ? tag : null;

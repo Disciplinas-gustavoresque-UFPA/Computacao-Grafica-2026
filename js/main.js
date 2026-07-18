@@ -41,6 +41,7 @@ import { LinhaCurvadaTool } from "./tools/LinhaCurvadaTool.js";
 import { BezierTool } from "./tools/BezierTool.js";
 import { ElipseTool } from "./tools/ElipseTool.js";
 import { EspiralTool } from "./tools/EspiralTool.js";
+import { StarTool } from './tools/StarTool.js';
 import { LupaTool } from "./tools/LupaTool.js";
 import { inicializarImportadorImagem } from "./tools/ImageImporter.js";
 import { inicializarMenuInicial } from "./core/UIManager.js";
@@ -305,6 +306,7 @@ const instanciasFerramentas = {
   poligono: new PoligonoPolilinhaTool(svgCanvas),
   elipse: new ElipseTool(svgCanvas),
   espiral: new EspiralTool(svgCanvas),
+  estrela: new StarTool(svgCanvas),
   "Conta-gotas": new ColorPickerTool(svgCanvas),
   lupa: new LupaTool(svgCanvas, overlayCanvas, cameraGlobal),
   texto: new TextoTool(svgCanvas),
@@ -1041,6 +1043,7 @@ window.addEventListener("keydown", (e) => {
     const mapaTeclasShift = {
       c: "bezier",
       e: "espiral",
+      s: "estrela",
     };
 
     if (teclaPressionada === "z") {
