@@ -11,6 +11,8 @@
  * - estiloLinha {string}            - Estilo visual usado pela ferramenta de linha.
  * - elementosSelecionados {SVGElement[]} - Elementos SVG atualmente selecionados.
  * - interfaceAtual {string}         - Flag para sabermos a tela onde o usuário está.
+ * - areaPagina {Object}            - Área da página (x, y, width, height).
+ * - espessuraLapis {number}        - Espessura do traço da ferramenta lápis.
  */
 
 /** @type {{ ferramentaAtual: import('../tools/ToolBase.js').ToolBase|null, corPreenchimento: string, corBorda: string, opacidadePreenchimento: string, opacidadeBorda: string, estiloLinha: string, elementosSelecionados: SVGElement[], interfaceAtual: string }} */
@@ -23,6 +25,7 @@ export const estado = {
   estiloLinha: 'continua',
   interfaceAtual: 'inicio', 
   elementosSelecionados: [],
+  areaPagina: { x: 0, y: 0, width: 800, height: 1131 },
   espessuraLapis: 2,
   coresRecentes: [],
 };
@@ -171,7 +174,21 @@ export function definirInterface(novaInterface) {
   estado.interfaceAtual = novaInterface;
 }
 
+let callbackRecalculo = null;
 let gerenciadorHistorico = null;
+
+/**
+ * Define a área da página (região imprimível/exportável).
+ * Dispara recálculo de status de todos os elementos.
+ *
+ * @param {{ x: number, y: number, width: number, height: number }} area
+ */
+export function definirAreaPagina(area) {
+  estado.areaPagina = { ...area };
+  if (typeof callbackRecalculo === 'function') {
+    callbackRecalculo();
+  }
+}
 
 /**
  * Injeta a instância do HistoryManager no estado global.
@@ -188,6 +205,22 @@ export function registrarAcaoHistorico() {
   if (gerenciadorHistorico) {
     gerenciadorHistorico.salvarEstado();
   }
+}
+
+/**
+ * Retorna a área atual da página.
+ * @returns {{ x: number, y: number, width: number, height: number }}
+ */
+export function obterAreaPagina() {
+  return { ...estado.areaPagina };
+}
+
+/**
+ * Registra uma função de callback chamada quando a área da página muda.
+ * @param {Function} cb
+ */
+export function onAreaPaginaMudou(cb) {
+  callbackRecalculo = cb;
 }
 
 /**
